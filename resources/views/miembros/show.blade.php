@@ -46,17 +46,14 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="file">Fotografía</label><br>
-
                                 @if($miembro->fotografia == '')
-                                    @if($miembro->genero == 'MASCULINO')
-                                        <center>
+                                    <center>
+                                        @if($miembro->genero == 'MASCULINO')
                                             <img src="{{url('images/hombre.png')}}" width="100" alt="">
-                                        </center>
-                                     @else
-                                        <center>
+                                        @else
                                             <img src="{{url('images/mujer.png')}}" width="100" alt="">
-                                        </center>
-                                     @endif
+                                        @endif
+                                    <center>
                                 @else
                                     <center>
                                         <img src="{{asset('storage').'/'.$miembro->fotografia}}" width="100" alt="">

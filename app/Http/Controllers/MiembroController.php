@@ -63,4 +63,9 @@ class MiembroController extends Controller
         $miembro = Miembro::findOrFail($id);
         return view('miembros.show', compact('miembro'));
     }
+
+    public function edit($id){
+        $miembro = Miembro::findOrFail($id);
+        return view('miembros.edit', compact('miembro'));
+    }
 }

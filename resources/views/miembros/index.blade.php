@@ -54,8 +54,8 @@
                             <td style="text-align: center;">
                                 <div class="btn-group" role="group" aria-label="Basic example">
                                     <a href="{{ route('miembros.show', $miembro->id) }}" type="button" class="btn btn-info"><i class="bi bi-eye"></i></a>
-                                    <button type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i></button>
-                                    <button type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i></button>
+                                    <a href="{{ route('miembros.edit', $miembro->id) }}" type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i></a>
+                                    <a href="{{ route('miembros.destroy', $miembro->id) }}" type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
                                 </div>
                             </td>
                         </tr>

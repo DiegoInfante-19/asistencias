@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="content">
+<div class="content" style="margin-left: 20px;">
     <h1>Crear Miembro</h1>
 
 
@@ -28,38 +28,30 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="nombre_apellido">Nombres y Apellidos*</label>
-                                            <input type="text" class="form-control" id="nombre_apellido" name="nombre_apellido" required>
-                                            @error('nombre_apellido')
-                                            <small class="text-danger">Este campo es obligatorio</small>
-                                            @enderror
+                                            <input type="text" class="form-control" id="nombre_apellido" value="{{ old('nombre_apellido') }}" required>
+                                            
 
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="email">Email*</label>
-                                            <input type="email" class="form-control" id="email" name="email" required>
-                                            @error('email')
-                                            <small class="text-danger">Este campo es obligatorio</small>
-                                            @enderror
+                                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required>
+                                            
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="telefono">Telefono*</label>
-                                            <input type="number" class="form-control" id="telefono" name="telefono" required>
-                                            @error('telefono')
-                                            <small class="text-danger">Este campo es obligatorio</small>
-                                            @enderror
+                                            <input type="number" class="form-control" id="telefono" name="telefono" value="{{ old('telefono') }}" required>
+                                            
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="fecha_nacimiento">Fecha de Nacimiento*</label>
-                                            <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
-                                            @error('fecha_nacimiento')
-                                            <small class="text-danger">Este campo es obligatorio</small>
-                                            @enderror
+                                            <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" required>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -106,26 +98,26 @@
 
                             <div class="col-md-8">
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-3"> 
                                         <div class="form-group">
                                             <label for="genero">Genero*</label>
                                             <select class="form-control" id="genero" name="genero">
                                                 <option value="">Seleccione una opción</option>
-                                                <option value="masculino">Masculino</option>
-                                                <option value="femenino">Femenino</option>
+                                                <option value="MASCULINO">Masculino</option>
+                                                <option value="FEMENINO" >Femenino</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="ministerio">Ministerio*</label>
-                                            <input type="text" class="form-control" id="ministerio" name="ministerio">
+                                            <input type="text" class="form-control" id="ministerio" name="ministerio" value="{{ old('ministerio') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="direccion">Direccion*</label>
-                                            <input type="text" class="form-control" id="direccion" name="direccion">
+                                            <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion') }}">
                                         </div>
                                     </div>
                                 </div>
