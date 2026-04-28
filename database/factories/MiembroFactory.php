@@ -19,16 +19,16 @@ class MiembroFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre_apellido' => Str::random(length: 10),
-            'direccion' => Str::random(length: 50),
-            'telefono' => random_int(70000000, max: 79999999),
-            'fecha_nacimiento' => '1999-01-01',
+            'nombre_apellido' => fake()->name,
+            'direccion' => fake()->address,
+            'telefono' => fake()->phoneNumber,
+            'fecha_nacimiento' => fake()->date($format = 'Y-m-d', $max = 'now'),
             'genero' =>'MASCULINO',
-            'email' =>Str::random(length: 10).'@gmail.com',
+            'email' => fake()->unique()->safeEmail,
             'estado' =>'1',
             'ministerio' =>'pastoral',
             'fotografia' =>'Freddy.jpg',
-            'fecha_ingreso' =>'1999-01-01',
+            'fecha_ingreso' => fake()->date($format = 'Y-m-d', $max = 'now'),
         ];
     }
 }

@@ -68,4 +68,43 @@ class MiembroController extends Controller
         $miembro = Miembro::findOrFail($id);
         return view('miembros.edit', compact('miembro'));
     }
+
+    public function update(Request $request, $id){
+        $request->validate([
+            'nombre_apellido' => 'required',
+            'direccion' => 'required',
+            'telefono' => 'required',
+            'fecha_nacimiento' => 'required',
+            'genero' => 'required',
+            'email' => 'required',
+            'ministerio' => 'required',
+        ]);
+
+        $miembro = Miembro::findOrFail($id);
+        $miembro->nombre_apellido = $request->nombre_apellido;
+        $miembro->direccion = $request->direccion;
+        $miembro->telefono = $request->telefono;
+        $miembro->fecha_nacimiento = $request->fecha_nacimiento;
+        $miembro->genero = $request->genero;
+        $miembro->email = $request->email;
+        $miembro->ministerio = $request->ministerio;
+
+        if ($request->hasFile('fotografia')) {
+            if ($miembro->fotografia) {
+                Storage::disk('public')->delete($miembro->fotografia);
+            }
+            $miembro->fotografia = $request->file('fotografia')->store('fotografias_miembros', 'public');
+        }
+
+        $miembro->save();
+        return redirect()->route('miembros.index')->with('mensaje', 'Se actualizo el miembro exitosamente.');
+    }
+
+    public function destroy($id){
+         $miembro = Miembro::findOrFail($id);
+        Miembro::destroy($id);
+        Storage::disk('public')->delete($miembro->fotografia);
+        return redirect()->route('miembros.index')->with('mensaje', 'Miembro eliminado exitosamente.');
+    }
+
 }

@@ -1,6 +1,8 @@
 @extends('layouts.admin')
 @section('content')
-<h1>Listado de Miembros</h1>
+
+<div class="content" style="margin-left: 20px;">
+    <h1>Listado de Ministerios</h1>
 
 @if($message = Session::get('mensaje'))
 <script>
@@ -16,11 +18,11 @@
     <div class="col-md-12">
         <div class="card card-outline card-primary">
             <div class="card-header">
-                <h3 class="card-title">Miembros Registrados</h3>
+                <h3 class="card-title">Ministerios Registrados</h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool">
-                        <a href="{{url('/miembros/create')}}" class="btn btn-primary">
-                            <i class="bi bi-person-fill-add"></i> Agregar nuevo miembro
+                        <a href="{{url('/ministerios/create')}}" class="btn btn-primary">
+                            <i class="bi bi-person-fill-add"></i> Agregar nuevo Ministerio
                         </a>
                     </button>
                 </div>
@@ -28,43 +30,39 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body" style="display: block;">
-                <table id="example1" class="table table-bordered table-striped">
+                <table id="example2" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>Nro</th>
-                            <th>Nombres y Apellidos</th>
-                            <th>Telefonos</th>
-                            <th>Email</th>
+                            <th>Nombre del ministerio</th>
+                            <th>Descripcion</th>
                             <th>Estado</th>
-                            <th>Agregado</th>
+                            <th>Fecha de ingreso</th>
                             <th>Accion</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $contador = 0; ?>
-                        @foreach ($miembros as $miembro)
+                        @foreach ($ministerios as $ministerio)
                         <tr>
                             <td><?php echo $contador = $contador + 1; ?></td>
-                            <td>{{ $miembro->nombre_apellido}}</td>
-                            <td>{{ $miembro->telefono}}</td>
-                            <td>{{ $miembro->email}}</td>
+                            <td>{{ $ministerio->nombre_ministerio}}</td>
+                            <td>{!!$ministerio->descripcion!!}</td>
                             <td style=" text-align: center;">
                                 <button class="btn btn-success btn-sm" >Activo</button>
                             </td>
-                            <td>{{ $miembro->fecha_ingreso}}</td>
+                            <td>{{ $ministerio->fecha_ingreso}}</td>
                             <td style="text-align: center;">
                                 <div class="btn-group" role="group" aria-label="Basic example">
-                                    <a href="{{ route('miembros.show',    $miembro->id) }}" type="button" class="btn btn-info"><i class="bi bi-eye"></i></a>
-                                    <a href="{{ route('miembros.edit',    $miembro->id) }}" type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i></a>
-                                    
-                                    <form action="{{url('miembros', $miembro->id)}}" method="post">
+                                    <a href="{{ route('ministerios.show', $ministerio->id) }}" type="button" class="btn btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ route('ministerios.edit', $ministerio->id) }}" type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i></a>
+                                    <form action="{{url('ministerios', $ministerio->id)}}" method="post">
                                         @csrf
                                         {{method_field('DELETE')}}
-                                        <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este miembro?')" class="btn btn-danger" value="">
+                                        <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este ministerio?')" class="btn btn-danger" value="">
                                             <i class="bi bi-trash-fill"></i>
                                         </button> 
                                     </form>
-
                                 </div>
                             </td>
                         </tr>
@@ -73,11 +71,10 @@
                     <tfoot>
                         <tr>
                             <th>Nro</th>
-                            <th>Nombres y Apellidos</th>
-                            <th>Telefonos</th>
-                            <th>Email</th>
+                            <th>Nombre del ministerio</th>
+                            <th>Descripcion</th>
                             <th>Estado</th>
-                            <th>Agregado</th>
+                            <th>Fecha de ingreso</th>
                             <th>Accion</th>
                         </tr>
                     </tfoot>

@@ -28,6 +28,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <!-- CKEditor -->
+  <script src="https://cdn.ckeditor.com/4.20.1/standard/ckeditor.js"></script>
+
+
+
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -198,8 +203,32 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+
             <li class="nav-item menu-open">
-              <a href="" class="nav-link active">
+              <a href="" class="nav-link ">
+                <i class="bi bi-building"></i>
+                Ministerios
+                <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{{ url('ministerios/create') }}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Nuevo Ministerio</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{ url('ministerios') }}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Listado de Ministerios</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <li class="nav-item menu-open">
+              <a href="" class="nav-link ">
                 <i class="bi bi-people-fill"></i>
                 Miembros
                 <i class="right fas fa-angle-left"></i>
@@ -207,7 +236,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{ url('miembros/create') }}" class="nav-link active">
+                  <a href="{{ url('miembros/create') }}" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Nuevo Miembro</p>
                   </a>
@@ -220,6 +249,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </li>
               </ul>
             </li>
+
+
             <li class="nav-item">
 
               <a class="nav-link" href="{{ route('logout') }}"
@@ -308,12 +339,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
         "language": {
           "decimal": "",
           "emptyTable": "No hay información",
-          "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
-          "infoEmpty": "Mostrando 0 a 0 de 0 registros",
-          "infoFiltered": "(Filtrado de _MAX_ registros totales)",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Miembros",
+          "infoEmpty": "Mostrando 0 a 0 de 0 miembros",
+          "infoFiltered": "(Filtrado de _MAX_ miembros totales)",
           "infoPostFix": "",
           "thousands": ",",
-          "lengthMenu": "Mostrar _MENU_ registros",
+          "lengthMenu": "Mostrar _MENU_ miembros",
           "loadingRecords": "Cargando...",
           "processing": "Procesando...",
           "search": "Buscar:",
@@ -338,6 +369,49 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
   </script>
+
+  <script>
+    $(function() {
+      // Solo UNA inicialización para #example2
+      $("#example2").DataTable({
+        "responsive": true,
+        "lengthChange": true,
+        "autoWidth": false,
+        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+        "language": {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Ministerios",
+          "infoEmpty": "Mostrando 0 a 0 de 0 ministerios",
+          "infoFiltered": "(Filtrado de _MAX_ ministerios totales)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ ministerios",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Último",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          },
+          "buttons": {
+            "copy": "Copiar",
+            "colvis": "Visibilidad",
+            "print": "Imprimir",
+            "copyTitle": "Copiado al portapapeles",
+            "copySuccess": {
+              "_": "%d filas copiadas",
+              "1": "1 fila copiada"
+            }
+          }
+        }
+      }).buttons().container().appendTo('#example2_wrapper .col-md-6:eq(0)');
+    });
+  </script>
+
 </body>
 
 </html>
