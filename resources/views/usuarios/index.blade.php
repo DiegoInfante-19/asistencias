@@ -2,9 +2,9 @@
 @section('content')
 
 <div class="content" style="margin-left: 20px;">
-    <h1>Listado de Ministerios</h1>
+    <h1>Listado de Usuarios</h1>
 
-@if($message = Session::get('mensaje'))
+@if($message = Session::get('success'))
 <script>
     Swal.fire({
         title: "{{$message}}",
@@ -18,11 +18,11 @@
     <div class="col-md-12">
         <div class="card card-outline card-primary">
             <div class="card-header">
-                <h3 class="card-title">Ministerios Registrados</h3>
+                <h3 class="card-title">Usuarios Registrados</h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool">
-                        <a href="{{url('/ministerios/create')}}" class="btn btn-primary">
-                            <i class="bi bi-person-fill-add"></i> Agregar nuevo Ministerio
+                        <a href="{{url('/usuarios/create')}}" class="btn btn-primary">
+                            <i class="bi bi-person-fill-add"></i> Agregar nuevo Usuario
                         </a>
                     </button>
                 </div>
@@ -30,36 +30,37 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body" style="display: block;">
-                <table id="example2" class="table table-bordered table-striped">
+                <table id="example3" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>Nro</th>
-                            <th>Nombre del ministerio</th>
-                            <th>Descripcion</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Fecha de Ingrsso</th>
                             <th>Estado</th>
-                            <th>Fecha de ingreso</th>
                             <th>Accion</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $contador = 0; ?>
-                        @foreach ($ministerios as $ministerio)
+                        @foreach ($usuarios as $usuario)
                         <tr>
                             <td><?php echo $contador = $contador + 1; ?></td>
-                            <td>{{ $ministerio->nombre_ministerio}}</td>
-                            <td>{!!$ministerio->descripcion!!}</td>
-                            <td style=" text-align: center;">
-                                <button class="btn btn-success btn-sm" >Activo</button>
+                            <td>{{ $usuario->name}}</td>
+                            <td>{{ $usuario->email}}</td>
+                            <td>{{ $usuario->fecha_ingreso}}</td>
+                            <td style="text-align: center;">
+                                <button class="btn btn-success btn-sm" style="border-radius: 20px;">Activo</button> 
                             </td>
-                            <td>{{ $ministerio->fecha_ingreso}}</td>
+
                             <td style="text-align: center;">
                                 <div class="btn-group" role="group" aria-label="Basic example">
-                                    <a href="{{ route('ministerios.show', $ministerio->id) }}" type="button" class="btn btn-info"><i class="bi bi-eye"></i></a>
-                                    <a href="{{ route('ministerios.edit', $ministerio->id) }}" type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i></a>
-                                    <form action="{{url('ministerios', $ministerio->id)}}" method="post">
+                                    <a href="{{ route('usuarios.show', $usuario->id) }}" type="button" class="btn btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ route('usuarios.edit', $usuario->id) }}" type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i></a>
+                                    <form action="{{url('usuarios', $usuario->id)}}" method="post">
                                         @csrf
                                         {{method_field('DELETE')}}
-                                        <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este ministerio?')" class="btn btn-danger" value="">
+                                        <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este Usuario?')" class="btn btn-danger" value="">
                                             <i class="bi bi-trash-fill"></i>
                                         </button> 
                                     </form>
@@ -71,10 +72,10 @@
                     <tfoot>
                         <tr>
                             <th>Nro</th>
-                            <th>Nombre del ministerio</th>
-                            <th>Descripcion</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Fecha de Ingrsso</th>
                             <th>Estado</th>
-                            <th>Fecha de ingreso</th>
                             <th>Accion</th>
                         </tr>
                     </tfoot>
@@ -85,10 +86,11 @@
         <!-- /.card -->
     </div>
 </div>
+
 <script>
     $(function() {
-      // Solo UNA inicialización para #example2
-      $("#example2").DataTable({
+      // Solo UNA inicialización para #example1
+      $("#example3").DataTable({
         "responsive": true,
         "lengthChange": true,
         "autoWidth": false,
@@ -96,12 +98,12 @@
         "language": {
           "decimal": "",
           "emptyTable": "No hay información",
-          "info": "Mostrando _START_ a _END_ de _TOTAL_ Ministerios",
-          "infoEmpty": "Mostrando 0 a 0 de 0 ministerios",
-          "infoFiltered": "(Filtrado de _MAX_ ministerios totales)",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Usuarios",
+          "infoEmpty": "Mostrando 0 a 0 de 0 Usuarios",
+          "infoFiltered": "(Filtrado de _MAX_ Usuarios totales)",
           "infoPostFix": "",
           "thousands": ",",
-          "lengthMenu": "Mostrar _MENU_ ministerios",
+          "lengthMenu": "Mostrar _MENU_ Usuarios",
           "loadingRecords": "Cargando...",
           "processing": "Procesando...",
           "search": "Buscar:",
@@ -123,7 +125,8 @@
             }
           }
         }
-      }).buttons().container().appendTo('#example2_wrapper .col-md-6:eq(0)');
+      }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
   </script>
+
 @endsection

@@ -14,6 +14,3 @@ class AdminController extends Controller{
         return view('index', ['ministerios'=>$ministerios,'miembros'=>$miembros]);
     }
 }
-
-
-siguiente video es el 43

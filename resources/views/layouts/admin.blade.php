@@ -250,6 +250,29 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </ul>
             </li>
 
+            <li class="nav-item menu-open">
+              <a href="" class="nav-link ">
+                <i class="bi bi-person-circle"></i>
+                Usuarios
+                <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{{ url('usuarios/create') }}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Nuevo usuario</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{ url('usuarios') }}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Listado de usuarios</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
 
             <li class="nav-item">
 
@@ -370,47 +393,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     });
   </script>
 
-  <script>
-    $(function() {
-      // Solo UNA inicialización para #example2
-      $("#example2").DataTable({
-        "responsive": true,
-        "lengthChange": true,
-        "autoWidth": false,
-        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
-        "language": {
-          "decimal": "",
-          "emptyTable": "No hay información",
-          "info": "Mostrando _START_ a _END_ de _TOTAL_ Ministerios",
-          "infoEmpty": "Mostrando 0 a 0 de 0 ministerios",
-          "infoFiltered": "(Filtrado de _MAX_ ministerios totales)",
-          "infoPostFix": "",
-          "thousands": ",",
-          "lengthMenu": "Mostrar _MENU_ ministerios",
-          "loadingRecords": "Cargando...",
-          "processing": "Procesando...",
-          "search": "Buscar:",
-          "zeroRecords": "Sin resultados encontrados",
-          "paginate": {
-            "first": "Primero",
-            "last": "Último",
-            "next": "Siguiente",
-            "previous": "Anterior"
-          },
-          "buttons": {
-            "copy": "Copiar",
-            "colvis": "Visibilidad",
-            "print": "Imprimir",
-            "copyTitle": "Copiado al portapapeles",
-            "copySuccess": {
-              "_": "%d filas copiadas",
-              "1": "1 fila copiada"
-            }
-          }
-        }
-      }).buttons().container().appendTo('#example2_wrapper .col-md-6:eq(0)');
-    });
-  </script>
+  
 
 </body>
 
