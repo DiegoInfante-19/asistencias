@@ -38,7 +38,7 @@
                     <div class="row mb-3">
                         <label for="email" class="col-md-4 col-form-label text-md-end">Correo Electronico</label>
                         <div class="col-md-6">
-                            <input id="email" type="email" class="form-control" name="email" value="{{ $usuario->email }}" disabled>
+                            <input id="text" type="email" class="form-control" name="email" value="{{ $usuario->email }}" disabled>
                             @error('email')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -50,7 +50,7 @@
                     <div class="row mb-3">
                         <label for="password" class="col-md-4 col-form-label text-md-end">Fecha de Ingreso</label>
                         <div class="col-md-6">
-                            <input id="password" type="text" class="form-control" name="password" value="{{$usuario->fecha_ingreso}}" disabled>
+                            <input id="text" type="text" class="form-control" name="password" value="{{$usuario->fecha_ingreso}}" disabled>
                             @error('password')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
