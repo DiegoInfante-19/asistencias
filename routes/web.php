@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\MiembroController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AsistenciaController;
 
 use App\Http\Controllers\HomeController;
 
@@ -25,4 +26,4 @@ Route::get('/home', [HomeController::class, 'index']);
 Route::resource(name:'/miembros',    controller:  \App\Http\Controllers\MiembroController::class);
 Route::resource(name:'/ministerios', controller:  \App\Http\Controllers\MinisterioController::class);
 Route::resource(name:'/usuarios',    controller:  \App\Http\Controllers\UserController::class); 
-
+Route::resource(name:'/asistencias',    controller:  \App\Http\Controllers\AsistenciaController::class); 

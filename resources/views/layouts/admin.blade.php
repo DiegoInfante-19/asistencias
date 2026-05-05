@@ -31,7 +31,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- CKEditor -->
   <script src="https://cdn.ckeditor.com/4.20.1/standard/ckeditor.js"></script>
 
+<script src="
+https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js
+"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -207,7 +211,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <li class="nav-item menu-open">
               <a href="" class="nav-link ">
                 <i class="bi bi-building"></i>
-                Ministerios
+                Cohorte
                 <i class="right fas fa-angle-left"></i>
                 </p>
               </a>
@@ -215,13 +219,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <li class="nav-item">
                   <a href="{{ url('ministerios/create') }}" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
-                    <p>Nuevo Ministerio</p>
+                    <p>Nueva Cohorte</p>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{ url('ministerios') }}" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
-                    <p>Listado de Ministerios</p>
+                    <p>Cohorte Actual</p>
                   </a>
                 </li>
               </ul>
@@ -230,7 +234,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <li class="nav-item menu-open">
               <a href="" class="nav-link ">
                 <i class="bi bi-people-fill"></i>
-                Miembros
+                Estudiantes
                 <i class="right fas fa-angle-left"></i>
                 </p>
               </a>
@@ -238,13 +242,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <li class="nav-item">
                   <a href="{{ url('miembros/create') }}" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
-                    <p>Nuevo Miembro</p>
+                    <p>Nuevo Estudiante</p>
                   </a>
                 </li>
                 <li class="nav-item">
                   <a href="{{ url('miembros') }}" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
-                    <p>Listado de Miembros</p>
+                    <p>Listado de Estudiantes</p>
                   </a>
                 </li>
               </ul>
@@ -268,6 +272,29 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <a href="{{ url('usuarios') }}" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Listado de usuarios</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <li class="nav-item menu-open">
+              <a href="" class="nav-link ">
+                <i class="bi bi-calendar2-week"></i>
+                Asistencias
+                <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{{ url('asistencias/create') }}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Nueva asistencia</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{ url('asistencias') }}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Listado de asistencias</p>
                   </a>
                 </li>
               </ul>
