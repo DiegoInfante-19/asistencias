@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Http\Controllers;
 
 use App\Models\Asistencia;
@@ -10,6 +12,9 @@ use App\Http\Requests\AsistenciaRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
+
 class AsistenciaController extends Controller
 {
     /**
@@ -18,9 +23,30 @@ class AsistenciaController extends Controller
     public function index(Request $request): View
     {
         $asistencias = Asistencia::paginate();
-
         return view('asistencias.index', compact('asistencias'))
             ->with('i', ($request->input('page', 1) - 1) * $asistencias->perPage());
+    }
+
+    public function reportes(){
+        return view('asistencias.reportes');
+    }
+
+    public function pdf(Request $request){
+        $asistencias = Asistencia::paginate(); 
+        $pdf = Pdf::loadView('asistencias.pdf',['asistencias' => $asistencias]);
+        return $pdf->stream();
+        // $asistencias = Asistencia::paginate(); 
+        // return view('asistencias.pdf', compact('asistencias'))
+        //     ->with('i', ($request->input('page', 1) - 1) * $asistencias->perPage());
+    }
+
+    public function pdf_fechas(Request $request){
+        $fi = $request->fi;
+        $ff = $request->ff;
+        $asistencias = Asistencia::where('fecha','>=', $fi)
+        ->where('fecha','<=',$ff)
+        ->get();
+        return view('asistencias.pdf_fechas',['asistencias'=>$asistencias]); 
     }
 
     /**

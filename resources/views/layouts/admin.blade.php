@@ -300,6 +300,32 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js
               </ul>
             </li>
 
+            <li class="nav-item menu-open">
+              <a href="" class="nav-link ">
+                <i class="bi bi-printer"></i>
+                Reportes
+                <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                
+                <li class="nav-item">
+                  <a href="{{ url('asistencias/reportes') }}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Nueva asistencia</p>
+                  </a>
+                </li>
+                
+                <li class="nav-item">
+                  <a href="{{ url('asistencias') }}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Listado de asistencias</p>
+                  </a>
+                </li>
+              
+              </ul>
+            </li>
+
 
             <li class="nav-item">
 

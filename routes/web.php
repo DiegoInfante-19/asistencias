@@ -8,22 +8,19 @@ use App\Http\Controllers\AsistenciaController;
 
 use App\Http\Controllers\HomeController;
 
-
 // Ruta principal protegida
 // Route::get('/',function (){ return view('index');})->middleware('auth');
 
 
-Route::get('/', [\App\Http\Controllers\AdminController::class, 'index'])->name('home');
-
+Route::get('/', [\App\Http\Controllers\AdminController::class,'index'])->name('home');
+Route::get('/asistencias/reportes', [AsistenciaController::class,'reportes']);
+Route::get('/asistencias/pdf', [AsistenciaController::class,'pdf']);
+Route::get('/asistencias/pdf_fechas', [AsistenciaController::class,'pdf']);
+Route::get('/home', [HomeController::class,'index']);
 
 Auth::routes(['register' => true]);
-
-// Home
-Route::get('/home', [HomeController::class, 'index']);
-
-// --- SECCIÓN DE MIEMBROS ---
 
 Route::resource(name:'/miembros',    controller:  \App\Http\Controllers\MiembroController::class);
 Route::resource(name:'/ministerios', controller:  \App\Http\Controllers\MinisterioController::class);
 Route::resource(name:'/usuarios',    controller:  \App\Http\Controllers\UserController::class); 
-Route::resource(name:'/asistencias',    controller:  \App\Http\Controllers\AsistenciaController::class); 
+Route::resource(name:'/asistencias', controller:  \App\Http\Controllers\AsistenciaController::class); 
