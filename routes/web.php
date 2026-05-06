@@ -15,7 +15,7 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [\App\Http\Controllers\AdminController::class,'index'])->name('home');
 Route::get('/asistencias/reportes', [AsistenciaController::class,'reportes']);
 Route::get('/asistencias/pdf', [AsistenciaController::class,'pdf']);
-Route::get('/asistencias/pdf_fechas', [AsistenciaController::class,'pdf']);
+Route::get('/asistencias/pdf_fechas', [AsistenciaController::class,'pdf_fechas']);
 Route::get('/home', [HomeController::class,'index']);
 
 Auth::routes(['register' => true]);

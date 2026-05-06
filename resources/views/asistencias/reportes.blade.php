@@ -40,7 +40,7 @@
                                     </a>
                                 </span>
                                 <div class="info-box-content">
-                                    <form action="{{route('asistencias/pdf_fechas')}}" method="get">
+                                    <form action="{{url('/asistencias/pdf_fechas')}}" method="get">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <label for="">Fecha de Inicio</label>

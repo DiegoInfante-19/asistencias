@@ -1,9 +1,6 @@
 <?php
 
-
-
 namespace App\Http\Controllers;
-
 use App\Models\Asistencia;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Miembro;
@@ -13,7 +10,6 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
 use Barryvdh\DomPDF\Facade\Pdf;
-
 
 class AsistenciaController extends Controller
 {
@@ -46,7 +42,10 @@ class AsistenciaController extends Controller
         $asistencias = Asistencia::where('fecha','>=', $fi)
         ->where('fecha','<=',$ff)
         ->get();
-        return view('asistencias.pdf_fechas',['asistencias'=>$asistencias]); 
+
+        $pdf = Pdf::loadView('asistencias.pdf_fechas',['asistencias' => $asistencias]);
+        return $pdf->stream();
+        // return view('asistencias.pdf_fechas',['asistencias'=>$asistencias]); 
     }
 
     /**
