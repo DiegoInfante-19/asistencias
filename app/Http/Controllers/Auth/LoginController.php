@@ -39,3 +39,10 @@ class LoginController extends Controller
         $this->middleware('auth')->only('logout');
     }
 }
+
+
+los archivos controllers de login y registro confundden
+
+ya que no entiendo por que el validor de login tienen todo cosa que no o es por el register controler nolo sabre hasta hoy
+
+deven estar operativos de una buena vez 

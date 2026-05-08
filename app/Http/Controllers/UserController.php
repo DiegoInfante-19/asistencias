@@ -1,76 +1,51 @@
 <?php
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
-
-
-class UserController extends Controller{
-    
-    public function index(){
-        $usuarios = \App\Models\User::all();
-        return view('usuarios.index',['usuarios' => $usuarios]);  
-    }
-
-    public function create(){
-        return view('usuarios.create');
-
-    }
-
-
-    protected function validator(array $data)
+class UserController extends Controller
+{
+    public function index()
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+        // Traemos el rol para mostrarlo en la tabla
+        $usuarios = User::with('role')->get();
+        return view('usuarios.index', compact('usuarios'));
+    }
+
+    public function create()
+    {
+        $roles = Role::all();
+        return view('usuarios.create', compact('roles'));
     }
 
     public function store(Request $request)
     {
-        $usuario = new User();
-        $usuario->name = $request->name;
-        $usuario->email = $request->email;
-        $usuario->password = Hash::make($request['password']);
-        $usuario->fecha_ingreso = date($format = 'Y-m-d');
-        $usuario->estado = '1';
-        $usuario->save();
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'cedula' => 'required|string|unique:users',
+            'email' => 'required|string|email|unique:users',
+            'username' => 'required|string|unique:users',
+            'role_id' => 'required|exists:roles,id',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
 
-        return redirect()->route('usuarios.index')->with('success', 'Se registro el usuario de manera correcta');
+        User::create([
+            'name' => $request->name,
+            'last_name' => $request->last_name,
+            'cedula' => $request->cedula,
+            'email' => $request->email,
+            'username' => $request->username,
+            'phone' => $request->phone,
+            'status' => 'Activo',
+            'role_id' => $request->role_id,
+            'password' => Hash::make($request->password),
+        ]);
 
+        return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
     }
-
-    public function show($id){
-        $usuario = User::findOrFail($id);
-        return view('usuarios.show',['usuario'=>$usuario]);
-    }
-
-    public function edit($id){
-        $usuario = User::findOrFail($id);
-        return view('usuarios.edit',['usuario'=>$usuario]);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $usuario = User::findOrFail($id);
-        $usuario = new User();
-        $usuario->name = $request->name;
-        $usuario->email = $request->email;
-        $usuario->password = Hash::make($request['password']);
-        $usuario->save();
-        return redirect()->route('usuarios.index')->with('success', 'Se registro el usuario de manera correcta');
-    }
-
-    public function destroy($id){
-        User::destroy($id);
-        return redirect()->route('usuarios.index')->with('success','Se elimino al usuario de manera correcta');
-    }
-        
-    
-
 }
