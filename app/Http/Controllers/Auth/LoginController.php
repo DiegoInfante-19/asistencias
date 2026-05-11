@@ -4,45 +4,42 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request; 
 
-class LoginController extends Controller
-{
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
+class LoginController extends Controller{
     use AuthenticatesUsers;
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    // protected $redirectTo = '/home';
     protected $redirectTo = '/';
 
-    /** 
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
+    public function __construct(){
         $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
+    }
+
+    
+    protected function validateLogin(Request $request){
+        $request->validate([
+            'login'    => 'required|string',
+            'password' => 'required|string',
+        ]);
+    }
+
+    protected function credentials(Request $request){
+        $loginValue = $request->input('login');
+
+        $field = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'cedula';
+
+        return [
+            $field     => $loginValue,
+            'password' => $request->input('password'),
+        ];
+    }
+
+    
+    public function username(){
+        return 'login';
     }
 }
 
 
-los archivos controllers de login y registro confundden
 
-ya que no entiendo por que el validor de login tienen todo cosa que no o es por el register controler nolo sabre hasta hoy
-
-deven estar operativos de una buena vez 

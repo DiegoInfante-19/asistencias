@@ -19,17 +19,16 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'last_name',
-        'cedula',
-        'email',
-        'phone',
-        'username',
-        'status',
-        'role_id',
-        'password',
-        'last_login_at',
-    ];
+    'username',
+    'email',
+    'name',
+    'last_name',
+    'cedula',
+    'phone', 
+    'status',
+    'role_id',
+    'password',
+];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -59,3 +58,12 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 }
+
+
+el login 
+email validate 
+
+vista <s>
+el deasborad  
+
+permisos de vistas</s>
