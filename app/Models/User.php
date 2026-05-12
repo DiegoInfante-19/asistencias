@@ -60,10 +60,17 @@ class User extends Authenticatable
 }
 
 
-el login 
-email validate 
 
-vista <s>
-el deasborad  
 
-permisos de vistas</s>
+/*
+    el login
+    email validate
+    vista
+    el deasborad
+    permisos de vistas
+
+    -------------------------------------------------------------------------
+*/
+
+// en app/Models/User.php no entiedo donde hay problema
+

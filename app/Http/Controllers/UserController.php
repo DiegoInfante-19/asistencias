@@ -30,6 +30,7 @@ class UserController extends Controller
             'cedula' => 'required|string|unique:users',
             'email' => 'required|string|email|unique:users',
             'username' => 'required|string|unique:users',
+            'phone' => 'nullable|numeric|digits_between:7,15',
             'role_id' => 'required|exists:roles,id',
             'password' => 'required|string|min:8|confirmed',
         ]);

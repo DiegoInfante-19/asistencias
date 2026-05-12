@@ -2,25 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\MiembroController;
+
+// Importamos solo los controladores que tenemos listos
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\AdminController;
 
-use App\Http\Controllers\HomeController;
-
-// Ruta principal protegida
-// Route::get('/',function (){ return view('index');})->middleware('auth');
-
-
-Route::get('/', [\App\Http\Controllers\AdminController::class,'index'])->name('home');
-Route::get('/asistencias/reportes', [AsistenciaController::class,'reportes']);
-Route::get('/asistencias/pdf', [AsistenciaController::class,'pdf']);
-Route::get('/asistencias/pdf_fechas', [AsistenciaController::class,'pdf_fechas']);
-Route::get('/home', [HomeController::class,'index']);
-
+// 1. Rutas de Autenticación (Públicas)
 Auth::routes(['register' => true]);
 
-Route::resource(name:'/miembros',    controller:  \App\Http\Controllers\MiembroController::class);
-Route::resource(name:'/ministerios', controller:  \App\Http\Controllers\MinisterioController::class);
-Route::resource(name:'/usuarios',    controller:  \App\Http\Controllers\UserController::class); 
-Route::resource(name:'/asistencias', controller:  \App\Http\Controllers\AsistenciaController::class); 
+// 2. Grupo Protegido (Solo usuarios logueados)
+Route::middleware(['auth', 'no-back-history'])->group(function () {
+    
+    Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+    Route::resource('usuarios', UserController::class);
+
+});

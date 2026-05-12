@@ -31,11 +31,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- CKEditor -->
   <script src="https://cdn.ckeditor.com/4.20.1/standard/ckeditor.js"></script>
 
-<script src="
-https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js
-"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -217,13 +215,13 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{ url('ministerios/create') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Nueva Cohorte</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{ url('ministerios') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Cohorte Actual</p>
                   </a>
@@ -240,13 +238,13 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{ url('miembros/create') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Nuevo Estudiante</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{ url('miembros') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Listado de Estudiantes</p>
                   </a>
@@ -263,13 +261,13 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{ url('usuarios/create') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Nuevo usuario</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{ url('usuarios') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Listado de usuarios</p>
                   </a>
@@ -286,13 +284,13 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{ url('asistencias/create') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Nueva asistencia</p>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{ url('asistencias') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Listado de asistencias</p>
                   </a>
@@ -308,21 +306,21 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js
                 </p>
               </a>
               <ul class="nav nav-treeview">
-                
+
                 <li class="nav-item">
-                  <a href="{{ url('asistencias/reportes') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Nueva asistencia</p>
                   </a>
                 </li>
-                
+
                 <li class="nav-item">
-                  <a href="{{ url('asistencias') }}" class="nav-link">
+                  <a href="" class="nav-link">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Listado de asistencias</p>
                   </a>
                 </li>
-              
+
               </ul>
             </li>
 
@@ -446,7 +444,7 @@ https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js
     });
   </script>
 
-  
+
 
 </body>
 
