@@ -15,17 +15,17 @@ class AdminController extends Controller
     }
 
     public function index()
-{
-    // 1. Obtenemos los usuarios para el contador
-    $usuarios = \App\Models\User::all();
-    
-    // 2. Como borraste Miembros, Ministerios y Asistencias,
-    // enviamos arreglos vacíos [] para que los @foreach de tu vista no den error.
-    $ministerios = []; 
-    $miembros = [];
-    $asistencias = [];
+    {
+        // 1. Obtenemos los usuarios para el contador
+        $usuarios = \App\Models\User::all();
 
-    // 3. CAMBIO CLAVE: Quitamos "admin." y dejamos solo "index"
-    return view('index', compact('usuarios', 'ministerios', 'miembros', 'asistencias'));
-}
+        // 2. Como borraste Miembros, Ministerios y Asistencias,
+        // enviamos arreglos vacíos [] para que los @foreach de tu vista no den error.
+        $ministerios = [];
+        $miembros = [];
+        $asistencias = [];
+
+        // 3. CAMBIO CLAVE: Quitamos "admin." y dejamos solo "index"
+        return view('index', compact('usuarios', 'ministerios', 'miembros', 'asistencias'));
+    }
 }
