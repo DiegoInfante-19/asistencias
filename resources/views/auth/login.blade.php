@@ -52,3 +52,6 @@
     </div>
 </div>
 @endsection
+@section('scripts')
+    <script src="{{ asset('js/auth-validations-login.js') }}" defer></script>
+@endsection
