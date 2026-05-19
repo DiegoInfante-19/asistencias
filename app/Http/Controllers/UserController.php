@@ -7,19 +7,22 @@ use App\Models\User;
 use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
+use App\DataTables\UsersDataTable;
+
 class UserController extends Controller
+
 {
-    public function index()
+    public function index(UsersDataTable $dataTable)
     {
         // Traemos el rol para mostrarlo en la tabla
-        $usuarios = User::with('role')->get();
-        return view('usuarios.index', compact('usuarios'));
+        // $usuarios = User::with('role')->get();
+        return $dataTable->render('profesores.index');
     }
 
     public function create()
     {
-        $roles = Role::all();
-        return view('usuarios.create', compact('roles'));
+        $roles = Role::all();   
+        return view('usuarios.create', compact('roles')); //esto es para crearlo desde el index
     }
 
     public function store(Request $request)
