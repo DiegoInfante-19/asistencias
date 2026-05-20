@@ -45,7 +45,7 @@
   <!--DataTables-->
   <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.8/datatables.min.css" rel="stylesheet" integrity="sha384-nD9P196GmYuiIASpxI7+7/0LqD6BBA74CfgIOSQUo7brmKKeph8lSEMm2sGgSAvK" crossorigin="anonymous">
  
-
+@yield('styles')
 
 
 </head><!--end::Head-->
@@ -328,12 +328,8 @@
       }
     });
   </script>
-
+@yield('scripts')
 </body>
 <!--end::Body-->
 
 </html>
-
-
-crud usuarios
-deashborad

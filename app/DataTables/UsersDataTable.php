@@ -46,17 +46,34 @@ class UsersDataTable extends DataTable
         return $this->builder()
             ->setTableId('users-table')
             ->columns($this->getColumns())
-            ->minifiedAjax() // Activa el procesamiento ultra rápido vía AJAX
-            ->orderBy(1)     // Ordena por la columna Nombre por defecto
+            ->minifiedAjax()
+            ->orderBy(1)
             ->parameters([
                 'responsive' => true,
                 'autoWidth'  => false,
                 'language'   => [
-                    'url' => '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' // Traducción oficial
+                    'processing'     => 'Procesando...',
+                    'search'         => 'Buscar:',
+                    'lengthMenu'     => 'Mostrar _MENU_ registros',
+                    'info'           => 'Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros',
+                    'infoEmpty'      => 'Mostrando registros del 0 al 0 de un total de 0 registros',
+                    'infoFiltered'   => '(filtrado de un total de _MAX_ registros)',
+                    'loadingRecords' => 'Cargando aplicaciones...',
+                    'zeroRecords'    => 'No se encontraron resultados',
+                    'emptyTable'     => 'Ningún dato disponible en esta tabla',
+                    'paginate'       => [
+                        'first'    => 'Primero',
+                        'previous' => 'Anterior',
+                        'next'     => 'Siguiente',
+                        'last'     => 'Último'
+                    ],
+                    'aria' => [
+                        'sortAscending'  => ': Activar para ordenar la columna de manera ascendente',
+                        'sortDescending' => ': Activar para ordenar la columna de manera descendente'
+                    ]
                 ]
             ]);
     }
-
     /**
      * Columnas que se renderizarán en la interfaz.
      */

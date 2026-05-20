@@ -6,27 +6,34 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
-
 use App\DataTables\UsersDataTable;
 
 class UserController extends Controller
-
 {
+    /**
+     * Muestra la tabla interactiva de DataTables en el área administrativa.
+     */
     public function index(UsersDataTable $dataTable)
     {
-        // Traemos el rol para mostrarlo en la tabla
-        // $usuarios = User::with('role')->get();
+        // Renderiza el DataTables dentro de la carpeta profesores
         return $dataTable->render('profesores.index');
     }
 
+    // =========================================================================
+    // REGISTRO PÚBLICO (LOG IN / REGISTRO INICIAL) - Mantener intacto
+    // =========================================================================
+    
     public function create()
     {
         $roles = Role::all();   
-        return view('usuarios.create', compact('roles')); //esto es para crearlo desde el index
+        return view('usuarios.create', compact('roles')); // Tu formulario original
     }
 
     public function store(Request $request)
     {
+        // ... Tu lógica de validación y creación original ...
+        // (Mantén el código exacto que ya tenías aquí abajo)
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -51,5 +58,31 @@ class UserController extends Controller
         ]);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
+    }
+
+    // =========================================================================
+    // GESTIÓN INTERNA DE PROFESORES / PERSONAL - Nuevos Métodos
+    // =========================================================================
+
+    /**
+     * Muestra el formulario para crear un profesor desde el panel interno.
+     */
+    public function createProfesor()
+    {
+        $roles = Role::all();   
+        // Apunta a tu vista dedicada interna
+        return view('profesores.create', compact('roles')); 
+    }
+
+    /**
+     * Procesa y guarda el profesor creado desde el panel interno.
+     */
+    public function storeProfesor(Request $request)
+    {
+        // Ejecuta la lógica y validación exacta del store principal
+        $this->store($request);
+
+        // Al terminar, sobrescribe la redirección para quedarse en el panel administrativo
+        return redirect()->route('profesores.index')->with('success', 'Personal registrado exitosamente.');
     }
 }
