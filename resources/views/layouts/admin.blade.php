@@ -43,11 +43,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css" integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4=" crossorigin="anonymous" />
 
   <!--DataTables-->
-  <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.8/datatables.min.css" rel="stylesheet" integrity="sha384-nD9P196GmYuiIASpxI7+7/0LqD6BBA74CfgIOSQUo7brmKKeph8lSEMm2sGgSAvK" crossorigin="anonymous">
- 
-@yield('styles')
+  <!-- <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.8/datatables.min.css" rel="stylesheet" integrity="sha384-nD9P196GmYuiIASpxI7+7/0LqD6BBA74CfgIOSQUo7brmKKeph8lSEMm2sGgSAvK" crossorigin="anonymous"> -->
 
-
+  @yield('styles')
 </head><!--end::Head-->
 
 <!--begin::Body-->
@@ -204,8 +202,8 @@
               <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="./widgets/small-box.html" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Opciones</p>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-person-circle"></i>
+                    <p>Ver Perfil</p>
                   </a>
                 </li>
               </ul>
@@ -292,7 +290,7 @@
   Este bloque de código personalizado sirve para inicializar y configurar las barras de 
   desplazamiento en el menú lateral (sidebar).
 -->
-  
+
 
   <script>
     // Indica el contenedor del menú lateral al cual se le aplicará la barra personalizada
@@ -328,7 +326,7 @@
       }
     });
   </script>
-@yield('scripts')
+  @yield('scripts')
 </body>
 <!--end::Body-->
 
