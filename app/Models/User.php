@@ -18,17 +18,20 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
+    protected $primaryKey = 'id_users';
+
     protected $fillable = [
-    'username',
-    'email',
-    'name',
-    'last_name',
-    'cedula',
-    'phone', 
-    'status',
-    'role_id',
-    'password',
-];
+        'username',
+        'email',
+        'name',
+        'last_name',
+        'cedula',
+        'phone',
+        'status',
+        'role_id',
+        'password',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -58,19 +61,3 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 }
-
-
-
-
-/*
-    el login
-    email validate
-    vista
-    el deasborad
-    permisos de vistas
-
-    -------------------------------------------------------------------------
-*/
-
-// en app/Models/User.php no entiedo donde hay problema
-

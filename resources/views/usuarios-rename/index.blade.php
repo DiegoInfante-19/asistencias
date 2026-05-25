@@ -55,9 +55,9 @@
 
                             <td style="text-align: center;">
                                 <div class="btn-group" role="group" aria-label="Basic example">
-                                    <a href="{{ route('usuarios.show', $usuario->id) }}" type="button" class="btn btn-info"><i class="bi bi-eye"></i></a>
-                                    <a href="{{ route('usuarios.edit', $usuario->id) }}" type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i></a>
-                                    <form action="{{url('usuarios', $usuario->id)}}" method="post">
+                                    <a href="{{ route('usuarios.show', $usuario->id_users) }}" type="button" class="btn btn-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ route('usuarios.edit', $usuario->id_users) }}" type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i></a>
+                                    <form action="{{url('usuarios', $usuario->id_users)}}" method="post">
                                         @csrf
                                         {{method_field('DELETE')}}
                                         <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este Usuario?')" class="btn btn-danger" value="">

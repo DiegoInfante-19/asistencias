@@ -108,3 +108,10 @@
 @section('scripts')
     <script src="{{ asset('js/auth-validations.js') }}" defer></script>
 @endsection
+
+
+<!-- 
+
+quedamos en adaptar la validacion de los formularios del crud panel de usuarios 
+
+-->

@@ -21,7 +21,7 @@
                     <h3 class="card-title">LLene los Datos de forma Correcta</h3>
                 </div>
                 <div class="card-body" style="display: block;">
-                    <form method="POST" action="{{ url('/usuarios',$usuario->id) }}">
+                    <form method="POST" action="{{ url('/usuarios',$usuario->id_users) }}">
                         @csrf
                         {{method_field('PATCH')}}
                         <div class="row mb-6">
