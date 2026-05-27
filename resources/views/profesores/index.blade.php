@@ -130,50 +130,88 @@
                 $('#users-table').DataTable().columns.adjust().responsive.recalc();
             }
         });
+
         // 2. LÓGICA PARA EL MODAL: VER DETALLES
         $('#viewUserModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget); // Identifica el botón presionado
+            var button = $(event.relatedTarget);
             var modal = $(this);
-            // Extraemos e inyectamos datos como texto
             modal.find('#modal-username').text(button.data('username'));
             modal.find('#modal-name').text(button.data('name'));
             modal.find('#modal-lastname').text(button.data('lastname'));
             modal.find('#modal-cedula').text(button.data('cedula'));
             modal.find('#modal-email').text(button.data('email'));
             modal.find('#modal-phone').text(button.data('phone'));
-            // Etiqueta visual para el estado
             var status = button.data('status');
             var statusBadge = (status.toLowerCase() === 'activo') ?
                 '<span class="badge bg-success px-3 py-2">Activo</span>' :
                 '<span class="badge bg-danger px-3 py-2">' + status + '</span>';
             modal.find('#modal-status').html(statusBadge);
         });
-        // 3. LÓGICA PARA EL MODAL: EDITAR DATOS (¡NUEVO!)
+
+        // 3. LÓGICA PARA EL MODAL: EDITAR DATOS
         $('#editUserModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget); // Identifica el botón del lápiz presionado
+            var button = $(event.relatedTarget);
+            // Si el modal se abre automáticamente por código (ej. error de validación), el botón no existe
+            if (!button.length) return;
+            
             var modal = $(this);
-            // A. Inyectamos la URL dinámica al atributo "action" del formulario
             modal.find('#editUserForm').attr('action', button.data('url'));
-            // B. Llenamos los <input> y <select> con la información actual (.val)
+            modal.find('#edit_url').val(button.data('url'));
+            modal.find('#edit-username').val(button.data('username'));
             modal.find('#edit-name').val(button.data('name'));
             modal.find('#edit-lastname').val(button.data('lastname'));
             modal.find('#edit-cedula').val(button.data('cedula'));
             modal.find('#edit-phone').val(button.data('phone'));
             modal.find('#edit-email').val(button.data('email'));
             modal.find('#edit-status').val(button.data('status'));
+            // --- ESTO ES LO QUE FALTABA AQUÍ ADENTRO ---
+            // Simula que el usuario acaba de escribir en los campos para que 
+            // el script de validación los revise y encienda el botón "Guardar Cambios".
+            modal.find('input, select').trigger('input');
         });
+
+        // 4. LÓGICA PARA AUTO-ABRIR MODAL TRAS ERROR DE VALIDACIÓN
+        @if($errors->any())
+            @if(old('origen') == 'modal')
+                var createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+                createUserModal.show();
+            @elseif(old('_method') == 'PUT')
+                $('#editUserForm').attr('action', $('#edit_url').val());
+                var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                editUserModal.show();
+            @endif
+        @endif
     });
 </script>
+<script src="{{ asset('js/core-validations.js') }}" defer></script>
+<script src="{{ asset('js/admin-validations.js') }}" defer></script>
 @endsection
 
 <!-- 
     modificacion *
     eliminacion  *
     creacion     *
-    validacion   
-    preguntar antes de hacer cada cosa
-    modal de respuesta positiva
+    validacion   *
+
+    mismo forumulario en todo *
+    pruebas panel
+    validacion en panel * 
+    quitar los indicadores de error cuando se cierra el modal 
+
+    preguntar antes de hacer cada cosa del panel
+    modal de respuesta positiva *
+
+    edicion  falla cuando se ingresa algo repetido
+
     diseño perfil
     modales perfil
     
+       usuario correo
+    
+       nombres apellidos
+
+        cedula telefono
+
+    contraseña confirmar
+
 -->

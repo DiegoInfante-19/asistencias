@@ -14,8 +14,6 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
     
     // CRUD de Usuarios (mantiene URLs como usuarios/create, usuarios/edit)
     Route::resource('usuarios', UserController::class);
-
-    Route::post('/usuarios/admin', [UserController::class, 'storeAdmin'])->name('usuarios.storeAdmin');
     
     // Nuestra ruta especial para la tabla profesional de administración
     Route::get('/profesores', [UserController::class, 'index'])->name('profesores.index');

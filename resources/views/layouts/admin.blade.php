@@ -327,6 +327,7 @@
     });
   </script>
   @yield('scripts')
+  @include('partials.alerts')
 </body>
 <!--end::Body-->
 

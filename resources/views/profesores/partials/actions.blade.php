@@ -17,6 +17,7 @@
         data-bs-toggle="modal"
         data-bs-target="#editUserModal"
         data-url="{{ route('usuarios.update', $user->id_users) }}"
+        data-username="{{ $user->username }}"
         data-name="{{ $user->name }}"
         data-lastname="{{ $user->last_name }}"
         data-cedula="{{ $user->cedula }}"

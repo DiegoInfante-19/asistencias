@@ -59,49 +59,62 @@
         </div>
     </div>
 </div>
-
 <div class="modal fade" id="editUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header border-bottom text-dark">
-                <h1 class="modal-title fs-5 fw-bold" id="editUserModalLabel">
-                    Modificar Datos del Profesor
-                </h1>
+                <h1 class="modal-title fs-5 fw-bold" id="editUserModalLabel"> Modificar Datos del Profesor </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <form id="editUserForm" method="POST" action="">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="edit_url" id="edit_url" value="{{ old('edit_url') }}">
                     <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Nombre de Usuario</label>
+                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" id="edit-username" value="{{ old('_method') == 'PUT' ? old('username') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Correo Electrónico</label>
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="edit-email" value="{{ old('_method') == 'PUT' ? old('email') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
+                        </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombres</label>
-                            <input type="text" class="form-control" name="name" id="edit-name" required>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="edit-name" value="{{ old('_method') == 'PUT' ? old('name') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Apellidos</label>
-                            <input type="text" class="form-control" name="last_name" id="edit-lastname" required>
+                            <input type="text" class="form-control @error('last_name') is-invalid @enderror" name="last_name" id="edit-lastname" value="{{ old('_method') == 'PUT' ? old('last_name') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
+
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Cédula</label>
-                            <input type="text" class="form-control" name="cedula" id="edit-cedula" required>
+                            <input type="text" class="form-control @error('cedula') is-invalid @enderror" name="cedula" id="edit-cedula" value="{{ old('_method') == 'PUT' ? old('cedula') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Teléfono</label>
-                            <input type="text" class="form-control" name="phone" id="edit-phone">
+                            <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" id="edit-phone" value="{{ old('_method') == 'PUT' ? old('phone') : '' }}">
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Estado</label>
-                            <select class="form-select" name="status" id="edit-status" required>
-                                <option value="Activo">Activo</option>
-                                <option value="Inactivo">Inactivo</option>
-                                <option value="Suspendido">Suspendido</option>
+                            <select class="form-select @error('status') is-invalid @enderror" name="status" id="edit-status" required>
+                                <option value="Activo" {{ old('_method') == 'PUT' && old('status') == 'Activo' ? 'selected' : '' }}>Activo</option>
+                                <option value="Inactivo" {{ old('_method') == 'PUT' && old('status') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
+                                <option value="Suspendido" {{ old('_method') == 'PUT' && old('status') == 'Suspendido' ? 'selected' : '' }}>Suspendido</option>
                             </select>
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Correo Electrónico</label>
-                            <input type="email" class="form-control" name="email" id="edit-email" required>
-                        </div>
+
                     </div>
                 </form>
             </div>
@@ -119,7 +132,7 @@
 <div class="modal fade" id="createUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            
+
             <div class="modal-header border-bottom">
                 <h1 class="modal-title fs-5 fw-bold" id="createUserModalLabel">
                     Registrar Profesor
@@ -130,51 +143,60 @@
             <div class="modal-body p-4">
                 <form id="createUserForm" method="POST" action="{{ route('usuarios.store') }}">
                     @csrf
-                    
-                    <div class="row g-4"> 
+                    <input type="hidden" name="origen" value="modal">
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Nombre de Usuario</label>
+                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('origen') == 'modal' ? old('username') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Correo Electrónico</label>
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('origen') == 'modal' ? old('email') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
+                        </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombres</label>
-                            <input type="text" class="form-control" name="name" required placeholder="Ej. Juan Carlos">
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('origen') == 'modal' ? old('name') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Apellidos</label>
-                            <input type="text" class="form-control" name="last_name" required placeholder="Ej. Pérez Gómez">
+                            <input type="text" class="form-control @error('last_name') is-invalid @enderror" name="last_name" value="{{ old('origen') == 'modal' ? old('last_name') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Cédula</label>
-                            <input type="text" class="form-control" name="cedula" required placeholder="Ej. 12345678">
+                            <input type="text" class="form-control @error('cedula') is-invalid @enderror" name="cedula" value="{{ old('origen') == 'modal' ? old('cedula') : '' }}" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Teléfono</label>
-                            <input type="text" class="form-control" name="phone" placeholder="Ej. 0414-1234567">
+                            <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('origen') == 'modal' ? old('phone') : '' }}">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Rol del Sistema</label>
-                            <select class="form-select" name="role_id" required style="color: black;">
-                                <option value="" disabled selected>Seleccione un rol...</option>
+                            <select class="form-select @error('role_id') is-invalid @enderror" name="role_id" required style="color: black;">
+                                <option value="" disabled {{ !old('role_id') ? 'selected' : '' }}>Seleccione un rol...</option>
                                 @foreach($roles as $role)
-                                    <option value="{{ $role->id }}">{{ $role->nombre }}</option>
+                                <option value="{{ $role->id }}" {{ old('origen') == 'modal' && old('role_id') == $role->id ? 'selected' : '' }}>{{ $role->nombre }}</option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Correo Electrónico</label>
-                            <input type="email" class="form-control" name="email" required placeholder="correo@institucion.edu">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Nombre de Usuario</label>
-                            <input type="text" class="form-control" name="username" required placeholder="Ej. jperez">
-                        </div>
-
-                        <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Contraseña</label>
-                            <input type="password" class="form-control" name="password" required placeholder="Mínimo 8 caracteres">
+                            <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Confirmar Contraseña</label>
-                            <input type="password" class="form-control" name="password_confirmation" required placeholder="Repite la contraseña">
+                            <input type="password" class="form-control" name="password_confirmation" required>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                     </div>
                 </form>
