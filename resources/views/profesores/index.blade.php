@@ -194,24 +194,16 @@
     validacion   *
 
     mismo forumulario en todo *
-    pruebas panel
+    pruebas panel *
     validacion en panel * 
-    quitar los indicadores de error cuando se cierra el modal 
+    quitar los indicadores de error cuando se cierra el modal *
 
-    preguntar antes de hacer cada cosa del panel
+    preguntar antes de hacer cada cosa del panel 
     modal de respuesta positiva *
 
     edicion  falla cuando se ingresa algo repetido
 
     diseño perfil
     modales perfil
-    
-       usuario correo
-    
-       nombres apellidos
-
-        cedula telefono
-
-    contraseña confirmar
 
 -->

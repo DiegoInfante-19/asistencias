@@ -27,7 +27,7 @@
         <i class="bi bi-pencil"></i>
     </button>
 
-    <form action="{{ route('usuarios.destroy', $user->id_users) }}" method="POST" class="m-0 p-0 d-inline-block" onsubmit="return confirm('¿Estás totalmente seguro de eliminar a este profesor del sistema?');">
+    <form action="{{ route('usuarios.destroy', $user->id_users) }}" method="POST" class="m-0 p-0 d-inline-block form-eliminar">
         @csrf
         @method('DELETE')
 

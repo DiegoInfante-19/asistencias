@@ -57,8 +57,9 @@ class UserController extends Controller
 
 
    public function update(UserUpdateRequest $request, $id){
-        $user = User::where('id_ususers', $id)->firstOrFail();
+        $user = User::where('id_users', $id)->firstOrFail();
         $user->update([
+            'username'  => $request->username,
             'name'      => $request->name,
             'last_name' => $request->last_name,
             'cedula'    => $request->cedula,
@@ -70,8 +71,8 @@ class UserController extends Controller
     }
 
     public function destroy($id){
-        $user = User::where('id_ususers', $id)->firstOrFail();
-        if (auth()->user()->id_ususers === $user->id_ususers) {
+        $user = User::where('id_users', $id)->firstOrFail();
+        if (auth()->user()->id_users === $user->id_users) {
             return redirect()->back()->with('error', 'No puedes eliminar tu propia cuenta mientras estás en sesión.');
         }
         $user->delete();
