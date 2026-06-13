@@ -2,62 +2,67 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-
+    protected $table = 'users';
     protected $primaryKey = 'id_users';
 
     protected $fillable = [
+        'name_users',
+        'last_name_users',
+        'cedula_users',
+        'email_users',
+        'phone_users',
         'username',
-        'email',
-        'name',
-        'last_name',
-        'cedula',
-        'phone',
-        'status',
-        'role_id',
-        'password',
+        'status_users',
+        'id_rol',
+        'last_login_at',
+        'password_users',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
+        'password_users',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'last_login_at' => 'datetime',
+            'password_users' => 'hashed',
         ];
     }
 
-    public function role()
+    /**
+     * IMPORTANTE: Sobrescribir el método de autenticación
+     * para que Laravel use tu columna personalizada.
+     */
+    public function getAuthPassword()
     {
-        return $this->belongsTo(Role::class);
+        return $this->password_users;
+    }
+
+    /**
+     * RELACIONES (Paso 6)
+     */
+
+    // Un usuario pertenece a un rol
+    public function rol(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'id_rol', 'id_rol');
+    }
+
+    // Un usuario puede tener una configuración de preguntas secretas
+    public function preguntasSecretas(): HasOne
+    {
+        return $this->hasOne(PreguntaSecreta::class, 'id_users', 'id_users');
     }
 }

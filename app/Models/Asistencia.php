@@ -3,39 +3,37 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Class Asistencia
- *
- * @property $id
- * @property $fecha
- * @property $miembro_id
- * @property $created_at
- * @property $updated_at
- *
- * @property Miembro $miembro
- * @package App
- * @mixin \Illuminate\Database\Eloquent\Builder
- */
 class Asistencia extends Model
 {
-    
-    protected $perPage = 20;
+    use SoftDeletes;
+
+    // Configuración de tabla y llave primaria (Paso 5)
+    protected $table = 'asistencias';
+    protected $primaryKey = 'id_asistencias';
+
+    // Seguridad de Asignación Masiva (Paso 5)
+    protected $fillable = [
+        'id_sesiones',
+        'id_inscripcion_cohortes',
+        'estado_asistencia',
+        'observacion_asistencia'
+    ];
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * RELACIONES (Paso 6)
      */
-    protected $fillable = ['fecha', 'miembro_id'];
 
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function miembro()
+    // Una asistencia pertenece a una sesión específica
+    public function sesion()
     {
-        return $this->belongsTo(\App\Models\Miembro::class, 'miembro_id', 'id');
+        return $this->belongsTo(Sesion::class, 'id_sesiones', 'id_sesiones');
     }
-    
+
+    // Una asistencia pertenece a una inscripción de cohorte
+    public function inscripcion()
+    {
+        return $this->belongsTo(InscripcionCohorte::class, 'id_inscripcion_cohortes', 'id_inscripcion_cohortes');
+    }
 }

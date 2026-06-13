@@ -5,28 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Role extends Model
+class Titulo extends Model
 {
     // Configuración de tabla y llave primaria (Paso 5)
-    protected $table = 'roles';
-    protected $primaryKey = 'id_rol';
+    protected $table = 'titulos';
+    protected $primaryKey = 'id_titulos';
 
     // Desactivar timestamps por ser catálogo (Paso 5)
     public $timestamps = false;
     
     // Seguridad de Asignación Masiva (Paso 5)
     protected $fillable = [
-        'nombre_rol',
-        'descripcion_rol'
+        'nombre_titulo_base',
+        'nivel_academico'
     ];
 
     /**
      * RELACIONES (Paso 6)
      */
 
-    // Un rol puede estar asignado a muchos usuarios
-    public function users(): HasMany
+    // Un título base puede estar presente en muchas titulaciones de personas
+    public function titulaciones(): HasMany
     {
-        return $this->hasMany(User::class, 'id_rol', 'id_rol');
+        return $this->hasMany(TitulacionPersona::class, 'id_titulacion', 'id_titulos');
     }
 }
