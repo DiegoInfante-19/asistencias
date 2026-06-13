@@ -1,7 +1,7 @@
 window.CoreRules = {
     username: { 
-        regex: /^[a-z0-9]{4,20}$/, 
-        error: 'Usa solo letras minúsculas y números (entre 4 y 20 caracteres).' 
+        regex: /^[A-Z](?=.*\d)[a-z0-9]{3,19}$/, 
+        error: 'Debe iniciar con mayúscula, usar minúsculas y al menos un número (4-20 caracteres).' 
     },
     email: { 
         regex: /^[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]{1,251}\.com$/, 

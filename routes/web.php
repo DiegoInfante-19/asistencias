@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
 
 Auth::routes(['register' => true]);
 
@@ -17,4 +18,7 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
     
     // Nuestra ruta especial para la tabla profesional de administración
     Route::get('/profesores', [UserController::class, 'index'])->name('profesores.index');
+
+    // Ruta para el perfil del usuario autenticado
+    Route::get('/perfil', [ProfileController::class, 'index'])->name('perfil.index');
 });

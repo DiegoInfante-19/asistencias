@@ -17,7 +17,7 @@ class UserUpdateRequest extends FormRequest
         $id = $this->route('usuario');
 
         return [
-            'username'  => ['required', 'string', 'max:50', 'unique:users,username,' . $id . ',id_users', 'regex:/^[a-zA-Z0-9_]+$/'],
+            'username'  => ['required', 'string', 'max:20', 'unique:users,username,' . $id . ',id_users', 'regex:/^[A-Z](?=.*\d)[a-z0-9]{3,19}$/'],
             'name'      => ['required', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],
             'last_name' => ['required', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],
             // Se ignora el ID actual para evitar falsos positivos en la regla unique
@@ -33,6 +33,7 @@ class UserUpdateRequest extends FormRequest
         return [
             'required'        => 'Este campo es obligatorio.',
             'username.unique' => 'El nombre de usuario ya está en uso.',
+            'username.regex'  => 'Debe iniciar con mayúscula, usar minúsculas y al menos un número (4-20 caracteres).',
             'email.unique'    => 'El valor del campo email ya está en uso.',
             'cedula.unique'   => 'El valor del campo cedula ya está en uso.',
             'phone.unique'    => 'Este número de teléfono ya está registrado.',

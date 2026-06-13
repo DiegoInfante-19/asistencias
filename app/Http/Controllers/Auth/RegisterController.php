@@ -22,7 +22,7 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         $mensajes = [
-            'username.regex'     => 'Solo minúsculas y números (sin espacios).',
+            'username.regex'     => 'Debe iniciar con mayúscula, usar minúsculas y al menos un número (4-20 caracteres).',
             'email.regex'        => 'Debe ser un correo válido terminado en .com.',
             'name.regex'         => 'Solo letras y espacios permitidos.',
             'last_name.regex'    => 'Solo letras y espacios permitidos.',
@@ -35,7 +35,7 @@ class RegisterController extends Controller
         ];
 
         return Validator::make($data, [
-            'username'  => ['required', 'string', 'min:4', 'max:20', 'unique:users', 'regex:/^[a-z0-9]+$/'],
+            'username'  => ['required', 'string', 'min:4', 'max:20', 'unique:users', 'regex:/^[A-Z](?=.*\d)[a-z0-9]{3,19}$/'],
             'email'     => ['required', 'string', 'email:rfc,dns', 'unique:users', 'regex:/^[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]{1,251}\.com$/'],
             'name'      => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],
             'last_name' => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],

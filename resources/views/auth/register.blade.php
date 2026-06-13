@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12"> <!-- Aumenté un poco el ancho para que los campos dobles respiren mejor -->
+        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6"> <!-- Aumenté un poco el ancho para que los campos dobles respiren mejor -->
             <div class="card card-primary card-outline shadow">
                 <div class="card-header">
                     <h3>Registro de Usuario</h3>
@@ -15,13 +15,13 @@
 
                         <!-- FILA 1: Username y Email -->
                         <div class="row">
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-6 form-group mb-3 mb-md-0">
                                 <label for="username"><b>Nombre de Usuario</b><span class="text-danger">*</span></label>
-                                <input id="username" type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autocomplete="username" autofocus autocomplete="off">
+                                <input id="username" type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autocomplete="username" autofocus autocomplete="off" pattern="^[A-Z](?=.*\d)[a-z0-9]{3,19}$">
                                 <div class="invalid-feedback dynamic-feedback text-bold"></div>
                                 @error('username') <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span> @enderror
                             </div>
-
+                                
                             <div class="col-md-6 form-group">
                                 <label for="email"><b>Correo Electrónico</b><span class="text-danger">*</span></label>
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autocomplete="off">
@@ -34,7 +34,7 @@
 
                         <!-- FILA 2: Nombres y Apellidos -->
                         <div class="row">
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-6 form-group mb-3 mb-md-0">
                                 <label for="name"><b>Nombres</b><span class="text-danger">*</span></label>
                                 <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="off">
                                 <div class="invalid-feedback dynamic-feedback text-bold"></div>
@@ -54,7 +54,7 @@
                         <!-- FILA 3: Cédula y Teléfono -->
                         <!-- Ejemplo para Cédula -->
                         <div class="row">
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-6 form-group mb-3 mb-md-0">
                                 <label for="cedula"><b>Cédula de Identidad</b> <span class="text-danger">*</span></label>
                                 <input id="cedula" type="text" class="form-control @error('cedula') is-invalid @enderror" name="cedula" value="{{ old('cedula') }}" required>
                                 <div class="invalid-feedback dynamic-feedback text-bold"></div>
@@ -76,7 +76,7 @@
 
                         <!-- FILA 4: Contraseña y Confirmar -->
                         <div class="row">
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-6 form-group mb-3 mb-md-0">
                                 <label for="password"><b>Contraseña</b><span class="text-danger">*</span></label>
                                 <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
                                 <div class="invalid-feedback dynamic-feedback text-bold"></div>

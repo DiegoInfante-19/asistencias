@@ -204,6 +204,84 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // 3. Envío asíncrono para Crear Profesor
+    const formCrear = document.getElementById('createUserForm');
+    if (formCrear) {
+        formCrear.addEventListener('submit', function (event) {
+            if (this.checkValidity()) {
+                event.preventDefault(); // Detenemos el envío tradicional
+
+                const formData = new FormData(this);
+                const actionUrl = this.getAttribute('action');
+
+                // Deshabilitamos el botón para evitar doble submit
+                const submitBtn = document.querySelector(`button[form="${this.id}"]`);
+                if (submitBtn) submitBtn.disabled = true;
+
+                $.ajax({
+                    url: actionUrl,
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Cerrar el modal
+                            const modalEl = document.getElementById('createUserModal');
+                            const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                            modalInstance.hide();
+
+                            // Recargar DataTable
+                            if ($.fn.DataTable.isDataTable('#users-table')) {
+                                $('#users-table').DataTable().ajax.reload(null, false);
+                            }
+
+                            // SweetAlert de éxito
+                            Swal.fire({
+                                title: '¡Registrado!',
+                                text: response.message || 'El profesor ha sido registrado con éxito.',
+                                icon: 'success',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        // Rehabilitar botón
+                        if (submitBtn) submitBtn.disabled = false;
+
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON.errors;
+                            // Encender los errores en el modal
+                            Object.keys(errors).forEach(key => {
+                                const input = formCrear.querySelector(`[name="${key}"]`);
+                                if (input) {
+                                    input.classList.add('is-invalid');
+                                    const feedback = input.parentNode.querySelector('.dynamic-feedback');
+                                    if (feedback) {
+                                        feedback.textContent = errors[key][0];
+                                        feedback.style.display = 'block';
+                                    }
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Ocurrió un error inesperado al guardar el registro.',
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     // Inicializamos ambos formularios
     activarValidacion('#createUserForm');
     activarValidacion('#editUserForm');

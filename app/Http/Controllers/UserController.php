@@ -32,7 +32,7 @@ class UserController extends Controller
     public function store(UserStoreRequest $request)
     {
         // Creamos al usuario (el código es el mismo para ambos casos)
-        User::create([
+        $user = User::create([
             'name'      => $request->name,
             'last_name' => $request->last_name,
             'cedula'    => $request->cedula,
@@ -43,6 +43,15 @@ class UserController extends Controller
             'role_id'   => $request->role_id,
             'password'  => Hash::make($request->password),
         ]);
+
+        // Si la petición es AJAX, respondemos con JSON
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'El profesor ha sido registrado desde el panel exitosamente.',
+                'user'    => $user
+            ]);
+        }
 
         // Redirección Inteligente: Comprobamos de dónde viene la petición
         if ($request->has('origen') && $request->origen === 'modal') {

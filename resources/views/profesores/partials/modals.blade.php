@@ -76,7 +76,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombre de Usuario</label>
-                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" id="edit-username" value="{{ old('_method') == 'PUT' ? old('username') : '' }}" required>
+                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" id="edit-username" value="{{ old('_method') == 'PUT' ? old('username') : '' }}" required pattern="^[A-Z](?=.*\d)[a-z0-9]{3,19}$">
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 
@@ -149,7 +149,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombre de Usuario</label>
-                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('origen') == 'modal' ? old('username') : '' }}" required>
+                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('origen') == 'modal' ? old('username') : '' }}" required pattern="^[A-Z](?=.*\d)[a-z0-9]{3,19}$">
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 

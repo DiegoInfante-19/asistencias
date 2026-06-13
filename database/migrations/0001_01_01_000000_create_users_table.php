@@ -1,5 +1,14 @@
 <?php
 
+/*
+con antigraviti solucionaremos el registro de la base de datos aplicando 
+la ingenir¿eria de prompt presente en el docuemnto
+
+
+
+*/
+
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

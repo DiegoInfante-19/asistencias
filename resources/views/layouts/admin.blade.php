@@ -20,6 +20,8 @@
   <!-- Skip links will be dynamically added by accessibility.js -->
   <meta name="supported-color-schemes" content="light dark" />
 
+<link rel="icon" type="image/png" href="{{ asset('images/upt_logo-modified.png') }}">
+
   <!-- CAMBIO AQUÍ: Preload de AdminLTE CSS -->
   <link rel="preload" href="{{ asset('dist/css/adminlte.css') }}" as="style" />
   <!--end::Accessibility Features-->
@@ -73,12 +75,12 @@
         <a href="./index.html" class="brand-link">
           <!--begin::Brand Image-->
           <img
-            src="./assets/img/AdminLTELogo.png"
+            src="{{ asset('images/upt_logo-modified.png') }}"
             alt="AdminLTE Logo"
             class="brand-image opacity-75 shadow" />
           <!--end::Brand Image-->
           <!--begin::Brand Text-->
-          <span class="brand-text fw-light">AdminLTE 4</span>
+          <span class="brand-text fw-light">Assis.UPT</span> 
           <!--end::Brand Text-->
         </a>
         <!--end::Brand Link-->
@@ -91,7 +93,7 @@
           <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false" id="navigation">
 
             <li class="nav-item">
-              <a href="./generate/theme.html" class="nav-link">
+              <a href="{{ route('admin.index') }}" class="nav-link">
                 <i class="bi bi-house-fill"></i>
                 <p>Pagina de Inicio</p>
               </a>
@@ -201,7 +203,7 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="./widgets/small-box.html" class="nav-link">
+                  <a href="{{ route('perfil.index') }}" class="nav-link">
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-person-circle"></i>
                     <p>Ver Perfil</p>
                   </a>
@@ -332,3 +334,17 @@
 <!--end::Body-->
 
 </html>
+
+
+
+
+<!-- 
+
+pagina del perfil 
+sistema de toma de asistenicas 
+resto de tablas (empresas, titulaciones, cohortes) pasarlas con la lista en draw.iio y empezar a pasarlar a phpmyadmin y hacer las migraciones correspondientes para cada una de ellas.
+diseño de interfaz de asistenicas 
+
+
+ 
+-->
