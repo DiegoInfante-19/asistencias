@@ -107,10 +107,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('hidden.bs.modal', function (event) {
         console.log('Modal cerrado (evento detectado):', event.target.id);
         
-        // Buscar si el modal cerrado contiene uno de nuestros formularios
-        const form = event.target.querySelector('#createUserForm, #editUserForm');
+        // Buscamos TODOS los formularios que estén dentro del modal que se cerró
+        const formularios = event.target.querySelectorAll('form');
         
-        if (form) {
+        formularios.forEach(form => {
             console.log('Reseteando formulario...', form.id);
             
             // 1. Limpiar los valores de todos los inputs
@@ -129,21 +129,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 feedback.style.display = 'none';
             });
 
-            // (Opcional) Limpiar también los errores estáticos de Laravel si los hay
+            // Limpiar también los errores estáticos de Laravel si los hay
             const erroresLaravel = form.querySelectorAll('[role="alert"]');
             erroresLaravel.forEach(errorLaravel => {
                 errorLaravel.classList.remove('d-block');
                 errorLaravel.style.display = 'none';
             });
 
-            // 4. Volver a bloquear el botón de Submit
+            // 4. Volver a bloquear el botón de Submit asociado a este formulario en específico
             const submitBtn = document.querySelector(`button[form="${form.id}"]`);
             if (submitBtn) {
                 submitBtn.disabled = true;
             }
-            
-            console.log('Reseteo completado con éxito para:', form.id);
-        }
+        });
     });
 
     // =================================================================
@@ -285,4 +283,5 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inicializamos ambos formularios
     activarValidacion('#createUserForm');
     activarValidacion('#editUserForm');
+    activarValidacion('#profileUpdateForm');
 });

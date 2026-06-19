@@ -76,46 +76,45 @@
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombre de Usuario</label>
-                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" id="edit-username" value="{{ old('_method') == 'PUT' ? old('username') : '' }}" required pattern="^[A-Z](?=.*\d)[a-z0-9]{3,19}$">
+                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" id="edit-username" value="{{ old('_method') == 'PUT' ? old('username') : '' }}" autocomplete="off" required pattern="^[A-Z](?=.*\d)[a-z0-9]{3,19}$">
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Correo Electrónico</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="edit-email" value="{{ old('_method') == 'PUT' ? old('email') : '' }}" required>
+                            <input type="email" class="form-control @error('email_users') is-invalid @enderror" name="email_users" id="edit-email" value="{{ old('_method') == 'PUT' ? old('email_users') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombres</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="edit-name" value="{{ old('_method') == 'PUT' ? old('name') : '' }}" required>
+                            <input type="text" class="form-control @error('name_users') is-invalid @enderror" name="name_users" id="edit-name" value="{{ old('_method') == 'PUT' ? old('name_users') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Apellidos</label>
-                            <input type="text" class="form-control @error('last_name') is-invalid @enderror" name="last_name" id="edit-lastname" value="{{ old('_method') == 'PUT' ? old('last_name') : '' }}" required>
+                            <input type="text" class="form-control @error('last_name_users') is-invalid @enderror" name="last_name_users" id="edit-lastname" value="{{ old('_method') == 'PUT' ? old('last_name_users') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Cédula</label>
-                            <input type="text" class="form-control @error('cedula') is-invalid @enderror" name="cedula" id="edit-cedula" value="{{ old('_method') == 'PUT' ? old('cedula') : '' }}" required>
+                            <input type="text" class="form-control @error('cedula_users') is-invalid @enderror" name="cedula_users" id="edit-cedula" value="{{ old('_method') == 'PUT' ? old('cedula_users') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Teléfono</label>
-                            <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" id="edit-phone" value="{{ old('_method') == 'PUT' ? old('phone') : '' }}">
+                            <input type="text" class="form-control @error('phone_users') is-invalid @enderror" name="phone_users" id="edit-phone" value="{{ old('_method') == 'PUT' ? old('phone_users') : '' }}" autocomplete="off">
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Estado</label>
-                            <select class="form-select @error('status') is-invalid @enderror" name="status" id="edit-status" required>
-                                <option value="Activo" {{ old('_method') == 'PUT' && old('status') == 'Activo' ? 'selected' : '' }}>Activo</option>
-                                <option value="Inactivo" {{ old('_method') == 'PUT' && old('status') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
-                                <option value="Suspendido" {{ old('_method') == 'PUT' && old('status') == 'Suspendido' ? 'selected' : '' }}>Suspendido</option>
+                            <select class="form-select @error('status_users') is-invalid @enderror" name="status_users" id="edit-status" required>
+                                <option value="Activo" {{ old('_method') == 'PUT' && old('status_users') == 'Activo' ? 'selected' : '' }}>Activo</option>
+                                <option value="Inactivo" {{ old('_method') == 'PUT' && old('status_users') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
+                                <option value="Suspendido" {{ old('_method') == 'PUT' && old('status_users') == 'Suspendido' ? 'selected' : '' }}>Suspendido</option>
                             </select>
                         </div>
-
                     </div>
                 </form>
             </div>
@@ -149,42 +148,44 @@
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombre de Usuario</label>
-                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('origen') == 'modal' ? old('username') : '' }}" required pattern="^[A-Z](?=.*\d)[a-z0-9]{3,19}$">
+                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('origen') == 'modal' ? old('username') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Correo Electrónico</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('origen') == 'modal' ? old('email') : '' }}" required>
+                            <input type="email" class="form-control @error('email_users') is-invalid @enderror" name="email_users" value="{{ old('origen') == 'modal' ? old('email_users') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombres</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('origen') == 'modal' ? old('name') : '' }}" required>
+                            <input type="text" class="form-control @error('name_users') is-invalid @enderror" name="name_users" value="{{ old('origen') == 'modal' ? old('name_users') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Apellidos</label>
-                            <input type="text" class="form-control @error('last_name') is-invalid @enderror" name="last_name" value="{{ old('origen') == 'modal' ? old('last_name') : '' }}" required>
+                            <input type="text" class="form-control @error('last_name_users') is-invalid @enderror" name="last_name_users" value="{{ old('origen') == 'modal' ? old('last_name_users') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Cédula</label>
-                            <input type="text" class="form-control @error('cedula') is-invalid @enderror" name="cedula" value="{{ old('origen') == 'modal' ? old('cedula') : '' }}" required>
+                            <input type="text" class="form-control @error('cedula_users') is-invalid @enderror" name="cedula_users" value="{{ old('origen') == 'modal' ? old('cedula_users') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Teléfono</label>
-                            <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('origen') == 'modal' ? old('phone') : '' }}">
+                            <input type="text" class="form-control @error('phone_users') is-invalid @enderror" name="phone_users" value="{{ old('origen') == 'modal' ? old('phone_users') : '' }}" autocomplete="off" pattern="^\d{10,11}$">
+
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Rol del Sistema</label>
-                            <select class="form-select @error('role_id') is-invalid @enderror" name="role_id" required style="color: black;">
-                                <option value="" disabled {{ !old('role_id') ? 'selected' : '' }}>Seleccione un rol...</option>
+                            <select class="form-select @error('id_rol') is-invalid @enderror" name="id_rol" required style="color: black;">
+                                <option value="" disabled {{ !old('id_rol') ? 'selected' : '' }}>Seleccione un rol...</option>
                                 @foreach($roles as $role)
-                                <option value="{{ $role->id }}" {{ old('origen') == 'modal' && old('role_id') == $role->id ? 'selected' : '' }}>{{ $role->nombre }}</option>
+                                <option value="{{ $role->id_rol }}" {{ old('origen') == 'modal' && old('id_rol') == $role->id_rol ? 'selected' : '' }}>{{ $role->nombre_rol }}</option>
                                 @endforeach
                             </select>
                         </div>

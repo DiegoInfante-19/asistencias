@@ -153,7 +153,7 @@
             var button = $(event.relatedTarget);
             // Si el modal se abre automáticamente por código (ej. error de validación), el botón no existe
             if (!button.length) return;
-            
+
             var modal = $(this);
             modal.find('#editUserForm').attr('action', button.data('url'));
             modal.find('#edit_url').val(button.data('url'));
@@ -171,39 +171,18 @@
         });
 
         // 4. LÓGICA PARA AUTO-ABRIR MODAL TRAS ERROR DE VALIDACIÓN
-        @if($errors->any())
-            @if(old('origen') == 'modal')
-                var createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
-                createUserModal.show();
-            @elseif(old('_method') == 'PUT')
-                $('#editUserForm').attr('action', $('#edit_url').val());
-                var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
-                editUserModal.show();
-            @endif
+        @if($errors -> any())
+        @if(old('origen') == 'modal')
+        var createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+        createUserModal.show();
+        @elseif(old('_method') == 'PUT')
+        $('#editUserForm').attr('action', $('#edit_url').val());
+        var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        editUserModal.show();
+        @endif
         @endif
     });
 </script>
 <script src="{{ asset('js/core-validations.js') }}" defer></script>
 <script src="{{ asset('js/admin-validations.js') }}" defer></script>
 @endsection
-
-<!-- 
-    modificacion *
-    eliminacion  *
-    creacion     *
-    validacion   *
-
-    mismo forumulario en todo *
-    pruebas panel *
-    validacion en panel * 
-    quitar los indicadores de error cuando se cierra el modal *
-
-    preguntar antes de hacer cada cosa del panel 
-    modal de respuesta positiva *
-
-    edicion  falla cuando se ingresa algo repetido
-
-    diseño perfil
-    modales perfil
-
--->

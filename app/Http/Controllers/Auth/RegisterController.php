@@ -21,29 +21,34 @@ class RegisterController extends Controller
 
     protected function validator(array $data)
     {
+        // 1. Mensajes actualizados para que coincidan con las nuevas reglas
         $mensajes = [
-            'username.regex'     => 'Debe iniciar con mayúscula, usar minúsculas y al menos un número (4-20 caracteres).',
-            'email.regex'        => 'Debe ser un correo válido terminado en .com.',
-            'name.regex'         => 'Solo letras y espacios permitidos.',
-            'last_name.regex'    => 'Solo letras y espacios permitidos.',
+            'username.regex'     => 'Debe iniciar con mayúscula, tener al menos un número y entre 4-20 caracteres.',
+            'email.regex'        => 'Ingrese un correo electrónico válido.',
+            'name.regex'         => 'Solo letras y espacios permitidos (mínimo 3 caracteres).',
+            'last_name.regex'    => 'Solo letras y espacios permitidos (mínimo 3 caracteres).',
             'cedula.regex'       => 'Debe tener entre 6 y 8 números.',
             'phone.regex'        => 'Debe tener entre 10 y 11 números sin guiones.',
-            'phone.unique' => 'Este número de teléfono ya está registrado.',
-            'password.regex'     => 'Formato estricto: 8 caracteres (2 mayús, 2 minús, 2 núm, 2 especiales).',
+            'phone.unique'       => 'Este número de teléfono ya está registrado.',
+            'password.regex'     => 'Mínimo 8 caracteres: al menos una mayúscula, una minúscula, un número y un símbolo.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'required'           => 'Este campo es obligatorio.',
+            'username.unique'    => 'Este nombre de usuario ya está en uso.',
+            'email.unique'       => 'Este correo electrónico ya está registrado.',
+            'cedula.unique'      => 'Esta cédula ya está registrada.',
         ];
 
+        // 2. Reglas sincronizadas con el FormRequest y el JS
         return Validator::make($data, [
-            'username'  => ['required', 'string', 'min:4', 'max:20', 'unique:users', 'regex:/^[A-Z](?=.*\d)[a-z0-9]{3,19}$/'],
-            'email'     => ['required', 'string', 'email:rfc,dns', 'unique:users', 'regex:/^[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]{1,251}\.com$/'],
-            'name'      => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],
-            'last_name' => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],
-            'cedula'    => ['required', 'string', 'unique:users', 'regex:/^\d{6,8}$/'],
-            'phone'     => ['nullable', 'string', 'unique:users', 'regex:/^\d{10,11}$/'],
+            'username'  => ['required', 'string', 'min:4', 'max:20', 'unique:users,username', 'regex:/^[A-Z](?=.*\d)[a-zA-Z0-9_]{3,19}$/'],
+            'email'     => ['required', 'string', 'email:rfc,dns', 'unique:users,email_users', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
+            'name'      => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{3,50}$/'],
+            'last_name' => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{3,50}$/'],
+            'cedula'    => ['required', 'string', 'unique:users,cedula_users', 'regex:/^\d{6,8}$/'],
+            'phone'     => ['nullable', 'string', 'unique:users,phone_users', 'regex:/^\d{10,11}$/'],
             'password'  => [
                 'required', 'string', 'confirmed',
-                'regex:/^(?=(?:[^A-Z]*[A-Z]){2}[^A-Z]*$)(?=(?:[^a-z]*[a-z]){2}[^a-z]*$)(?=(?:[^0-9]*[0-9]){2}[^0-9]*$)(?=(?:[^+*$%&-]*[+*$%&-]){2}[^+*$%&-]*$)[A-Za-z0-9+*$%&-]{8}$/'
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.+-])[A-Za-z\d@$!%*?&.+-]{8,64}$/'
             ],
         ], $mensajes);
     }
@@ -51,15 +56,15 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         return User::create([
-            'username'  => $data['username'],
-            'email'     => $data['email'],
-            'name'      => $data['name'],
-            'last_name' => $data['last_name'],
-            'cedula'    => $data['cedula'],
-            'phone'     => $data['phone'] ?? null, // Captura el teléfono
-            'status'    => 'Activo',
-            'role_id'   => 3, // Rol de Profesor por defecto
-            'password'  => Hash::make($data['password']),
+            'username'        => $data['username'],
+            'email_users'     => $data['email'],
+            'name_users'      => $data['name'],
+            'last_name_users' => $data['last_name'],
+            'cedula_users'    => $data['cedula'],
+            'phone_users'     => $data['phone'] ?? null, 
+            'status_users'    => 'Activo',
+            'id_rol'          => 3, 
+            'password_users'  => Hash::make($data['password']),
         ]);
     }
 }

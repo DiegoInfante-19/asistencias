@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\PreguntaSecreta;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,6 +39,26 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'password_users' => 'hashed',
         ];
+    }
+
+
+    /**
+     * ==========================================================
+     * EVENTOS DEL MODELO (El disparador automático)
+     * ==========================================================
+     */
+    protected static function booted()
+    {
+        // El evento 'created' se dispara DESPUÉS de que el usuario se guarda en la BD
+        static::created(function ($user) {
+            PreguntaSecreta::create([
+                'id_users'   => $user->id_users, // Tomamos el ID recién generado
+                'pregunta1'  => '',              // Cadenas vacías para superar el NOT NULL
+                'pregunta2'  => '',
+                'respuesta1' => '',
+                'respuesta2' => '',
+            ]);
+        });
     }
 
     /**

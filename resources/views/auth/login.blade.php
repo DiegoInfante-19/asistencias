@@ -13,7 +13,7 @@
                         <!-- Cédula o Correo -->
                         <div class="form-group">
                             <label for="login"><b>Cédula o Correo Electrónico</b></label>
-                            <input id="login" type="text" class="form-control @error('login') is-invalid @enderror" name="login" value="{{ old('login') }}" required autofocus placeholder="Este campos es obligatorio">
+                            <input id="login" type="text" class="form-control @error('login') is-invalid @enderror" name="login" value="{{ old('login') }}" required autocomplete="off"  placeholder="Este campos es obligatorio">
                             @error('login')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>

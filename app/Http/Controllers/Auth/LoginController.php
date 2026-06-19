@@ -33,11 +33,18 @@ class LoginController extends Controller
     protected function credentials(Request $request){
         $loginValue = $request->input('login');
 
-        $field = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'cedula';
+        // Determinamos el campo lógico
+        $fieldLogic = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'cedula';
+        
+        // Mapeamos a las columnas reales de la BD
+        $dbColumn = $fieldLogic === 'email' ? 'email_users' : 'cedula_users';
 
+        // Laravel necesita recibir la clave 'password' en el array de credenciales.
+        // Internamente, usará getAuthPassword() del Modelo para compararla con 'password_users'.
         return [
-            $field     => $loginValue,
+            $dbColumn  => $loginValue,
             'password' => $request->input('password'),
+            'status_users' => 'Activo' // Opcional: Asegurarnos de que solo usuarios activos puedan loguearse
         ];
     }
 
@@ -49,5 +56,3 @@ class LoginController extends Controller
         return 'login';
     }
 }
-
-

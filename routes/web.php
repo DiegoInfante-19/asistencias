@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SecurityController;
+use App\Http\Controllers\SecuritySettingsController;
 
 Auth::routes(['register' => true]);
 
@@ -21,4 +23,20 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
 
     // Ruta para el perfil del usuario autenticado
     Route::get('/perfil', [ProfileController::class, 'index'])->name('perfil.index');
+
+    Route::put('/perfil/update', [ProfileController::class, 'update'])->name('perfil.update');
+
+    // Rutas dedicadas exclusivamente a seguridad de credenciales
+    Route::put('/perfil/password/update', [SecuritySettingsController::class, 'updatePassword'])
+        ->name('seguridad.password.update');
+        
+    Route::put('/perfil/seguridad/preguntas/update', [SecuritySettingsController::class, 'updateSecurityQuestions'])
+        ->name('seguridad.preguntas.update');
+
+    // Ruta para recibir y procesar el modal de preguntas secretas
+    Route::put('/seguridad/preguntas', [SecurityController::class, 'storePreguntas'])
+    ->name('seguridad.preguntas.store');
+
+
+
 });

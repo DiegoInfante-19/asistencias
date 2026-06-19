@@ -1,27 +1,38 @@
 <?php
-namespace Database\Seeders;
-use Illuminate\Database\Seeder;
-use App\Models\Role; // Asegúrate de usar TU modelo
 
-class RoleSeeder extends Seeder{
-    public function run(): void{
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class RoleSeeder extends Seeder
+{
+    public function run(): void
+    {
         $roles = [
             [
-                'nombre' => 'Tecnico',
-                'descripcion' => 'Programador y soporte del sistema'
+                'id_rol' => 1,
+                'nombre_rol' => 'Administrador',
+                'descripcion_rol' => 'Acceso total al sistema',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'nombre' => 'Admin',
-                'descripcion' => 'Secretaria y personal administrativo'
+                'id_rol' => 2,
+                'nombre_rol' => 'Coordinador',
+                'descripcion_rol' => 'Gestión de PNFs y cohortes',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'nombre' => 'Profesor',
-                'descripcion' => 'Personal docente del Vicerrectorado'
-            ],
+                'id_rol' => 3,
+                'nombre_rol' => 'Profesor',
+                'descripcion_rol' => 'Registro de asistencias y visualización de sesiones',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
         ];
 
-        foreach ($roles as $role) {
-            Role::create($role);
-        }
+        DB::table('roles')->insert($roles);
     }
 }

@@ -1,35 +1,41 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-class PreguntaSecreta extends Model
-{
-    // Configuración de tabla y llave primaria (Paso 5)
-    protected $table = 'preguntas_secretas';
-    protected $primaryKey = 'id_preguntas_secretas';
-
-    // Desactivar timestamps por ser un modelo de seguridad (Paso 5)
-    public $timestamps = false;
+class PreguntaSecreta extends Model{
     
-    // Seguridad de Asignación Masiva (Paso 5)
+protected $table = 'preguntas_secretas';
+    protected $primaryKey = 'id_preguntas_secretas';
+    public $timestamps = false; 
     protected $fillable = [
         'id_users',
         'pregunta1',
         'pregunta2',
         'respuesta1',
-        'respuesta2'
+        'respuesta2',
     ];
-
-    /**
-     * RELACIONES (Paso 6)
-     */
-
-    // Cada registro de seguridad pertenece a un usuario
-    public function user(): BelongsTo
-    {
+    
+    public function user(){
         return $this->belongsTo(User::class, 'id_users', 'id_users');
+    }
+
+    public static function listaPreguntas1(){
+        return [
+            1 => '¿Cuál es tu cantante favorito?',
+            2 => '¿Cuál es tu libro favorito?',
+            3 => '¿Cuál sería tu trabajo ideal?',
+            4 => '¿Cuál es tu película favorita?',
+            5 => '¿Cuál es tu personaje favorito?',
+        ];
+    }
+
+    public static function listaPreguntas2(){
+        return [
+            6 => '¿Cómo se llama tu mejor amigo?',
+            7 => '¿Cómo se llama tu primera mascota?',
+            8 => '¿Cómo se llama tu equipo favorito?',
+            9 => '¿Cómo se llama la calle donde creciste?',
+            10 => '¿Cómo se llama tu plato favorito?',
+        ];
     }
 }

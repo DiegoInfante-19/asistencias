@@ -4,7 +4,6 @@
     // Inyectamos las variables de sesión
     const mensajeExito = @json(session('success'));
     const mensajeError = @json(session('error'));
-    
     // ¡NUEVO!: Obtenemos todos los errores de validación (Cédulas duplicadas, correos en uso, etc.)
     const erroresValidacion = @json($errors->all());
 
@@ -57,25 +56,55 @@
             });
         }
 
-        // 4. Lógica Global para los botones de Eliminar (Panel Admin)
-        $('.form-delete').on('submit', function(e) {
-            e.preventDefault(); 
-            var form = this;
+        // 4. Lógica Global para los botones de Eliminar (Panel Admin) - VERSIÓN NATIVA
+        document.addEventListener('submit', function(e) {
+            // Verificamos si el formulario disparado tiene la clase form-delete
+            if (e.target && e.target.classList.contains('form-delete')) {
+                e.preventDefault(); 
+                const form = e.target;
 
-            Swal.fire({
-                title: '¿Estás totalmente seguro?',
-                text: "Esta acción eliminará el registro de forma permanente.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="bi bi-trash"></i> Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit(); 
-                }
-            });
+                Swal.fire({
+                    title: '¿Estás totalmente seguro?',
+                    text: "Esta acción eliminará el registro de forma permanente.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="bi bi-trash"></i> Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); 
+                    }
+                });
+            }
         });
+
+        // 5. Confirmación para Cerrar Sesión
+        // Seleccionamos el enlace por su icono o clase si prefieres, 
+        // pero aquí usamos el ID o una clase específica en el botón de logout
+        const logoutBtn = document.getElementById('logout-link');
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                Swal.fire({
+                    title: '¿Cerrar sesión?',
+                    text: "¿Estás seguro de que deseas salir del sistema?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, salir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Enviamos el formulario que está en tu admin.blade.php
+                        document.getElementById('logout-form').submit();
+                    }
+                });
+            });
+        }
     });
 </script>
