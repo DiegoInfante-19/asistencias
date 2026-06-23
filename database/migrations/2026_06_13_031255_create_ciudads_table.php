@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('id_estado')->constrained('estados', 'id_estado')->onDelete('restrict');
             
             $table->string('nombre_ciudad', 100);
-            // Sin timestamps por ser catálogo fijo
+            $table->timestamps();
         });
     }
 
