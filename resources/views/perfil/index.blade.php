@@ -11,16 +11,9 @@
                         <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 96px; height: 96px; font-size: 2.5rem; font-weight: bold;">
                             {{ substr($user->name_users, 0, 1) }}{{ substr($user->last_name_users, 0, 1) }}
                         </div>
-
                         <h3 class="h5 mb-0">{{ $user->name_users }} {{ $user->last_name_users }}</h3>
-                        <p class="text-muted mb-2">
-                            <i class="bi bi-at"></i> {{ $user->username }}
-                        </p>
-
-                        <p class="text-secondary mb-3">
-                            <span class="badge text-bg-primary">{{ $user->rol->nombre_rol ?? 'Usuario' }}</span>
-                        </p>
-
+                        <p class="text-muted mb-2"><i class="bi bi-at"></i> {{ $user->username }}</p>
+                        <p class="text-secondary mb-3"><span class="badge text-bg-primary">{{ $user->rol->nombre_rol ?? 'Usuario' }}</span></p>
                         <ul class="list-group list-group-flush text-start small">
                             <li class="list-group-item d-flex justify-content-between px-0">
                                 <span class="text-secondary"><i class="bi bi-person-vcard me-1"></i> Cédula</span>
@@ -77,44 +70,44 @@
                                     @method('PUT')
 
                                     <div class="row g-4">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 form-group">
                                             <label class="form-label small fw-bold">Nombre de Usuario</label>
-                                            <input type="text" name="username" class="form-control" value="{{ $user->username }}" required>
+                                            <input type="text" name="username" class="form-control" value="{{ $user->username }}" required pattern="{{ config('regex.username.html') }}">
                                             <div class="dynamic-feedback fw-bold small text-danger" style="display:none;"></div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 form-group">
                                             <label class="form-label small fw-bold">Correo Electrónico</label>
-                                            <input type="email" name="email_users" class="form-control" value="{{ $user->email_users }}" required>
+                                            <input type="email" name="email_users" class="form-control" value="{{ $user->email_users }}" required pattern="{{ config('regex.email.html') }}">
                                             <div class="dynamic-feedback fw-bold small text-danger" style="display:none;"></div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 form-group">
                                             <label class="form-label small fw-bold">Nombres</label>
-                                            <input type="text" name="name_users" class="form-control" value="{{ $user->name_users }}" required>
+                                            <input type="text" name="name_users" class="form-control" value="{{ $user->name_users }}" required pattern="{{ config('regex.name.html') }}">
                                             <div class="dynamic-feedback fw-bold small text-danger" style="display:none;"></div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 form-group">
                                             <label class="form-label small fw-bold">Apellidos</label>
-                                            <input type="text" name="last_name_users" class="form-control" value="{{ $user->last_name_users }}" required>
+                                            <input type="text" name="last_name_users" class="form-control" value="{{ $user->last_name_users }}" required pattern="{{ config('regex.last_name.html') }}">
                                             <div class="dynamic-feedback fw-bold small text-danger" style="display:none;"></div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 form-group">
                                             <label class="form-label small fw-bold">Cédula</label>
-                                            <input type="text" name="cedula_users" class="form-control" value="{{ $user->cedula_users }}" required>
+                                            <input type="text" name="cedula_users" class="form-control" value="{{ $user->cedula_users }}" required pattern="{{ config('regex.cedula.html') }}">
                                             <div class="dynamic-feedback fw-bold small text-danger" style="display:none;"></div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 form-group">
                                             <label class="form-label small fw-bold">Teléfono</label>
-                                            <input type="text" name="phone_users" class="form-control" value="{{ $user->phone_users }}">
+                                            <input type="text" name="phone_users" class="form-control" value="{{ $user->phone_users }}" pattern="{{ config('regex.phone.html') }}">
                                             <div class="dynamic-feedback fw-bold small text-danger" style="display:none;"></div>
                                         </div>
 
                                         <div class="col-md-12 mt-3">
-                                            <button type="submit" class="btn btn-primary fw-bold" form="profileUpdateForm" >
+                                            <button type="submit" class="btn btn-primary fw-bold" form="profileUpdateForm">
                                                 <i class="bi bi-save me-1"></i> Guardar Cambios
                                             </button>
                                             <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#securityModal">
@@ -144,7 +137,15 @@
         </div>
     </div>
 </div>
-<script src="{{ asset('js/core-validations.js') }}" defer></script>
-<script src="{{ asset('js/admin-validations.js') }}" defer></script>
 @include('perfil.partials.security-modal')
+@endsection
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Activamos la validación automática para este formulario
+        activarValidacion('#profileUpdateForm');
+        activarValidacion('#formPassword');
+        activarValidacion('#formSecurity')
+    });
+</script>
 @endsection

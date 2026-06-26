@@ -5,23 +5,26 @@
                 <h5 class="modal-title fw-bold"><i class="bi bi-shield-check text-primary"></i> Seguridad de Cuenta</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            
+
             <div class="modal-body">
                 <form id="formPassword" action="{{ route('seguridad.password.update') }}" method="POST">
                     @csrf @method('PUT')
                     <h6 class="fw-bold border-bottom pb-2">Cambiar Contraseña</h6>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-4">
+                        <div class="col-md-4 form-group">
                             <label class="form-label small">Actual</label>
                             <input type="password" name="current_password" class="form-control" required>
+                            <div class="dynamic-feedback text-danger small" style="display:none;"></div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4 form-group">
                             <label class="form-label small">Nueva</label>
-                            <input type="password" name="password" id="password" class="form-control" required>
+                            <input type="password" name="password" id="password" class="form-control" required pattern="{{ config('regex.password.html') }}">
+                            <div class="dynamic-feedback text-danger small" style="display:none;"></div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4 form-group">
                             <label class="form-label small">Confirmar</label>
                             <input type="password" name="password_confirmation" class="form-control" required>
+                            <div class="dynamic-feedback text-danger small" style="display:none;"></div>
                         </div>
                     </div>
                 </form>
@@ -30,23 +33,25 @@
                     @csrf @method('PUT')
                     <h6 class="fw-bold border-bottom pb-2">Preguntas de Seguridad</h6>
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-6 form-group">
                             <label class="form-label small">Pregunta 1</label>
                             <select name="pregunta1" class="form-select">
                                 @foreach(\App\Models\PreguntaSecreta::listaPreguntas1() as $id => $pregunta)
-                                    <option value="{{ $id }}">{{ $pregunta }}</option>
+                                <option value="{{ $id }}">{{ $pregunta }}</option>
                                 @endforeach
                             </select>
-                            <input type="text" name="respuesta1" class="form-control mt-2" placeholder="Respuesta..." required>
+                            <input type="text" name="respuesta1" class="form-control mt-2" placeholder="Respuesta..." required pattern="{{ config('regex.respuesta1.html') }}">
+                            <div class="dynamic-feedback text-danger small" style="display:none;"></div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 form-group">
                             <label class="form-label small">Pregunta 2</label>
                             <select name="pregunta2" class="form-select">
                                 @foreach(\App\Models\PreguntaSecreta::listaPreguntas2() as $id => $pregunta)
-                                    <option value="{{ $id }}">{{ $pregunta }}</option>
+                                <option value="{{ $id }}">{{ $pregunta }}</option>
                                 @endforeach
                             </select>
-                            <input type="text" name="respuesta2" class="form-control mt-2" placeholder="Respuesta..." required>
+                            <input type="text" name="respuesta2" class="form-control mt-2" placeholder="Respuesta..." required pattern="{{ config('regex.respuesta2.html') }}">
+                            <div class="dynamic-feedback text-danger small" style="display:none;"></div>
                         </div>
                     </div>
                 </form>

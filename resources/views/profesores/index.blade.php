@@ -183,6 +183,4 @@
         @endif
     });
 </script>
-<script src="{{ asset('js/core-validations.js') }}" defer></script>
-<script src="{{ asset('js/admin-validations.js') }}" defer></script>
 @endsection

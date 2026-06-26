@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let esValido = true;
         let mensajeError = "";
 
-        // Lógica especial para confirmación de contraseña
+        // 1. Lógica especial para confirmación de contraseña
         if (nombreCampo === "password_confirmation") {
             const passInput = document.querySelector('input[name="password"]');
             if (valor !== passInput?.value) {
@@ -34,9 +34,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 mensajeError = "Las contraseñas no coinciden.";
             }
         }
-        // Lógica estándar basada en las reglas inyectadas desde PHP
+        // 2. Lógica estándar unificada (simplificada y limpia)
         else if (reglas[nombreCampo]) {
             const regla = reglas[nombreCampo];
+
+            // Evaluamos directamente la regex ya que config/regex.php trae los ^ y $
             if (input.required && valor === "") {
                 esValido = false;
                 mensajeError = "Este campo es obligatorio.";
@@ -44,39 +46,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 esValido = false;
                 mensajeError = regla.error;
             }
-        } else if (reglas[nombreCampo]) {
-            const regla = reglas[nombreCampo];
-
-            // Convertimos la regla a un objeto RegExp real
-            // Nos aseguramos de envolverla en ^ y $ para que sea estricta
-            const regex = new RegExp(
-                "^" + regla.html.replace(/^\^|\$$/g, "") + "$",
-            );
-
-            if (input.required && valor === "") {
-                esValido = false;
-                mensajeError = "Este campo es obligatorio.";
-            } else if (valor !== "" && !regex.test(valor)) {
-                esValido = false;
-                mensajeError = regla.error;
-            }
-        } else if (reglas[nombreCampo]) {
-            const regla = reglas[nombreCampo];
-            const regex = new RegExp("^" + regla.html + "$");
-
-            // SI EL CAMPO TIENE VALOR, SIEMPRE VALIDA (sea required o no)
-            if (valor !== "") {
-                if (!regex.test(valor)) {
-                    esValido = false;
-                    mensajeError = regla.error;
-                }
-            } else if (input.required) {
-                // Solo falla por vacío si es requerido
-                esValido = false;
-                mensajeError = "Este campo es obligatorio.";
-            }
         }
 
+        // 3. Manejo de estados e interfaz (con soporte ARIA)
         const formGroup = input.closest(".form-group");
         const feedback = formGroup
             ? formGroup.querySelector(".dynamic-feedback")
@@ -84,14 +56,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!esValido) {
             input.classList.add("is-invalid");
+            input.setAttribute("aria-invalid", "true"); // Accesibilidad
             if (feedback) {
                 feedback.textContent = mensajeError;
                 feedback.style.display = "block";
             }
         } else {
             input.classList.remove("is-invalid");
+            input.setAttribute("aria-invalid", "false"); // Accesibilidad
             if (valor !== "") input.classList.add("is-valid");
+
+            // Opcional: ocultar el mensaje si es válido
+            if (feedback) feedback.style.display = "none";
         }
+
         return esValido;
     };
 });

@@ -1,5 +1,32 @@
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form');
+    if (!form) return;
+    
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const inputs = form.querySelectorAll('input[name="login"], input[name="password"]');
+
+    // Estado inicial: botón deshabilitado
+    submitBtn.disabled = true;
+
+    function verificarLogin() {
+        let todoCorrecto = true;
+        inputs.forEach(input => {
+            // Validamos que no esté vacío y cumpla la longitud mínima
+            if (input.value.trim().length < 4) {
+                todoCorrecto = false;
+            }
+        });
+        submitBtn.disabled = !todoCorrecto;
+    }
+
+    inputs.forEach(input => {
+        input.addEventListener('input', verificarLogin);
+    });
+});
+
+/*codigo viejo
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
     const submitBtn = form.querySelector('button[type="submit"]');
     const inputs = form.querySelectorAll('input:not([type="hidden"])');
 
@@ -71,3 +98,4 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+*/

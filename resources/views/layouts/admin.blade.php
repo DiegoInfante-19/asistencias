@@ -48,6 +48,10 @@
   <!-- <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.8/datatables.min.css" rel="stylesheet" integrity="sha384-nD9P196GmYuiIASpxI7+7/0LqD6BBA74CfgIOSQUo7brmKKeph8lSEMm2sGgSAvK" crossorigin="anonymous"> -->
 
   @yield('styles')
+
+  <script>
+      window.CoreRules = @json(config('regex'));
+  </script>
 </head><!--end::Head-->
 
 <!--begin::Body-->
@@ -367,7 +371,7 @@
 
               <div class="col-md-12">
                 <label class="form-label fw-bold small text-muted text-uppercase">Respuesta 1</label>
-                <input type="text" class="form-control @error('respuesta1') is-invalid @enderror" name="respuesta1" value="{{ old('respuesta1') }}" autocomplete="off" required oninput="this.value = this.value.toUpperCase();" {{ old('pregunta1') ? '' : 'disabled' }}>
+                <input type="text" class="form-control @error('respuesta1') is-invalid @enderror" name="respuesta1" value="{{ old('respuesta1') }}" autocomplete="off" required pattern="{{ config('regex.respuesta_seguridad.html') }}" oninput="this.value = this.value.toUpperCase();" {{ old('pregunta1') ? '' : 'disabled' }}>
                 <div class="invalid-feedback dynamic-feedback fw-bold">
                   @error('respuesta1') {{ $message }} @enderror
                 </div>
@@ -390,7 +394,7 @@
 
               <div class="col-md-12">
                 <label class="form-label fw-bold small text-muted text-uppercase">Respuesta 2</label>
-                <input type="text" class="form-control @error('respuesta2') is-invalid @enderror" name="respuesta2" value="{{ old('respuesta2') }}" autocomplete="off" required oninput="this.value = this.value.toUpperCase();" {{ old('pregunta2') ? '' : 'disabled' }}>
+                <input type="text" class="form-control @error('respuesta2') is-invalid @enderror" name="respuesta2" value="{{ old('respuesta2') }}" autocomplete="off" required pattern="{{ config('regex.respuesta_seguridad.html') }}" oninput="this.value = this.value.toUpperCase();" {{ old('pregunta2') ? '' : 'disabled' }}>
                 <div class="invalid-feedback dynamic-feedback fw-bold">
                   @error('respuesta2') {{ $message }} @enderror
                 </div>
@@ -460,6 +464,8 @@
 
     });
   </script>
+  <script src="{{ asset('js/core-validations.js') }}" defer></script>
+  <script src="{{ asset('js/admin-validations.js') }}" defer></script>
   @endif
   @yield('scripts')
   @include('partials.alerts')

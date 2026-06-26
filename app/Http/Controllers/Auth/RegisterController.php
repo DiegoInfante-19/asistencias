@@ -7,6 +7,14 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+// Importamos nuestros nuevos guardias
+use App\Rules\ValidarUsername;
+use App\Rules\ValidarNombrePropio;
+use App\Rules\ValidarApellidoPropio;
+use App\Rules\ValidarCedula;
+use App\Rules\ValidarEmail;
+use App\Rules\ValidarTelefono;
+use App\Rules\ValidarPasswordFuerte;
 
 class RegisterController extends Controller
 {
@@ -21,16 +29,9 @@ class RegisterController extends Controller
 
     protected function validator(array $data)
     {
-        // 1. Mensajes actualizados para que coincidan con las nuevas reglas
+        // Solo conservamos los mensajes de base de datos y confirmación
         $mensajes = [
-            'username.regex'     => 'Debe iniciar con mayúscula, tener al menos un número y entre 4-20 caracteres.',
-            'email.regex'        => 'Ingrese un correo electrónico válido.',
-            'name.regex'         => 'Solo letras y espacios permitidos (mínimo 3 caracteres).',
-            'last_name.regex'    => 'Solo letras y espacios permitidos (mínimo 3 caracteres).',
-            'cedula.regex'       => 'Debe tener entre 6 y 8 números.',
-            'phone.regex'        => 'Debe tener entre 10 y 11 números sin guiones.',
             'phone.unique'       => 'Este número de teléfono ya está registrado.',
-            'password.regex'     => 'Mínimo 8 caracteres: al menos una mayúscula, una minúscula, un número y un símbolo.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'required'           => 'Este campo es obligatorio.',
             'username.unique'    => 'Este nombre de usuario ya está en uso.',
@@ -38,18 +39,14 @@ class RegisterController extends Controller
             'cedula.unique'      => 'Esta cédula ya está registrada.',
         ];
 
-        // 2. Reglas sincronizadas con el FormRequest y el JS
         return Validator::make($data, [
-            'username'  => ['required', 'string', 'min:4', 'max:20', 'unique:users,username', 'regex:/^[A-Z](?=.*\d)[a-zA-Z0-9_]{3,19}$/'],
-            'email'     => ['required', 'string', 'email:rfc,dns', 'unique:users,email_users', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
-            'name'      => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{3,50}$/'],
-            'last_name' => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{3,50}$/'],
-            'cedula'    => ['required', 'string', 'unique:users,cedula_users', 'regex:/^\d{6,8}$/'],
-            'phone'     => ['nullable', 'string', 'unique:users,phone_users', 'regex:/^\d{10,11}$/'],
-            'password'  => [
-                'required', 'string', 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.+-])[A-Za-z\d@$!%*?&.+-]{8,64}$/'
-            ],
+            'username'  => ['required', 'string', 'min:4', 'max:20', 'unique:users,username', new ValidarUsername()],
+            'email'     => ['required', 'string', 'email:rfc,dns', 'unique:users,email_users', new ValidarEmail()],
+            'name'      => ['required', 'string', 'min:3', 'max:50', new ValidarNombrePropio()],
+            'last_name' => ['required', 'string', 'min:3', 'max:50', new ValidarApellidoPropio()],
+            'cedula'    => ['required', 'string', 'unique:users,cedula_users', new ValidarCedula()],
+            'phone'     => ['nullable', 'string', 'unique:users,phone_users', new ValidarTelefono()],
+            'password'  => ['required', 'string', 'confirmed', new ValidarPasswordFuerte()],
         ], $mensajes);
     }
 
