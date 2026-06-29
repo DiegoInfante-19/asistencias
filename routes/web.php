@@ -7,17 +7,18 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SecuritySettingsController;
+use App\Http\Controllers\LocalidadController;
 
 Auth::routes(['register' => true]);
 
 Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usuarios logueados)
-    
+
     // Panel de inicio
     Route::get('/', [AdminController::class, 'index'])->name('admin.index');
-    
+
     // CRUD de Usuarios (mantiene URLs como usuarios/create, usuarios/edit)
     Route::resource('usuarios', UserController::class);
-    
+
     // Nuestra ruta especial para la tabla profesional de administración
     Route::get('/profesores', [UserController::class, 'index'])->name('profesores.index');
 
@@ -29,14 +30,31 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
     // Rutas dedicadas exclusivamente a seguridad de credenciales
     Route::put('/perfil/password/update', [SecuritySettingsController::class, 'updatePassword'])
         ->name('seguridad.password.update');
-        
+
     Route::put('/perfil/seguridad/preguntas/update', [SecuritySettingsController::class, 'updateSecurityQuestions'])
         ->name('seguridad.preguntas.update');
 
     // Ruta para recibir y procesar el modal de preguntas secretas
     Route::put('/seguridad/preguntas', [SecurityController::class, 'storePreguntas'])
-    ->name('seguridad.preguntas.store');
+        ->name('seguridad.preguntas.store');
 
+    // Route::controller(LocalidadController::class)->group(function () {
+    //     Route::get('/localidades', 'index')->name('localidades.index');
+    //     Route::post('/estados', 'storeEstado')->name('estados.store');
+    //     Route::post('/ciudades', 'storeCiudad')->name('ciudades.store');
+    //     Route::get('/api/ciudades/{id_estado}', 'getCiudadesPorEstado')->name('api.ciudades.get');
+    //     Route::put('/localidades/estado/{id}', 'updateEstado')->name('localidades.updateEstado');
+    //     Route::put('/localidades/ciudad/{id}', 'updateCiudad')->name('localidades.updateCiudad');
+    // });
 
-
+    Route::controller(LocalidadController::class)->group(function () {
+        Route::get('/localidades', 'index')->name('localidades.index');
+        Route::post('/estados', 'storeEstado')->name('estados.store');
+        Route::post('/ciudades', 'storeCiudad')->name('ciudades.store');
+        Route::put('/localidades/estado/{estado}', 'updateEstado')->name('localidades.updateEstado');
+        Route::put('/localidades/ciudad/{ciudad}', 'updateCiudad')->name('localidades.updateCiudad');
+        Route::get('/api/ciudades/{id_estado}', 'getCiudadesPorEstado')->name('api.ciudades.get');
+        Route::delete('/localidades/estado/{estado}', 'destroyEstado')->name('localidades.destroyEstado');
+        Route::delete('/localidades/ciudad/{ciudad}', 'destroyCiudad')->name('localidades.destroyCiudad');
+    });
 });

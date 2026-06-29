@@ -114,6 +114,8 @@
               </ul>
             </li>
 
+
+
             <li class="nav-item">
               <a href="#" class="nav-link">
                 <i class="bi bi-people-fill"></i>
@@ -168,8 +170,26 @@
               <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="./widgets/small-box.html" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="nav-icon bi bi-circle"></i>
                     <p>Opciones</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="bi bi-geo-alt-fill"></i>
+                <p>
+                  Localidades
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{{ route('localidades.index') }}" class="nav-link {{ request()->routeIs('localidades.index') ? 'active' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="nav-icon bi bi-circle"></i>
+                    <p>Catálogo</p>
                   </a>
                 </li>
               </ul>
