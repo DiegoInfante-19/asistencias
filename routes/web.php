@@ -8,6 +8,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SecuritySettingsController;
 use App\Http\Controllers\LocalidadController;
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\CargoController;
+
 
 Auth::routes(['register' => true]);
 
@@ -56,5 +59,19 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
         Route::get('/api/ciudades/{id_estado}', 'getCiudadesPorEstado')->name('api.ciudades.get');
         Route::delete('/localidades/estado/{estado}', 'destroyEstado')->name('localidades.destroyEstado');
         Route::delete('/localidades/ciudad/{ciudad}', 'destroyCiudad')->name('localidades.destroyCiudad');
+    });
+
+    Route::controller(EmpresaController::class)->group(function () {
+        Route::get('/empresas', 'index')->name('empresas.index');  // Vista principal y carga del DataTable
+        Route::post('/empresas', 'store')->name('empresas.store'); // Procesamiento de creación (Post)
+        Route::put('/empresas/{empresa}', 'update')->name('empresas.update');     // Procesamiento de actualización (Put) -> El parámetro debe ser {empresa}
+        Route::delete('/empresas/{empresa}', 'destroy')->name('empresas.destroy'); // Procesamiento de eliminación (Delete) -> El parámetro debe ser {empresa}
+    });
+
+    Route::controller(CargoController::class)->group(function () {
+        Route::get('/cargos', 'index')->name('cargos.index');
+        Route::post('/cargos', 'store')->name('cargos.store');
+        Route::put('/cargos/{cargo}', 'update')->name('cargos.update');
+        Route::delete('/cargos/{cargo}', 'destroy')->name('cargos.destroy');
     });
 });

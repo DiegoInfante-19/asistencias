@@ -163,23 +163,38 @@
             </li>
 
             <li class="nav-item">
-              <a href="#" class="nav-link">
+              <a href="#" class="nav-link {{ request()->routeIs('empresas.*') ? '' : '' }}">
                 <i class="bi bi-building-fill"></i>
-                <p>Empresas <i class="nav-arrow bi bi-chevron-right"></i></p>
+                <p>
+                  Empresas
+                  <i class="nav-arrow bi bi-chevron-right"></i>
+                </p>
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="./widgets/small-box.html" class="nav-link">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="nav-icon bi bi-circle"></i>
-                    <p>Opciones</p>
+                  <a href="{{ route('empresas.index') }}" class="nav-link {{ request()->routeIs('empresas.index') ? '' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="bi bi-journals"></i>
+                    <p>Catálogo</p>
                   </a>
                 </li>
+                
+
+                <li class="nav-item">
+                  <a href="{{ route('cargos.index') }}" class="nav-link {{ request()->routeIs('cargos.index') ? '' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="bi bi-person-vcard-fill"></i>
+                    <p>Cargos</p>
+                  </a>
+                </li>
+
               </ul>
             </li>
+                    
 
             <li class="nav-item">
               <a href="#" class="nav-link">
-                <i class="bi bi-geo-alt-fill"></i>
+                <i class="bi bi-map-fill"></i>
                 <p>
                   Localidades
                   <i class="nav-arrow bi bi-chevron-right"></i>
@@ -187,9 +202,9 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{ route('localidades.index') }}" class="nav-link {{ request()->routeIs('localidades.index') ? 'active' : '' }}">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="nav-icon bi bi-circle"></i>
-                    <p>Catálogo</p>
+                  <a href="{{ route('localidades.index') }}" class="nav-link {{ request()->routeIs('localidades.index') ? '' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-geo-alt-fill"></i>
+                    <p>Estados y Ciudades</p>
                   </a>
                 </li>
               </ul>
