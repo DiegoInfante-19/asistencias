@@ -11,7 +11,7 @@
                     <input type="hidden" name="origen" value="create_empresa">
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Nombre de la Empresa</label>
-                        <input type="text" class="form-control @error('nombre_empresa') is-invalid @enderror" name="nombre_empresa" value="{{ old('nombre_empresa') }}" required>
+                        <input type="text" class="form-control @error('nombre_empresa') is-invalid @enderror" name="nombre_empresa" value="{{ old('nombre_empresa') }}" autocomplete="off" required>
                         <div class="dynamic-feedback text-danger small mt-1"></div>
                         @error('nombre_empresa')<div class="invalid-feedback" role="alert">{{ $message }}</div>@enderror
                     </div>
@@ -38,7 +38,7 @@
                     <input type="hidden" name="origen" value="update_empresa">
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Nombre de la Empresa</label>
-                        <input type="text" class="form-control" name="nombre_empresa" id="edit-nombre-empresa" required>
+                        <input type="text" class="form-control" name="nombre_empresa" id="edit-nombre-empresa" autocomplete="off" required>
                         <div class="dynamic-feedback text-danger small mt-1"></div>
                     </div>
                 </form>

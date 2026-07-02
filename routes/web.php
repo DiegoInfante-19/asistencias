@@ -10,7 +10,9 @@ use App\Http\Controllers\SecuritySettingsController;
 use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\CargoController;
-
+use App\Http\Controllers\PnfController;
+use App\Http\Controllers\CohorteController;
+use App\Http\Controllers\TituloController;
 
 Auth::routes(['register' => true]);
 
@@ -73,5 +75,26 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
         Route::post('/cargos', 'store')->name('cargos.store');
         Route::put('/cargos/{cargo}', 'update')->name('cargos.update');
         Route::delete('/cargos/{cargo}', 'destroy')->name('cargos.destroy');
+    });
+
+    Route::controller(PnfController::class)->group(function () {
+        Route::get('/pnfs', 'index')->name('pnfs.index');
+        Route::post('/pnfs', 'store')->name('pnfs.store');
+        Route::put('/pnfs/{pnf}', 'update')->name('pnfs.update');
+        Route::delete('/pnfs/{pnf}', 'destroy')->name('pnfs.destroy');
+    });
+
+    Route::controller(App\Http\Controllers\CohorteController::class)->group(function () {
+        Route::get('/cohortes', 'index')->name('cohortes.index');
+        Route::post('/cohortes', 'store')->name('cohortes.store');
+        Route::put('/cohortes/{cohorte}', 'update')->name('cohortes.update');
+        Route::delete('/cohortes/{cohorte}', 'destroy')->name('cohortes.destroy');
+    });
+
+    Route::controller(TituloController::class)->group(function () {
+        Route::get('/titulos', 'index')->name('titulos.index');
+        Route::post('/titulos', 'store')->name('titulos.store');
+        Route::put('/titulos/{titulo}', 'update')->name('titulos.update');
+        Route::delete('/titulos/{titulo}', 'destroy')->name('titulos.destroy');
     });
 });

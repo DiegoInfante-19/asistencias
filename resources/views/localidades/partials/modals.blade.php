@@ -15,7 +15,7 @@
                     <input type="hidden" name="origen" value="create_estado">
                     <div class="col-md-12">
                         <label class="form-label fw-bold small text-muted text-uppercase">Nombre del Estado</label>
-                        <input type="text" class="form-control @error('nombre_estado') is-invalid @enderror" name="nombre_estado" value="{{ old('nombre_estado') }}" required>
+                        <input type="text" class="form-control @error('nombre_estado') is-invalid @enderror" name="nombre_estado" value="{{ old('nombre_estado') }}" autocomplete="off" required>
                         @error('nombre_estado')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </form>
@@ -58,7 +58,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombre de la Ciudad</label>
-                            <input type="text" class="form-control @error('nombre_ciudad') is-invalid @enderror" name="nombre_ciudad" value="{{ old('nombre_ciudad') }}" required>
+                            <input type="text" class="form-control @error('nombre_ciudad') is-invalid @enderror" name="nombre_ciudad" value="{{ old('nombre_ciudad') }}" autocomplete="off" required>
                         </div>
                     </div>
                 </form>
@@ -91,7 +91,7 @@
                     @csrf @method('PUT')
                     <input type="hidden" name="id_estado" id="edit-id-estado">
                     <label class="form-label fw-bold small text-muted text-uppercase">Nombre del Estado</label>
-                    <input type="text" class="form-control" name="nombre_estado" id="edit-nombre-estado" required>
+                    <input type="text" class="form-control" name="nombre_estado" id="edit-nombre-estado" autocomplete="off" required>
                 </form>
             </div>
 
@@ -131,7 +131,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombre de la Ciudad</label>
-                            <input type="text" class="form-control" name="nombre_ciudad" id="edit-nombre-ciudad" required>
+                            <input type="text" class="form-control" name="nombre_ciudad" id="edit-nombre-ciudad" autocomplete="off" required>
                         </div>
                     </div>
                 </form>

@@ -106,15 +106,14 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="./widgets/small-box.html" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Opciones</p>
+                  <a href="{{ route('cohortes.index') }}" class="nav-link {{ request()->routeIs('cohortes.index') ? '' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="bi bi-hourglass-split"></i>
+                    <p>Cohortes</p>
                   </a>
                 </li>
               </ul>
             </li>
-
-
 
             <li class="nav-item">
               <a href="#" class="nav-link">
@@ -139,9 +138,17 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="./widgets/small-box.html" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Opciones</p>
+                  <a href="{{ route('pnfs.index') }}" class="nav-link {{ request()->routeIs('pnfs.*') ? 'active' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                    <p>PNFs</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{ route('titulos.index') }}" class="nav-link {{ request()->routeIs('titulos.*') ? 'active' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <p>Títulos</p>
                   </a>
                 </li>
               </ul>
@@ -178,8 +185,6 @@
                     <p>Catálogo</p>
                   </a>
                 </li>
-                
-
                 <li class="nav-item">
                   <a href="{{ route('cargos.index') }}" class="nav-link {{ request()->routeIs('cargos.index') ? '' : '' }}">
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -187,10 +192,8 @@
                     <p>Cargos</p>
                   </a>
                 </li>
-
               </ul>
             </li>
-                    
 
             <li class="nav-item">
               <a href="#" class="nav-link">

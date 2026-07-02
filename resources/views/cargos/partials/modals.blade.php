@@ -11,7 +11,7 @@
                     <input type="hidden" name="origen" value="create_cargo">
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Descripción del Cargo</label>
-                        <input type="text" class="form-control" name="descripcion_cargo" required>
+                        <input type="text" class="form-control" name="descripcion_cargo" autocomplete="off" required>
                     </div>
                 </form>
             </div>
@@ -36,7 +36,7 @@
                     <input type="hidden" name="origen" value="update_cargo">
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Descripción del Cargo</label>
-                        <input type="text" class="form-control" name="descripcion_cargo" id="edit-descripcion-cargo" required>
+                        <input type="text" class="form-control" name="descripcion_cargo" id="edit-descripcion-cargo" autocomplete="off" required>
                     </div>
                 </form>
             </div>
