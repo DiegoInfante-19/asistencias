@@ -13,6 +13,10 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PnfController;
 use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\TituloController;
+use App\Http\Controllers\EstatusExpedienteController;
+use App\Http\Controllers\PeriodoRecesoController;
+
+
 
 Auth::routes(['register' => true]);
 
@@ -97,4 +101,19 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
         Route::put('/titulos/{titulo}', 'update')->name('titulos.update');
         Route::delete('/titulos/{titulo}', 'destroy')->name('titulos.destroy');
     });
+
+    Route::controller(EstatusExpedienteController::class)->group(function () {
+        Route::get('/estatus-expedientes', 'index')->name('estatus_expedientes.index');
+        Route::post('/estatus-expedientes', 'store')->name('estatus_expedientes.store');
+        Route::put('/estatus-expedientes/{estatus_expediente}', 'update')->name('estatus_expedientes.update');
+        Route::delete('/estatus-expedientes/{estatus_expediente}', 'destroy')->name('estatus_expedientes.destroy');
+    });
+
+    Route::controller(PeriodoRecesoController::class)->group(function () {
+        Route::get('/periodos-recesos', 'index')->name('periodos_recesos.index');
+        Route::post('/periodos-recesos', 'store')->name('periodos_recesos.store');
+        Route::put('/periodos-recesos/{periodo_receso}', 'update')->name('periodos_recesos.update');
+        Route::delete('/periodos-recesos/{periodo_receso}', 'destroy')->name('periodos_recesos.destroy');
+    });
+    
 });

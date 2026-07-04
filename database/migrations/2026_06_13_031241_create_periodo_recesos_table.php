@@ -15,6 +15,7 @@ return new class extends Migration
             $table->date('fecha_fin_periodo_receso');
             $table->text('descripcion_periodo_receso')->nullable();
             $table->string('nivel_periodo_receso', 50); // Ej. temporario, permanente
+            $table->boolean('suspension_actividades')->default(false);
         });
     }
 

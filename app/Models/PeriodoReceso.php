@@ -19,6 +19,14 @@ class PeriodoReceso extends Model
         'fecha_inicio_periodo_receso',
         'fecha_fin_periodo_receso',
         'descripcion_periodo_receso',
-        'nivel_periodo_receso'
+        'nivel_periodo_receso',
+        'suspension_actividades'
     ];
+
+    protected $casts = [
+        'fecha_inicio_periodo_receso' => 'date',
+        'fecha_fin_periodo_receso'    => 'date',
+        'suspension_actividades'      => 'boolean',
+    ];
+
 }

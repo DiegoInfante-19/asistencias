@@ -112,6 +112,13 @@
                     <p>Cohortes</p>
                   </a>
                 </li>
+                <li class="nav-item">
+                  <a href="{{ route('periodos_recesos.index') }}" class="nav-link {{ request()->routeIs('periodos_recesos.*') ? 'active' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="bi bi-calendar-event"></i>
+                    <p>Periodos de Recesos</p>
+                  </a>
+                </li>
               </ul>
             </li>
 
@@ -223,9 +230,10 @@
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="./widgets/small-box.html" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Opciones</p>
+                  <a href="{{ route('estatus_expedientes.index') }}" class="nav-link {{ request()->routeIs('estatus_expedientes.*') ? 'active' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="bi bi-folder2-open"></i>
+                    <p>Estatus Expedientes</p>
                   </a>
                 </li>
               </ul>
