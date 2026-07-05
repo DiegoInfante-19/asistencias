@@ -73,19 +73,3 @@ class EstatusExpedienteController extends Controller
         }
     }
 }
-
-/*
-
-cohortes
-periodos de receso
-pnf
-titulos
-users
-empresas
-cargos
-estados
-ciudades
-estatus expedientes
-
-
-*/

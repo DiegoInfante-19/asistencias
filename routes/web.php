@@ -17,7 +17,6 @@ use App\Http\Controllers\EstatusExpedienteController;
 use App\Http\Controllers\PeriodoRecesoController;
 
 
-
 Auth::routes(['register' => true]);
 
 Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usuarios logueados)
@@ -27,6 +26,10 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
 
     // CRUD de Usuarios (mantiene URLs como usuarios/create, usuarios/edit)
     Route::resource('usuarios', UserController::class);
+
+    // NUEVA RUTA: Procesar el formulario de asignación académica (Paso 3.2)
+    Route::post('/usuarios/{usuario}/asignar-pnf', [UserController::class, 'asignarPnf'])
+        ->name('usuarios.asignar_pnf');
 
     // Nuestra ruta especial para la tabla profesional de administración
     Route::get('/profesores', [UserController::class, 'index'])->name('profesores.index');
@@ -86,6 +89,17 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
         Route::post('/pnfs', 'store')->name('pnfs.store');
         Route::put('/pnfs/{pnf}', 'update')->name('pnfs.update');
         Route::delete('/pnfs/{pnf}', 'destroy')->name('pnfs.destroy');
+
+        // --- NUEVAS RUTAS PARA EL DASHBOARD (VISTA SHOW) ---
+        Route::get('/pnfs/{pnf}', 'show')->name('pnfs.show');
+
+        // --- RUTAS PARA VINCULACIONES DE TÍTULOS ---
+        Route::post('/pnfs/{pnf}/titulos', 'vincularTitulo')->name('pnfs.titulos.store');
+        Route::delete('/pnfs/titulos/{titulo_pnf}', 'desvincularTitulo')->name('pnfs.titulos.destroy');
+
+        // --- RUTAS PARA VINCULACIONES DE EMPRESAS ---
+        Route::post('/pnfs/{pnf}/empresas', 'vincularEmpresa')->name('pnfs.empresas.store');
+        Route::delete('/pnfs/empresas/{empresa_pnf}', 'desvincularEmpresa')->name('pnfs.empresas.destroy');
     });
 
     Route::controller(App\Http\Controllers\CohorteController::class)->group(function () {
@@ -115,5 +129,4 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
         Route::put('/periodos-recesos/{periodo_receso}', 'update')->name('periodos_recesos.update');
         Route::delete('/periodos-recesos/{periodo_receso}', 'destroy')->name('periodos_recesos.destroy');
     });
-    
 });

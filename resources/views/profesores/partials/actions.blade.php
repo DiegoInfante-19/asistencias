@@ -1,6 +1,10 @@
 <div class="btn-group " role="group" aria-label="Acciones de gestión">
+    
+    <a href="{{ route('usuarios.show', $user->id_users) }}" class="btn btn-sm btn-info text-white" title="Ver Detalles">
+        <i class="bi bi-eye"></i>
+    </a>
 
-    <button type="button" class="btn btn-tabla btn-outline-secondary" title="Ver Detalles" style="background-color: #ffffff;"
+    <!-- <button type="button" class="btn btn-tabla btn-outline-secondary" title="Ver Detalles" style="background-color: #ffffff;"
         data-bs-toggle="modal"
         data-bs-target="#viewUserModal"
         data-username="{{ $user->username }}"
@@ -11,7 +15,7 @@
         data-phone="{{ $user->phone_users ?? 'No registrado' }}"
         data-status="{{ $user->status_users }}">
         <i class="bi bi-eye"></i>
-    </button>
+    </button> -->
 
     <button type="button" class="btn btn-tabla btn-outline-secondary" title="Modificar Profesor" style="background-color: #ffffff;"
         data-bs-toggle="modal"

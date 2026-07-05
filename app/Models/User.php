@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Models\PreguntaSecreta;
+use App\Models\Profesor; // IMPORTANTE: Asegúrate de importar el modelo Profesor
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,19 +42,17 @@ class User extends Authenticatable
         ];
     }
 
-
     /**
      * ==========================================================
-     * EVENTOS DEL MODELO (El disparador automático)
+     * EVENTOS DEL MODELO
      * ==========================================================
      */
     protected static function booted()
     {
-        // El evento 'created' se dispara DESPUÉS de que el usuario se guarda en la BD
         static::created(function ($user) {
             PreguntaSecreta::create([
-                'id_users'   => $user->id_users, // Tomamos el ID recién generado
-                'pregunta1'  => '',              // Cadenas vacías para superar el NOT NULL
+                'id_users'   => $user->id_users,
+                'pregunta1'  => '',
                 'pregunta2'  => '',
                 'respuesta1' => '',
                 'respuesta2' => '',
@@ -61,28 +60,44 @@ class User extends Authenticatable
         });
     }
 
-    /**
-     * IMPORTANTE: Sobrescribir el método de autenticación
-     * para que Laravel use tu columna personalizada.
-     */
     public function getAuthPassword()
     {
         return $this->password_users;
     }
 
     /**
-     * RELACIONES (Paso 6)
+     * ==========================================================
+     * RELACIONES
+     * ==========================================================
      */
 
-    // Un usuario pertenece a un rol
     public function rol(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'id_rol', 'id_rol');
     }
 
-    // Un usuario puede tener una configuración de preguntas secretas
     public function preguntasSecretas(): HasOne
     {
         return $this->hasOne(PreguntaSecreta::class, 'id_users', 'id_users');
+    }
+
+    // NUEVO: Relación 1 a 1 con el perfil de Profesor
+    public function profesor(): HasOne
+    {
+        return $this->hasOne(Profesor::class, 'id_users', 'id_users');
+    }
+
+    /**
+     * ==========================================================
+     * HELPERS (Funciones auxiliares)
+     * ==========================================================
+     */
+
+    // NUEVO: Verifica si el usuario activo tiene el rol de Profesor
+    public function isProfesor(): bool
+    {
+        // Importante: Verifica que el nombre exacto de tu rol de profesor en la BD sea 'Profesor'.
+        // Si lo guardaste como 'Docente' u otra cosa, debes cambiar la palabra 'Profesor' de abajo.
+        return $this->rol && strtolower($this->rol->nombre_rol) === 'profesor';
     }
 }
