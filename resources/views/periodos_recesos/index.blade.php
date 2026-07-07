@@ -7,12 +7,14 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
     <div class="card">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold text-dark">Catálogo de Periodos y Eventos</h5>
-            <button type="button" class="btn btn-outline-secondary btn-tabla" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);" data-bs-toggle="modal" data-bs-target="#createPeriodoModal">
+
+        <div class="card-header bg-white py-3 d-flex align-items-center">
+            <h5 class="card-title fw-bold text-dark mb-0">Catálogo de Periodos y Eventos</h5>
+            <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#createPeriodoModal">
                 <i class="bi bi-calendar-plus me-1"></i> <b>Nuevo Periodo</b>
             </button>
         </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 {!! $dataTable->table(['class' => 'table table-bordered table-striped table-hover align-middle nowrap', 'style' => 'width:100%;']) !!}

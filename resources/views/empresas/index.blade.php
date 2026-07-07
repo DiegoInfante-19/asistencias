@@ -7,13 +7,12 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
     <div class="card">
-        <div class="card-header bg-white py-3" style="position: relative;">
-            <h3 class="card-title fw-bold text-dark mb-0">Catálogo de Empresas</h3>
 
-            <button type="button" class="btn btn-outline-secondary btn-tabla" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);" data-bs-toggle="modal" data-bs-target="#createEmpresaModal">
+        <div class="card-header bg-white py-3 d-flex align-items-center">
+            <h3 class="card-title fw-bold text-dark mb-0">Catálogo de Empresas</h3>
+            <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#createEmpresaModal">
                 <i class="bi bi-person-plus-fill me-1"></i><b>Nueva Empresa</b>
             </button>
-
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -38,7 +37,7 @@
         $('#UpdateEmpresaModal').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget);
             var modal = $(this);
-            
+
             modal.find('#UpdateEmpresaForm').attr('action', button.data('url'));
             modal.find('#edit-nombre-empresa').val(button.data('nombre'));
         });

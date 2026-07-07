@@ -1,5 +1,6 @@
-<div class="btn-group" role="group">
-    <button type="button" class="btn btn-tabla btn-outline-secondary"
+<div class="btn-group" role="group" aria-label="Acciones de gestión">
+
+    <button type="button" class="btn btn-outline-secondary" title="Modificar Estado"
         data-bs-toggle="modal"
         data-bs-target="#UpdateEstateModal"
         data-url="{{ route('localidades.updateEstado', $estado->id_estado) }}"
@@ -8,11 +9,12 @@
         <i class="bi bi-pencil"></i>
     </button>
 
-    <form action="{{ route('localidades.destroyEstado', $estado->id_estado) }}" method="POST" class="m-0 p-0 d-inline-block form-eliminar">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="btn btn-tabla btn-outline-secondary" title="Eliminar Estado" style="border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; background-color: #ffffff;">
+    <button type="submit" form="form-delete-{{ $estado->id_estado }}" class="btn btn-outline-secondary" title="Eliminar Estado">
         <i class="bi bi-trash"></i>
     </button>
-</form>
 </div>
+
+<form id="form-delete-{{ $estado->id_estado }}" action="{{ route('localidades.destroyEstado', $estado->id_estado) }}" method="POST" class="d-none">
+    @csrf
+    @method('DELETE')
+</form>

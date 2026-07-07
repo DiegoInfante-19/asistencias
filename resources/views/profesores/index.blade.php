@@ -2,112 +2,29 @@
 
 @section('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/r-2.5.0/datatables.min.css" crossorigin="anonymous">
-
-<style>
-    /* Tus ajustes estéticos exactos */
-    div.dataTables_wrapper div.dataTables_filter {
-        text-align: right;
-        margin-bottom: 15px;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0 !important;
-    }
-
-    #users-table {
-        width: 100% !important;
-    }
-
-    div.dataTables_wrapper div.dataTables_length {
-        margin-bottom: 0 !important;
-    }
-
-    div.dataTables_wrapper div.dataTables_length label {
-        margin-bottom: 0 !important;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    div.dataTables_wrapper div.dataTables_length select {
-        width: auto;
-        display: inline-block;
-    }
-
-    .btn-tabla {
-        /* Usamos var() para llamar a la variable de Bootstrap */
-        border: 1px solid var(--bs-secondary-color) !important;
-        color: var(--bs-secondary-color) !important;
-    }
-
-
-
-    .btn-tabla:hover {
-        background-color: var(--bs-secondary-color) !important;
-        color: #ffffff !important;
-        border: 1px solid var(--bs-secondary-color) !important;
-        /* Eliminamos sombras interiores y degradados que causan la línea clara */
-        box-shadow: none !important;
-        background-image: none !important;
-
-        /* Igualamos el color del borde con el del fondo para que se fusione perfecto */
-        border-color: var(--bs-secondary-color) !important;
-    }
-
-    /* --- TRANSFORMACIÓN DE LA PAGINACIÓN A ESTILO OUTLINE-SECONDARY --- */
-
-    /* 1. Estilo base (Botón inactivo / outline) */
-    .dataTables_wrapper .pagination .page-link {
-        color: var(--bs-secondary-color) !important;
-        border-color: var(--bs-border-color) !important;
-        background-color: #ffffff !important;
-        box-shadow: none !important;
-        /* Quitamos sombras al hacer clic */
-    }
-
-    /* 2. Estilo Hover (Al pasar el mouse por encima) */
-    .dataTables_wrapper .pagination .page-link:hover {
-        background-color: var(--bs-secondary-color) !important;
-        border-color: var(--bs-secondary-color) !important;
-        color: #ffffff !important;
-    }
-
-    /* 3. Estilo Activo (La página en la que estás actualmente) */
-    .dataTables_wrapper .pagination .page-item.active .page-link {
-        background-color: var(--bs-secondary-color) !important;
-        border-color: var(--bs-secondary-color) !important;
-        color: #ffffff !important;
-    }
-
-    /* 4. Estilo Deshabilitado (Cuando ya no hay más páginas) */
-    .dataTables_wrapper .pagination .page-item.disabled .page-link {
-        color: #adb5bd !important;
-        background-color: #f8f9fa !important;
-        border-color: var(--bs-border-color) !important;
-    }
-</style>
 @endsection
 
 @section('content')
 <div class="content" style="margin: 20px;">
     <div class="card">
-        <div class="card-header bg-white py-3" style="position: relative;">
 
+        <div class="card-header bg-white py-3 d-flex align-items-center">
             <h3 class="card-title fw-bold text-dark mb-0">Personal y Profesores Registrados</h3>
-
-            <button type="button" class="btn btn-outline-secondary btn-tabla" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);" data-bs-toggle="modal" data-bs-target="#createUserModal">
+            <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#createUserModal">
                 <i class="bi bi-person-plus-fill me-1"></i><b>Nuevo Profesor</b>
             </button>
-
         </div>
+
         <div class="card-body">
             <div class="w-100" style="overflow: hidden;">
                 {!! $dataTable->table(['class' => 'table table-bordered table-striped table-hover align-middle nowrap dt-responsive', 'style' => 'width:100%;']) !!}
             </div>
         </div>
+
         <div class="card-footer bg-white text-muted small py-3">
             Procesamiento en tiempo real activo desde el servidor.
         </div>
+
     </div>
 </div>
 

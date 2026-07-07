@@ -27,10 +27,10 @@ abstract class BaseDataTable extends DataTable
                         'button'    => ['className' => 'btn']
                     ],
                     'buttons' => [
-                        ['extend' => 'pdf', 'text'   => '<i class="bi bi-file-earmark-pdf me-1"></i> PDF', 'className' => 'btn btn-outline-secondary btn-tabla'],
-                        ['extend' => 'excel', 'text' => '<i class="bi bi-file-earmark-excel me-1"></i> Excel', 'className' => 'btn btn-outline-secondary btn-tabla'],
-                        ['extend' => 'print', 'text' => '<i class="bi bi-printer me-1"></i> Imprimir', 'className' => 'btn btn-outline-secondary btn-tabla'],
-                        ['extend' => 'copy', 'text'  => '<i class="bi bi-clipboard me-1"></i> Copiar', 'className' => 'btn btn-outline-secondary btn-tabla']
+                        ['extend' => 'pdf',   'text' => '<i class="bi bi-file-earmark-pdf me-1"></i> PDF',     'className' => 'btn btn-outline-secondary'],
+                        ['extend' => 'excel', 'text' => '<i class="bi bi-file-earmark-excel me-1"></i> Excel', 'className' => 'btn btn-outline-secondary'],
+                        ['extend' => 'print', 'text' => '<i class="bi bi-printer me-1"></i> Imprimir',         'className' => 'btn btn-outline-secondary'],
+                        ['extend' => 'copy',  'text' => '<i class="bi bi-clipboard me-1"></i> Copiar',         'className' => 'btn btn-outline-secondary']
                     ]
                 ],
                 'language'   => [

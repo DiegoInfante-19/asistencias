@@ -3,39 +3,41 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show fw-bold" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show fw-bold" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
     @endif
 
     @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <ul class="mb-0 fw-bold">
-                @foreach($errors->all() as $error)
-                    <li><i class="bi bi-exis-circle-fill me-2"></i> {{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <ul class="mb-0 fw-bold">
+            @foreach($errors->all() as $error)
+            <li><i class="bi bi-exis-circle-fill me-2"></i> {{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
     @endif
 
     <div class="card mb-4 border-0 shadow-sm">
         <div class="card-body p-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                <div>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
+
+                <div class="flex-grow-1">
                     <span class="badge {{ $pnf->vigencia_pnf ? 'bg-success' : 'bg-danger' }} px-3 py-2 mb-2 fs-6">
                         {{ $pnf->vigencia_pnf ? 'Activo' : 'Inactivo' }}
                     </span>
                     <h3 class="fw-bold text-dark mb-1">{{ $pnf->nombre_pnf }}</h3>
                     <p class="text-muted mb-0">{{ $pnf->descripcion_pnf ?? 'Sin descripción registrada.' }}</p>
                 </div>
-                <div class="mt-3 mt-md-0 d-flex gap-2">
+
+                <div class="mt-3 mt-md-0 d-flex gap-2 flex-shrink-0">
                     <a href="{{ route('pnfs.index') }}" class="btn btn-outline-secondary fw-semibold">
                         <i class="bi bi-arrow-left me-1"></i> Volver al Catálogo
                     </a>
-                    <button type="button" class="btn btn-warning fw-bold text-dark" 
-                        data-bs-toggle="modal" 
+                    <button type="button" class="btn btn-warning fw-bold text-dark"
+                        data-bs-toggle="modal"
                         data-bs-target="#UpdatePnfModal"
                         data-url="{{ route('pnfs.update', $pnf->id_pnf) }}"
                         data-nombre="{{ $pnf->nombre_pnf }}"
@@ -44,6 +46,7 @@
                         <i class="bi bi-pencil me-1"></i> Editar Datos
                     </button>
                 </div>
+
             </div>
         </div>
     </div>
@@ -68,7 +71,7 @@
                 <div class="tab-pane fade show active" id="titulos-pane" role="tabpanel" aria-labelledby="titulos-tab" tabindex="0">
                     @include('pnfs.partials.tab_titulos')
                 </div>
-                
+
                 <div class="tab-pane fade" id="empresas-pane" role="tabpanel" aria-labelledby="empresas-tab" tabindex="0">
                     @include('pnfs.partials.tab_empresas')
                 </div>
@@ -86,7 +89,7 @@
             </div>
             <div class="modal-body p-4">
                 <form id="UpdatePnfForm" method="POST" action="">
-                    @csrf 
+                    @csrf
                     @method('PUT')
                     <input type="hidden" name="origen" value="update_pnf_show">
 

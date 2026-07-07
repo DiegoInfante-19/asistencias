@@ -28,7 +28,7 @@
                         <form action="{{ route('pnfs.titulos.destroy', $vinculo->id_titulos_pnf) }}" method="POST" class="m-0 p-0">
                             @csrf 
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Retirar Título del PNF" onclick="return confirm('¿Está seguro de desvincular este título del PNF actual?')">
+                            <button type="submit" class="btn btn-accion-desvinculacion btn-outline-secondary" title="Retirar Título del PNF" onclick="return confirm('¿Está seguro de desvincular este título del PNF actual?')">
                                 <i class="bi bi-link-45deg"></i> Desvincular
                             </button>
                         </form>

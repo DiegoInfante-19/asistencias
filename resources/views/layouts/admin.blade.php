@@ -43,11 +43,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css" integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0=" crossorigin="anonymous" />
   <!-- jsvectormap -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css" integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4=" crossorigin="anonymous" />
-
+  
   <!--DataTables-->
   <!-- <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.8/datatables.min.css" rel="stylesheet" integrity="sha384-nD9P196GmYuiIASpxI7+7/0LqD6BBA74CfgIOSQUo7brmKKeph8lSEMm2sGgSAvK" crossorigin="anonymous"> -->
-
+  
   @yield('styles')
+  <link href="{{ asset('css/custom-datatables.css') }}?v={{ time() }}" rel="stylesheet">
 </head><!--end::Head-->
 
 <!--begin::Body-->
@@ -275,7 +276,7 @@
     </aside>
     <!--end::Sidebar-->
 
-    <!--begin::App Main-->
+    
     <main class="app-main">
       <div class="app-content-header">
         <div class="container-fluid">
@@ -285,8 +286,8 @@
             </div>
             <div class="col-sm-4">
               <ol class="breadcrumb float-sm-end">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                <li class="breadcrumb-item"><a href="#"> </a></li>
+                <li class="breadcrumb-item active" aria-current="page"> </li>
               </ol>
             </div>
           </div>

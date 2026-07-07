@@ -18,35 +18,35 @@
         </thead>
         <tbody>
             @forelse($pnf->empresasPnf as $index => $vinculo)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td class="text-start fw-bold text-dark">
-                        <i class="bi bi-building me-2 text-muted"></i>{{ $vinculo->empresa->nombre_empresa }}
-                    </td>
-                    <td>
-                        <span class="badge bg-light text-dark border border-secondary px-3 py-2 fw-semibold">
-                            {{ $vinculo->tipo_relacion }}
-                        </span>
-                    </td>
-                    <td class="text-start text-wrap" style="max-width: 300px;">
-                        <small class="text-muted">{{ $vinculo->observacion_empresa_pnf ?? 'Sin observaciones de convenio.' }}</small>
-                    </td>
-                    <td>
-                        <form action="{{ route('pnfs.empresas.destroy', $vinculo->id_empresa_pnf) }}" method="POST" class="m-0 p-0">
-                            @csrf 
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Romper Convenio con Empresa" onclick="return confirm('¿Está seguro de revocar la alianza con esta empresa para este PNF?')">
-                                <i class="bi bi-link-45deg"></i> Desvincular
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td class="text-start fw-bold text-dark">
+                    <i class="bi bi-building me-2 text-muted"></i>{{ $vinculo->empresa->nombre_empresa }}
+                </td>
+                <td>
+                    <span class=" text-dark">
+                        "{{ $vinculo->tipo_relacion }}"
+                    </span>
+                </td>
+                <td class="text-start text-wrap" style="max-width: 300px;">
+                    <small class="text-muted">{{ $vinculo->observacion_empresa_pnf ?? 'Sin observaciones de convenio.' }}</small>
+                </td>
+                <td>
+                    <form action="{{ route('pnfs.empresas.destroy', $vinculo->id_empresa_pnf) }}" method="POST" class="m-0 p-0">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-accion-desvinculacion btn btn-outline-secondary" title="Romper Convenio con Empresa" onclick="return confirm('¿Está seguro de revocar la alianza con esta empresa para este PNF?')">
+                            <i class="bi bi-link-45deg"></i> Desvincular
+                        </button>
+                    </form>
+                </td>
+            </tr>
             @empty
-                <tr>
-                    <td colspan="5" class="text-muted py-4">
-                        <i class="bi bi-building-dash fs-4 d-block mb-2"></i> No hay convenios institucionales o empresas aliadas asociadas a este PNF actualmente.
-                    </td>
-                </tr>
+            <tr>
+                <td colspan="5" class="text-muted py-4">
+                    <i class="bi bi-building-dash fs-4 d-block mb-2"></i> No hay convenios institucionales o empresas aliadas asociadas a este PNF actualmente.
+                </td>
+            </tr>
             @endforelse
         </tbody>
     </table>
@@ -67,16 +67,14 @@
                         <select class="form-select" name="id_empresa" required>
                             <option value="" selected disabled>Seleccione...</option>
                             @foreach($catalogoEmpresas as $emp)
-                                <option value="{{ $emp->id_empresa }}">{{ $emp->nombre_empresa }}</option>
+                            <option value="{{ $emp->id_empresa }}">{{ $emp->nombre_empresa }}</option>
                             @endforeach
                         </select>
                     </div>
-
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Tipo de Relación o Convenio <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="tipo_relacion" placeholder="Ej: Pasantías, Proyecto Socio-Integrador" required autocomplete="off">
                     </div>
-
                     <div class="form-group mb-0">
                         <label class="form-label fw-bold small text-muted">Observaciones Adicionales (Opcional)</label>
                         <textarea class="form-control" name="observacion_empresa_pnf" rows="3" placeholder="Detalles de convenios, cantidad de vacantes permitidas, etc."></textarea>

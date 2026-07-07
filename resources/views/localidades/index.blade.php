@@ -19,21 +19,23 @@
 
             <div class="tab-content pt-4">
                 <div class="tab-pane fade show active" id="tab-estados">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0">Gestión de Estados</h4>
-                        <button class="btn btn-outline-secondary btn-tabla" data-bs-toggle="modal" data-bs-target="#createEstateModal">
+                    
+                    <div class="card-header bg-white py-3 d-flex align-items-center">
+                        <h4 class="card-title fw-bold text-dark mb-0">Gestión de Estados</h4>
+                        <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#createEstateModal">
                             <i class="bi bi-plus-lg"></i> <b>Nuevo Estado</b>
                         </button>
                     </div>
+
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered table-striped table-hover align-middle nowrap', 'style' => 'width:100%;']) !!}
                     </div>
                 </div>
 
                 <div class="tab-pane fade" id="tab-ciudades">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0">Gestión de Ciudades</h4>
-                        <button class="btn btn-outline-secondary btn-tabla" data-bs-toggle="modal" data-bs-target="#createCiudadModal">
+                    <div class="card-header bg-white py-3 d-flex align-items-center">
+                        <h4 class="card-title fw-bold text-dark mb-0">Gestión de Ciudades</h4>
+                        <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#createCiudadModal">
                             <i class="bi bi-plus-lg"></i> <b>Nueva Ciudad</b>
                         </button>
                     </div>

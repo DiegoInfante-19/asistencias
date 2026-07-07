@@ -7,15 +7,15 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
     <div class="card">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold text-dark">Catálogo de Cargos</h5>
-            <button type="button" class="btn btn-outline-secondary btn-tabla" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);" data-bs-toggle="modal" data-bs-target="#createCargoModal">
+        <div class="card-header bg-white py-3 d-flex align-items-center">
+            <h5 class="card-title fw-bold text-dark mb-0">Catálogo de Cargos</h5>
+            <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#createCargoModal">
                 <i class="bi bi-briefcase me-1"></i> <b>Nuevo Cargo</b>
             </button>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                {!! $dataTable->table(['class' => 'table table-bordered table-striped table-hover align-middle nowrap', 'style' => 'width:100%;']) !!}
+                {!! $dataTable->table(['class' => 'table table-bordered table-striped table-hover align-middle nowrap dt-responsive', 'style' => 'width:100%;']) !!}
             </div>
         </div>
     </div>

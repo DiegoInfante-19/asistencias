@@ -1,5 +1,6 @@
-<div class="d-flex justify-content-center">
-    <button type="button" class="btn btn-tabla btn-outline-secondary me-1" title="Modificar Empresa"
+<div class="btn-group" role="group" aria-label="Acciones de gestión">
+
+    <button type="button" class="btn btn-outline-secondary" title="Modificar Empresa"
         data-bs-toggle="modal" 
         data-bs-target="#UpdateEmpresaModal"
         data-url="{{ route('empresas.update', $empresa->id_empresa) }}"
@@ -8,11 +9,12 @@
         <i class="bi bi-pencil"></i>
     </button>
 
-    <form action="{{ route('empresas.destroy', $empresa->id_empresa) }}" method="POST" class="m-0 p-0 d-inline-block form-eliminar">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-tabla btn-outline-secondary" title="Eliminar Empresa">
-            <i class="bi bi-trash"></i>
-        </button>
-    </form>
+    <button type="submit" form="form-delete-{{ $empresa->id_empresa }}" class="btn btn-outline-secondary" title="Eliminar Empresa">
+        <i class="bi bi-trash"></i>
+    </button>
 </div>
+
+<form id="form-delete-{{ $empresa->id_empresa }}" action="{{ route('empresas.destroy', $empresa->id_empresa) }}" method="POST" class="d-none">
+    @csrf
+    @method('DELETE')
+</form>

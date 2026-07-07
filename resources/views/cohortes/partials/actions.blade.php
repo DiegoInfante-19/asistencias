@@ -1,6 +1,7 @@
-<div class="d-flex justify-content-center">
-    <button type="button" class="btn btn-tabla btn-outline-secondary me-1" title="Modificar Cohorte"
-        data-bs-toggle="modal" 
+<div class="btn-group" role="group" aria-label="Acciones de gestión">
+
+    <button type="button" class="btn btn-outline-secondary" title="Modificar Cohorte"
+        data-bs-toggle="modal"
         data-bs-target="#UpdateCohorteModal"
         data-url="{{ route('cohortes.update', $cohorte->id_cohortes) }}"
         data-numero="{{ $cohorte->numero_cohorte }}"
@@ -11,11 +12,12 @@
         <i class="bi bi-pencil"></i>
     </button>
 
-    <form action="{{ route('cohortes.destroy', $cohorte->id_cohortes) }}" method="POST" class="m-0 p-0 d-inline-block form-eliminar">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-tabla btn-outline-secondary" title="Eliminar Cohorte">
-            <i class="bi bi-trash"></i>
-        </button>
-    </form>
+    <button type="submit" form="form-delete-{{ $cohorte->id_cohortes }}" class="btn btn-outline-secondary" title="Eliminar Cohorte">
+        <i class="bi bi-trash"></i>
+    </button>
 </div>
+
+<form id="form-delete-{{ $cohorte->id_cohortes }}" action="{{ route('cohortes.destroy', $cohorte->id_cohortes) }}" method="POST" class="d-none">
+    @csrf
+    @method('DELETE')
+</form>
