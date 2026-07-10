@@ -32,11 +32,11 @@
                     <small class="text-muted">{{ $vinculo->observacion_empresa_pnf ?? 'Sin observaciones de convenio.' }}</small>
                 </td>
                 <td>
-                    <form action="{{ route('pnfs.empresas.destroy', $vinculo->id_empresa_pnf) }}" method="POST" class="m-0 p-0">
+                    <form action="{{ route('pnfs.empresas.destroy', $vinculo->id_empresa_pnf) }}" method="POST" class="m-0 p-0 form-desvincular-empresa" >
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn-accion-desvinculacion btn btn-outline-secondary" title="Romper Convenio con Empresa" onclick="return confirm('¿Está seguro de revocar la alianza con esta empresa para este PNF?')">
-                            <i class="bi bi-link-45deg"></i> Desvincular
+                        <button type="submit" class="btn-accion-desvinculacion btn btn-outline-secondary" title="Romper Convenio con Empresa">
+                            <i class="bi bi-link-45deg"></i>
                         </button>
                     </form>
                 </td>

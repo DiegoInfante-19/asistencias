@@ -1,16 +1,10 @@
 @extends('layouts.admin')
 
-@section('content')
-<div class="app-content-header">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-12">
-                <h3 class="mb-0">Acreditación - PNF Informática</h3>
-            </div>
-        </div>
-    </div>
-</div>
+@section('header')
+    <x-page-header title="Acreditación - PNF Informática" :breadcrumbs="false" />
+@endsection
 
+@section('content')
 <div class="app-content">
     <div class="container-fluid">
 

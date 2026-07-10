@@ -278,21 +278,11 @@
 
     
     <main class="app-main">
-      <div class="app-content-header">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-sm-8">
-              <h3 class="mb-0">ViceRectorado Académico </h3>
-            </div>
-            <div class="col-sm-4">
-              <ol class="breadcrumb float-sm-end">
-                <li class="breadcrumb-item"><a href="#"> </a></li>
-                <li class="breadcrumb-item active" aria-current="page"> </li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      </div>
+      @hasSection('header')
+        @yield('header')
+      @else
+        <x-page-header title="ViceRectorado Académico" />
+      @endif
 
 
       <div class="app-content">
@@ -507,6 +497,7 @@
 
     });
   </script>
+
   @endif
   @yield('scripts')
   @include('partials.alerts')

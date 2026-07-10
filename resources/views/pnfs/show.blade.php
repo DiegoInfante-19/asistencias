@@ -1,24 +1,14 @@
 @extends('layouts.admin')
 
+@section('header')
+<x-page-header title="Programa Nacional de Formación (PNF)">
+    <li class="breadcrumb-item"><a href="{{ route('pnfs.index') }}">PNFs</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Detalle</li>
+</x-page-header>
+@endsection
+
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show fw-bold" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    @endif
-
-    @if($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <ul class="mb-0 fw-bold">
-            @foreach($errors->all() as $error)
-            <li><i class="bi bi-exis-circle-fill me-2"></i> {{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    @endif
 
     <div class="card mb-4 border-0 shadow-sm">
         <div class="card-body p-4">
@@ -133,6 +123,87 @@
             modal.find('#edit-nombre-pnf').val(button.data('nombre'));
             modal.find('#edit-vigencia-pnf').val(button.data('vigencia'));
             modal.find('#edit-descripcion-pnf').val(button.data('descripcion'));
+        });
+    });
+
+    $(document).ready(function() {
+        // Inicializar datos del modal de edición
+        $('#UpdatePnfModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget);
+            var modal = $(this);
+            modal.find('#UpdatePnfForm').attr('action', button.data('url'));
+            modal.find('#edit-nombre-pnf').val(button.data('nombre'));
+            modal.find('#edit-vigencia-pnf').val(button.data('vigencia'));
+            modal.find('#edit-descripcion-pnf').val(button.data('descripcion'));
+        });
+    });
+
+    // Delegación de eventos para Confirmación de SweetAlert2
+    document.addEventListener('submit', function(event) {
+
+        // 1. Interceptar eliminación de Títulos
+        if (event.target && event.target.classList.contains('form-desvincular-titulo')) {
+            event.preventDefault(); // Detenemos el envío inmediato
+
+            Swal.fire({
+                title: '¿Desvincular Título?',
+                text: "¿Está seguro de retirar este título del programa de formación?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="bi bi-link-45deg me-1"></i> Sí, desvincular',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit(); // Enviamos el formulario
+                }
+            });
+        }
+
+        // 2. Interceptar eliminación de Empresas
+        if (event.target && event.target.classList.contains('form-desvincular-empresa')) {
+            event.preventDefault(); // Detenemos el envío inmediato
+
+            Swal.fire({
+                title: '¿Revocar Alianza?',
+                text: "¿Está seguro de romper el convenio con esta empresa para este PNF?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="bi bi-link-45deg me-1"></i> Sí, revocar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit(); // Enviamos el formulario
+                }
+            });
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // A) Leer si hay una pestaña guardada previamente en la memoria del navegador
+        let activeTabId = localStorage.getItem('pnf_dashboard_active_tab');
+
+        if (activeTabId) {
+            let tabElement = document.getElementById(activeTabId);
+            if(tabElement) {
+                // Instanciar y mostrar la pestaña usando la API nativa de Bootstrap 5
+                let tab = new bootstrap.Tab(tabElement);
+                tab.show();
+            }
+        }
+
+        // B) Detectar cuando el usuario cambia de pestaña y guardar su ID
+        let tabElements = document.querySelectorAll('button[data-bs-toggle="tab"]');
+        tabElements.forEach(function(tab) {
+            tab.addEventListener('shown.bs.tab', function(event) {
+                // event.target es el botón de la pestaña que acaba de activarse
+                localStorage.setItem('pnf_dashboard_active_tab', event.target.id);
+            });
         });
     });
 </script>

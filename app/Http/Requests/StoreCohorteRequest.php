@@ -11,6 +11,18 @@ class StoreCohorteRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Saneamiento preventivo: convierte a mayúsculas antes de pasar por las reglas
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('numero_cohorte')) {
+            $this->merge([
+                'numero_cohorte' => strtoupper(trim($this->numero_cohorte)),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -19,7 +31,7 @@ class StoreCohorteRequest extends FormRequest
                 'string',
                 'max:20',
                 'unique:cohortes,numero_cohorte',
-                'regex:/^[a-zA-Z0-9\s]+$/'
+                'regex:/^[A-Z0-9\s-]+$/' // Expresión regular solo para letras MAYÚSCULAS, números, espacios y guiones
             ],
             'fecha_inicio_cohorte' => ['required', 'date'],
             'fecha_fin_cohorte'    => ['required', 'date', 'after:fecha_inicio_cohorte'],
@@ -31,12 +43,12 @@ class StoreCohorteRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'numero_cohorte.required'       => 'El número de cohorte es obligatorio.',
-            'numero_cohorte.unique'         => 'Este número de cohorte ya existe.',
-            'numero_cohorte.regex'          => 'El formato del número no es válido.',
-            'fecha_fin_cohorte.after'       => 'La fecha de fin debe ser posterior a la fecha de inicio.',
-            'descripcion_cohorte.regex'     => 'La descripción contiene caracteres no permitidos.',
-            'estatus_cohorte.required'      => 'El estatus es obligatorio.',
+            'numero_cohorte.required' => 'El número de cohorte es obligatorio.',
+            'numero_cohorte.unique'   => 'Este número de cohorte ya existe.',
+            'numero_cohorte.regex'    => 'El número de cohorte debe contener únicamente letras mayúsculas y números.',
+            'fecha_fin_cohorte.after' => 'La fecha de fin debe ser posterior a la fecha de inicio.',
+            'descripcion_cohorte.regex' => 'La descripción contiene caracteres no permitidos.',
+            'estatus_cohorte.required' => 'El estatus es obligatorio.',
         ];
     }
 }

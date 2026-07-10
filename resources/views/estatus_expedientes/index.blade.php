@@ -47,4 +47,5 @@
         });
     });
 </script>
+<script src="{{ asset('js/admin-validations.js') }}" defer></script>
 @endsection

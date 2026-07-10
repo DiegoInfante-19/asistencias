@@ -4,6 +4,12 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/r-2.5.0/datatables.min.css" crossorigin="anonymous">
 @endsection
 
+@section('header')
+    <x-page-header title="Personal y Profesores">
+        <li class="breadcrumb-item active" aria-current="page">Profesores</li>
+    </x-page-header>
+@endsection
+
 @section('content')
 <div class="content" style="margin: 20px;">
     <div class="card">

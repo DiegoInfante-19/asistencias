@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- Añadido para consistencia
 
 class EmpresaPersona extends Model
 {
@@ -26,19 +27,19 @@ class EmpresaPersona extends Model
      */
 
     // La persona dueña de este registro laboral
-    public function persona()
+    public function persona(): BelongsTo
     {
         return $this->belongsTo(Persona::class, 'id_personas', 'id_personas');
     }
 
     // La empresa donde trabaja o trabajó
-    public function empresa()
+    public function empresa(): BelongsTo
     {
         return $this->belongsTo(Empresa::class, 'id_empresa', 'id_empresa');
     }
 
     // El cargo que desempeña
-    public function cargo()
+    public function cargo(): BelongsTo
     {
         return $this->belongsTo(Cargo::class, 'id_cargo', 'id_cargo');
     }

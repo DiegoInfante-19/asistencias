@@ -25,11 +25,11 @@
                     </td>
                     <td class="text-start fw-semibold text-primary">{{ $vinculo->nombre_titulo_pnf }}</td>
                     <td>
-                        <form action="{{ route('pnfs.titulos.destroy', $vinculo->id_titulos_pnf) }}" method="POST" class="m-0 p-0">
+                        <form action="{{ route('pnfs.titulos.destroy', $vinculo->id_titulos_pnf) }}" method="POST" class="m-0 p-0 form-desvincular-titulo">
                             @csrf 
                             @method('DELETE')
-                            <button type="submit" class="btn btn-accion-desvinculacion btn-outline-secondary" title="Retirar Título del PNF" onclick="return confirm('¿Está seguro de desvincular este título del PNF actual?')">
-                                <i class="bi bi-link-45deg"></i> Desvincular
+                            <button type="submit" class="btn btn-accion-desvinculacion btn-outline-secondary" title="Retirar Título del PNF">
+                                <i class="bi bi-link-45deg"></i>
                             </button>
                         </form>
                     </td>

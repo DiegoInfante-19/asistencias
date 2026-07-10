@@ -40,4 +40,16 @@ class LugarNacimientoPersona extends Model
     {
         return $this->hasMany(Persona::class, 'id_lugar_nacimiento', 'id_lugar_nacimiento');
     }
+
+    // Permite usar $lugar->direccion_completa en las vistas
+    public function getDireccionCompletaAttribute()
+    {
+        $direccion = "{$this->ciudad->nombre_ciudad}, {$this->estado->nombre_estado}";
+        
+        if (!empty($this->detalles_adicionales)) {
+            $direccion .= " - Detalles: {$this->detalles_adicionales}";
+        }
+        
+        return $direccion;
+    }
 }
