@@ -15,7 +15,16 @@ use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\TituloController;
 use App\Http\Controllers\EstatusExpedienteController;
 use App\Http\Controllers\PeriodoRecesoController;
+use App\Http\Controllers\PersonaTelefonoController;
+use App\Http\Controllers\PersonaObservacionController;
+use App\Http\Controllers\PersonaEmpresaController;
+use App\Http\Controllers\PersonaTitulacionController;
+use App\Http\Controllers\PersonaFormacionAcademicaController;
+use App\Http\Controllers\PersonaInscripcionController;
+use App\Http\Controllers\PersonaController;
 
+
+// 
 
 Auth::routes(['register' => true]);
 
@@ -128,5 +137,39 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
         Route::post('/periodos-recesos', 'store')->name('periodos_recesos.store');
         Route::put('/periodos-recesos/{periodo_receso}', 'update')->name('periodos_recesos.update');
         Route::delete('/periodos-recesos/{periodo_receso}', 'destroy')->name('periodos_recesos.destroy');
+    });
+
+    // ==========================================
+    // RUTAS PRINCIPALES DEL MEGA-CRUD (PERSONAS)
+    // ==========================================
+    // Debe ir PRIMERO para que rutas como /personas/create funcionen bien.
+    Route::resource('personas', PersonaController::class);
+
+    // ==========================================
+    // RUTAS ANIDADAS DEL EXPEDIENTE DE PERSONAS
+    // ==========================================
+    Route::prefix('personas/{persona}')->name('personas.')->group(function () {
+
+        // Módulo 1: Teléfonos
+        Route::post('/telefonos', [PersonaTelefonoController::class, 'store'])->name('telefonos.store');
+        Route::delete('/telefonos/{telefono}', [PersonaTelefonoController::class, 'destroy'])->name('telefonos.destroy');
+
+        // Módulo 2: Observaciones
+        Route::post('/observaciones', [PersonaObservacionController::class, 'store'])->name('observaciones.store');
+
+        // Módulo 3: Perfil Laboral
+        Route::post('/empresas', [PersonaEmpresaController::class, 'store'])->name('empresas.store');
+        Route::delete('/empresas/{empresa}', [PersonaEmpresaController::class, 'destroy'])->name('empresas.destroy');
+
+        // Módulo 4: Expediente Académico (Titulación)
+        Route::post('/titulacion', [PersonaTitulacionController::class, 'store'])->name('titulacion.store');
+
+        // Módulo 5: Formación Previa
+        Route::post('/formacion', [PersonaFormacionAcademicaController::class, 'store'])->name('formacion.store');
+        Route::delete('/formacion/{formacion}', [PersonaFormacionAcademicaController::class, 'destroy'])->name('formacion.destroy');
+
+        // Módulo 6: Control de Estudio (Inscripciones a Cohortes)
+        Route::post('/inscripciones', [PersonaInscripcionController::class, 'store'])->name('inscripciones.store');
+        Route::delete('/inscripciones/{inscripcion}', [PersonaInscripcionController::class, 'destroy'])->name('inscripciones.destroy');
     });
 });
