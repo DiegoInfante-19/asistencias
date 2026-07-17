@@ -17,91 +17,145 @@
                 <div class="row g-3">
                     <!-- Cédula -->
                     <div class="col-md-4">
-                        <label for="cedula" class="form-label fw-bold">Cédula <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('cedula') is-invalid @enderror" 
-                               id="cedula" name="cedula" value="{{ old('cedula') }}" 
-                               placeholder="Ej: 12345678" required>
-                        @error('cedula')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <label for="cedula_personas" class="form-label fw-bold">Cédula <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control @error('cedula_personas') is-invalid @enderror"
+                            id="cedula_personas" name="cedula_personas" value="{{ old('cedula_personas') }}"
+                            autocomplete="off" required>
+                        @error('cedula_personas')
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <!-- Nombres -->
                     <div class="col-md-4">
-                        <label for="nombres" class="form-label fw-bold">Nombres <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('nombres') is-invalid @enderror" 
-                               id="nombres" name="nombres" value="{{ old('nombres') }}" 
-                               placeholder="Ej: Juan Carlos" required>
-                        @error('nombres')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <label for="primer_nombre_personas" class="form-label fw-bold">Primer Nombre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control @error('primer_nombre_personas') is-invalid @enderror"
+                            id="primer_nombre_personas" name="primer_nombre_personas" value="{{ old('primer_nombre_personas') }}"
+                            autocomplete="off" required>
+                        @error('primer_nombre_personas')
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="segundo_nombre_personas" class="form-label fw-bold">Segundo Nombre</label>
+                        <input type="text" class="form-control @error('segundo_nombre_personas') is-invalid @enderror"
+                            id="segundo_nombre_personas" name="segundo_nombre_personas" value="{{ old('segundo_nombre_personas') }}"
+                            autocomplete="off">
                     </div>
 
                     <!-- Apellidos -->
                     <div class="col-md-4">
-                        <label for="apellidos" class="form-label fw-bold">Apellidos <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('apellidos') is-invalid @enderror" 
-                               id="apellidos" name="apellidos" value="{{ old('apellidos') }}" 
-                               placeholder="Ej: Pérez Gómez" required>
-                        @error('apellidos')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <label for="primer_apellido_personas" class="form-label fw-bold">Primer Apellido <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control @error('primer_apellido_personas') is-invalid @enderror"
+                            id="primer_apellido_personas" name="primer_apellido_personas" value="{{ old('primer_apellido_personas') }}"
+                            autocomplete="off" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="segundo_apellido_personas" class="form-label fw-bold">Segundo Apellido</label>
+                        <input type="text" class="form-control @error('segundo_apellido_personas') is-invalid @enderror"
+                            id="segundo_apellido_personas" name="segundo_apellido_personas" value="{{ old('segundo_apellido_personas') }}"
+                            autocomplete="off">
+                    </div>
+
+                    <!-- Sexo -->
+                    <div class="col-md-4">
+                        <label for="sexo_personas" class="form-label fw-bold">Sexo <span class="text-danger">*</span></label>
+                        <select class="form-select @error('sexo_personas') is-invalid @enderror" id="sexo_personas" name="sexo_personas" required>
+                            <option value="">Seleccione...</option>
+                            <option value="M" {{ old('sexo_personas') == 'M' ? 'selected' : '' }}>Masculino</option>
+                            <option value="F" {{ old('sexo_personas') == 'F' ? 'selected' : '' }}>Femenino</option>
+                        </select>
                     </div>
 
                     <!-- Fecha de Nacimiento -->
-                    <div class="col-md-6">
-                        <label for="fecha_nacimiento" class="form-label fw-bold">Fecha de Nacimiento <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control @error('fecha_nacimiento') is-invalid @enderror" 
-                               id="fecha_nacimiento" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" required>
-                        @error('fecha_nacimiento')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="col-md-4">
+                        <label for="fecha_nacimiento_personas" class="form-label fw-bold">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control @error('fecha_nacimiento_personas') is-invalid @enderror"
+                            id="fecha_nacimiento_personas" name="fecha_nacimiento_personas" value="{{ old('fecha_nacimiento_personas') }}" autocomplete="off" required>
                     </div>
 
-                    <!-- Correo Electrónico -->
-                    <div class="col-md-6">
-                        <label for="correo_electronico" class="form-label fw-bold">Correo Electrónico</label>
-                        <input type="email" class="form-control @error('correo_electronico') is-invalid @enderror" 
-                               id="correo_electronico" name="correo_electronico" value="{{ old('correo_electronico') }}" 
-                               placeholder="Ej: correo@ejemplo.com">
-                        @error('correo_electronico')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="text-muted">Opcional, pero recomendado.</small>
+                    <!-- Correo -->
+                    <div class="col-md-4">
+                        <label for="email_personas" class="form-label fw-bold">Correo Electrónico </label>
+                        <input type="email" class="form-control @error('email_personas') is-invalid @enderror"
+                            id="email_personas" name="email_personas" value="{{ old('email_personas') }}" autocomplete="off">
                     </div>
 
-                    <!-- Lugar de Nacimiento -->
-                    <div class="col-12">
-                        <label for="lugar_nacimiento_personas" class="form-label fw-bold">Lugar de Nacimiento <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('lugar_nacimiento_personas') is-invalid @enderror" 
-                               id="lugar_nacimiento_personas" name="lugar_nacimiento_personas" value="{{ old('lugar_nacimiento_personas') }}" 
-                               placeholder="Ej: Hospital Universitario, Ciudad Bolívar" required>
-                        @error('lugar_nacimiento_personas')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <!-- Lugar de Nacimiento (Aquí debes hacer un select basado en tu tabla estados/ciudades) -->
+
+                    <!-- ========================================== -->
+                    <!-- SECCIÓN: LUGAR DE NACIMIENTO -->
+                    <!-- ========================================== -->
+                    <div class="col-12 mt-4">
+                        <h5 class="fw-bold border-bottom pb-2"><i class="bi bi-geo-alt-fill me-2"></i>Lugar de Nacimiento</h5>
                     </div>
 
-                    <!-- Dirección -->
-                    <div class="col-12">
-                        <label for="direccion" class="form-label fw-bold">Dirección Completa <span class="text-danger">*</span></label>
-                        <textarea class="form-control @error('direccion') is-invalid @enderror" 
-                                  id="direccion" name="direccion" rows="3" 
-                                  placeholder="Ej: Calle Principal, Casa #45, Sector Centro" required>{{ old('direccion') }}</textarea>
-                        @error('direccion')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <!-- Estado -->
+                    <div class="col-md-4">
+                        <label for="id_estado" class="form-label fw-bold">Estado <span class="text-danger">*</span></label>
+                        <select class="form-select @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado" required>
+                            <option value="">Seleccione...</option>
+                            @foreach($estados as $estado)
+                            <option value="{{ $estado->id_estado }}" {{ old('id_estado') == $estado->id_estado ? 'selected' : '' }}>
+                                {{ $estado->nombre_estado }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('id_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
+
+                    <!-- Ciudad (Con botón Collapse) -->
+                    <div class="col-md-4">
+                        <label for="id_ciudad" class="form-label fw-bold">Ciudad <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <select class="form-select @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
+                                <option value="">Seleccione primero un estado...</option>
+                            </select>
+                            <!-- Botón que activa el Collapse -->
+                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNuevaCiudad" aria-expanded="false" aria-controls="collapseNuevaCiudad" id="btnToggleCiudad" disabled>
+                                <i class="bi bi-plus-lg"></i> Nueva
+                            </button>
+                        </div>
+                        @error('id_ciudad') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+
+                    <!-- Detalles Adicionales -->
+                    <div class="col-md-4">
+                        <label for="detalles_adicionales" class="form-label fw-bold">Detalles (Opcional)</label>
+                        <input type="text" class="form-control" id="detalles_adicionales" name="detalles_adicionales" value="{{ old('detalles_adicionales') }}" placeholder="Ej: Hospital Ruiz y Páez">
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- PANEL COLAPSABLE: NUEVA CIUDAD -->
+                    <!-- ========================================== -->
+                    <div class="col-5">
+                        <div class="collapse" id="collapseNuevaCiudad">
+                            <div class="card card-body bg-light border-primary shadow-sm mt-2">
+                                <h6 class="fw-bold text-primary mb-3"><i class="bi bi-building-add me-2"></i>Registrar Nueva Ciudad</h6>
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Nombre de la Ciudad</label>
+                                        <input type="text" class="form-control" id="nueva_nombre_ciudad" placeholder="Ej: Puerto Ordaz">
+                                        <small class="text-muted">Se asociará automáticamente al Estado seleccionado arriba.</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <!-- IMPORTANTE: type="button" para no enviar el formulario de la persona -->
+                                        <button type="button" class="btn btn-primary w-100 fw-bold" id="btnGuardarCiudad">
+                                            <i class="bi bi-save me-1"></i> Guardar y Seleccionar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <hr class="my-4">
-
                 <div class="d-flex justify-content-end gap-2">
-                    <button type="reset" class="btn btn-secondary">
-                        <i class="bi bi-eraser-fill me-1"></i> Limpiar
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save-fill me-1"></i> Guardar Estudiante
-                    </button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save-fill me-1"></i> Guardar Estudiante</button>
                 </div>
             </form>
         </div>
@@ -110,6 +164,108 @@
 @endsection
 
 @section('scripts')
+<!-- 1. CARGAMOS JQUERY PRIMERO -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
+
+<!-- 2. Tus scripts de validación -->
 <script src="{{ asset('js/core-validations.js') }}" defer></script>
 <script src="{{ asset('js/admin-validations.js') }}" defer></script>
+
+<!-- 3. Script para la lógica dinámica de Estados/Ciudades -->
+<script>
+    $(document).ready(function() {
+
+        function mostrarErrorSwal(titulo, mensaje) {
+            Swal.fire({
+                icon: 'error',
+                title: titulo,
+                text: mensaje,
+                confirmButtonColor: '#0d6efd'
+            });
+        }
+
+        const estadoSelect = $('#id_estado');
+        const ciudadSelect = $('#id_ciudad');
+        const btnToggleCiudad = $('#btnToggleCiudad');
+        const collapseElement = $('#collapseNuevaCiudad');
+        const inputNuevaCiudad = $('#nueva_nombre_ciudad');
+        const btnGuardarCiudad = $('#btnGuardarCiudad');
+
+        // FUNCIÓN CENTRALIZADA PARA CARGAR CIUDADES
+        function cargarCiudades(id_estado, id_ciudad_seleccionada = null) {
+            if (!id_estado) {
+                ciudadSelect.prop('disabled', true).empty().append('<option value="">Seleccione primero un estado...</option>');
+                btnToggleCiudad.prop('disabled', true);
+                collapseElement.collapse('hide');
+                return;
+            }
+
+            let url = "{{ route('api.ciudades.get', ['id_estado' => ':id']) }}".replace(':id', id_estado);
+
+            $.get(url, function(data) {
+                ciudadSelect.prop('disabled', false);
+                btnToggleCiudad.prop('disabled', false);
+                ciudadSelect.empty().append('<option value="">Seleccione la ciudad...</option>');
+
+                $.each(data, function(key, ciudad) {
+                    let selected = (id_ciudad_seleccionada && ciudad.id_ciudad == id_ciudad_seleccionada) ? 'selected' : '';
+                    ciudadSelect.append('<option value="' + ciudad.id_ciudad + '" ' + selected + '>' + ciudad.nombre_ciudad + '</option>');
+                });
+            }).fail(function() {
+                mostrarErrorSwal('Error de carga', 'Ocurrió un error al cargar las ciudades.');
+            });
+        }
+
+        // 1. EVENTO CHANGE: Llamamos a la función centralizada
+        estadoSelect.on('change', function() {
+            cargarCiudades($(this).val());
+        });
+
+        // 2. PERSISTENCIA AL CARGAR (Si hay error de validación)
+        let oldEstado = "{{ old('id_estado') }}";
+        let oldCiudad = "{{ old('id_ciudad') }}";
+        if (oldEstado) {
+            cargarCiudades(oldEstado, oldCiudad);
+        }
+
+           // 3. Guardar Ciudad por AJAX
+        btnGuardarCiudad.on('click', function() {
+            let id_estado = estadoSelect.val();
+            let nombre_ciudad = inputNuevaCiudad.val().trim();
+
+            if (!nombre_ciudad) {
+                mostrarErrorSwal('Campo requerido', 'Por favor, escriba el nombre de la ciudad.');
+                return;
+            }
+
+            btnGuardarCiudad.prop('disabled', true).html('<i class="spinner-border spinner-border-sm"></i> Guardando...');
+
+            $.ajax({
+                type: "POST",
+                url: "{{ route('ciudades.store') }}",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id_estado: id_estado,
+                    nombre_ciudad: nombre_ciudad,
+                    origen: 'create_ciudad'
+                },
+                success: function(response) {
+                    ciudadSelect.append('<option value="' + response.ciudad.id_ciudad + '" selected>' + response.ciudad.nombre_ciudad + '</option>');
+                    inputNuevaCiudad.val('');
+                    collapseElement.collapse('hide');
+                    btnGuardarCiudad.prop('disabled', false).html('<i class="bi bi-save me-1"></i> Guardar y Seleccionar');
+                },
+                error: function(xhr) {
+                    btnGuardarCiudad.prop('disabled', false).html('<i class="bi bi-save me-1"></i> Guardar y Seleccionar');
+                    if (xhr.status === 422) {
+                        let errores = xhr.responseJSON.errors;
+                        mostrarErrorSwal('Verifique los datos', errores.nombre_ciudad ? errores.nombre_ciudad[0] : 'Error de validación');
+                    } else {
+                        mostrarErrorSwal('Error del servidor', 'No se pudo guardar la ciudad.');
+                    }
+                }
+            });
+        });
+    });
+</script>
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePersonaRequest extends FormRequest
 {
@@ -13,41 +14,59 @@ class UpdatePersonaRequest extends FormRequest
 
     public function rules()
     {
-        // Se obtiene el ID de la ruta {persona} 
-        // Asumiendo que en web.php la ruta es /personas/{persona}
-        $id = $this->route('persona');
+        // Al usar Route Model Binding en Laravel, la variable contiene el modelo completo.
+        // Accedemos a su clave primaria para ignorarla en las reglas 'unique'.
+        $id = $this->route('persona')->id_personas;
 
         return [
-            'cedula' => [
+            'cedula_personas' => [
                 'required', 'string', 
-                // Ignoramos el ID actual
-                'unique:personas,cedula,' . $id . ',id_personas', 
+                Rule::unique('personas', 'cedula_personas')->ignore($id, 'id_personas'),
                 'regex:/^\d{6,8}$/'
             ],
-            'nombres' => [
-                'required', 'string', 'max:100', 
-                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{3,100}$/'
+            'primer_nombre_personas' => [
+                'required', 'string', 'max:50', 
+                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'
             ],
-            'apellidos' => [
-                'required', 'string', 'max:100', 
-                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{3,100}$/'
+            'segundo_nombre_personas' => [
+                'nullable', 'string', 'max:50', 
+                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'
             ],
-            'fecha_nacimiento' => [
+            'primer_apellido_personas' => [
+                'required', 'string', 'max:50', 
+                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'
+            ],
+            'segundo_apellido_personas' => [
+                'nullable', 'string', 'max:50', 
+                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'
+            ],
+            'sexo_personas' => [
+                'required', 'string', 'in:M,F'
+            ],
+            'fecha_nacimiento_personas' => [
                 'required', 'date', 'before:today'
             ],
-            'correo_electronico' => [
-                'nullable', 'string', 'email:rfc,dns', 'max:150',
-                // Ignoramos el ID actual
-                'unique:personas,correo_electronico,' . $id . ',id_personas',
+            'email_personas' => [
+                'nullable', 'string', 'email:rfc,dns', 'max:255',
+                Rule::unique('personas', 'email_personas')->ignore($id, 'id_personas'),
                 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
             ],
-            'lugar_nacimiento_personas' => [
-                'required', 'string', 'max:255',
-                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s\.,]{3,255}$/'
+            
+            // --- NUEVA LÓGICA DE LUGAR DE NACIMIENTO ---
+            
+            // El campo original es nullable porque se procesará manual en el controlador
+            'id_lugar_nacimiento' => [
+                'nullable', 'integer', 'exists:lugar_nacimiento_personas,id_lugar_nacimiento'
             ],
-            'direccion' => [
-                'required', 'string', 'max:500',
-                'regex:/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ\s\.,#-]{5,500}$/'
+            // Validamos los pedazos que componen el lugar de nacimiento desde la vista
+            'id_estado' => [
+                'required', 'integer', 'exists:estados,id_estado'
+            ],
+            'id_ciudad' => [
+                'required', 'integer', 'exists:ciudades,id_ciudad'
+            ],
+            'detalles_adicionales' => [
+                'nullable', 'string', 'max:255'
             ],
         ];
     }
@@ -56,17 +75,25 @@ class UpdatePersonaRequest extends FormRequest
     {
         return [
             'required' => 'Este campo es obligatorio.',
-            'cedula.unique' => 'Esta cédula ya está registrada en otro expediente.',
-            'correo_electronico.unique' => 'Este correo electrónico ya le pertenece a otro registro.',
+            'cedula_personas.unique' => 'Esta cédula ya está registrada en otro expediente.',
+            'email_personas.unique' => 'Este correo electrónico ya le pertenece a otro registro.',
+            'sexo_personas.in' => 'El género seleccionado no es válido.',
+            
+            // Mensajes para el lugar de nacimiento dinámico
+            'id_estado.required' => 'Debe seleccionar un estado.',
+            'id_estado.exists' => 'El estado seleccionado no es válido.',
+            'id_ciudad.required' => 'Debe seleccionar una ciudad.',
+            'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
+            'id_lugar_nacimiento.exists' => 'El lugar de nacimiento procesado no es válido.',
 
-            // Mensajes regex sincronizados
-            'cedula.regex' => 'La cédula debe tener entre 6 y 8 números exactos. Sin espacios ni puntos.',
-            'nombres.regex' => 'Solo letras y espacios (mínimo 3 caracteres).',
-            'apellidos.regex' => 'Solo letras y espacios (mínimo 3 caracteres).',
-            'correo_electronico.regex' => 'Ingrese un correo electrónico válido.',
-            'lugar_nacimiento_personas.regex' => 'El lugar de nacimiento solo admite letras, espacios, comas y puntos.',
-            'direccion.regex' => 'Caracteres no válidos en la dirección. Solo se permiten letras, números, y los símbolos (, . - #).',
-            'fecha_nacimiento.before' => 'La fecha de nacimiento no es válida.',
+            // Mensajes regex
+            'cedula_personas.regex' => 'La cédula debe tener entre 6 y 8 números exactos. Sin espacios ni puntos.',
+            'primer_nombre_personas.regex' => 'Solo se permiten letras y espacios.',
+            'segundo_nombre_personas.regex' => 'Solo se permiten letras y espacios.',
+            'primer_apellido_personas.regex' => 'Solo se permiten letras y espacios.',
+            'segundo_apellido_personas.regex' => 'Solo se permiten letras y espacios.',
+            'email_personas.regex' => 'Ingrese un correo electrónico válido.',
+            'fecha_nacimiento_personas.before' => 'La fecha de nacimiento no es válida.',
         ];
     }
 }

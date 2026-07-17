@@ -124,15 +124,18 @@
             </li>
 
             <li class="nav-item">
-              <a href="#" class="nav-link">
+              <!-- El menú principal se marca como activo si estamos en cualquier ruta de personas -->
+              <a href="#" class="nav-link {{ request()->routeIs('personas.*') ? 'active' : '' }}">
                 <i class="bi bi-people-fill"></i>
                 <p>Estudiantes<i class="nav-arrow bi bi-chevron-right"></i></p>
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="./widgets/small-box.html" class="nav-link">
-                    <i class="nav-icon bi bi-circle"></i>
-                    <p>Opciones</p>
+                  <!-- Enlace al Index (Directorio) -->
+                  <a href="{{ route('personas.index') }}" class="nav-link {{ request()->routeIs('personas.*') ? 'active' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="bi bi-person-badge-fill"></i>
+                    <p>Directorio General</p>
                   </a>
                 </li>
               </ul>

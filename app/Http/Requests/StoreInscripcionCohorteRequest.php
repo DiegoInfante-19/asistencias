@@ -34,6 +34,7 @@ class StoreInscripcionCohorteRequest extends FormRequest
                 'required',
                 'string',
                 'max:50',
+                'in:Activo,Retirado,Suspendido'
                 // Opcional pero recomendado: Restringir a valores exactos si es un campo de texto
                 // 'in:Activo,Retirado,Suspendido' 
             ],

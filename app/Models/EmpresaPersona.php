@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- Añadido para consistencia
 
-class EmpresaPersona extends Model
-{
+class EmpresaPersona extends Model{
     use SoftDeletes;
 
     // Configuración de tabla y llave primaria (Paso 5)

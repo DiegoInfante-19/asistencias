@@ -20,7 +20,7 @@ class PersonaTitulacionController extends Controller
             // Asumiendo que en tu modelo Persona.php tienes definida la relación 
             // como: public function titulacion() { return $this->hasOne(...); }
             
-            $persona->titulacion()->updateOrCreate(
+           $persona->titulacionPersona()->updateOrCreate(
                 ['id_personas' => $persona->id_personas],
                 $request->validated()
             );

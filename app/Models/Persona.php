@@ -15,7 +15,7 @@ class Persona extends Model
     // Configuración de tabla y llave primaria
     protected $table = 'personas';
     protected $primaryKey = 'id_personas';
-    
+
     // Seguridad de Asignación Masiva
     protected $fillable = [
         'cedula_personas',
@@ -113,7 +113,7 @@ class Persona extends Model
         // Limpia espacios dobles en caso de no tener segundo nombre o segundo apellido
         $nombres = trim("{$this->primer_nombre_personas} {$this->segundo_nombre_personas}");
         $apellidos = trim("{$this->primer_apellido_personas} {$this->segundo_apellido_personas}");
-        
+
         return preg_replace('/\s+/', ' ', "{$nombres} {$apellidos}");
     }
 }

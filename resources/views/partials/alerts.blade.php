@@ -5,10 +5,10 @@
     const mensajeExito = @json(session('success'));
     const mensajeError = @json(session('error'));
     // ¡NUEVO!: Obtenemos todos los errores de validación (Cédulas duplicadas, correos en uso, etc.)
-    const erroresValidacion = @json($errors->all());
+    const erroresValidacion = @json($errors -> all());
 
     document.addEventListener('DOMContentLoaded', function() {
-        
+
         const swalConfig = {
             confirmButtonColor: '#0d6efd',
             cancelButtonColor: '#6c757d',
@@ -60,7 +60,7 @@
         document.addEventListener('submit', function(e) {
             // Verificamos si el formulario disparado tiene la clase form-delete
             if (e.target && e.target.classList.contains('form-delete')) {
-                e.preventDefault(); 
+                e.preventDefault();
                 const form = e.target;
 
                 Swal.fire({
@@ -74,7 +74,7 @@
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        form.submit(); 
+                        form.submit();
                     }
                 });
             }
@@ -84,11 +84,11 @@
         // Seleccionamos el enlace por su icono o clase si prefieres, 
         // pero aquí usamos el ID o una clase específica en el botón de logout
         const logoutBtn = document.getElementById('logout-link');
-        
+
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 Swal.fire({
                     title: '¿Cerrar sesión?',
                     text: "¿Estás seguro de que deseas salir del sistema?",

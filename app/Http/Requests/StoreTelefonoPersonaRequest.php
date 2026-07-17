@@ -22,20 +22,20 @@ class StoreTelefonoPersonaRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Corregido: nombre de la columna según tu tabla SQL
             'numero_telefono_personas' => [
                 'required',
                 'string',
                 'min:10',
                 'max:20',
-                // Expresión regular que permite números, espacios, guiones, y el signo +
                 'regex:/^[\d\-\+\s\(\)]+$/',
             ],
             'tipo_telefono' => [
                 'required',
                 'string',
                 'max:50',
-                // Opcional: Si quieres forzar a que solo seleccionen estas opciones del <select>
-                'in:Móvil,Local,Trabajo,Emergencia,Otro'
+                // Ajustado a las opciones de tu vista (Móvil, Fijo/Local, Trabajo, WhatsApp)
+                'in:Móvil,Fijo,Trabajo,WhatsApp,Otro'
             ],
         ];
     }

@@ -11,7 +11,7 @@ class StorePersonaFormacionAcademicaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; 
+        return true;
     }
 
     /**
@@ -27,11 +27,10 @@ class StorePersonaFormacionAcademicaRequest extends FormRequest
                 'exists:titulos,id_titulos',
             ],
             'id_titulos_pnf' => [
-                'nullable', // Puede venir vacío...
-                'required_without:id_titulos', // ...PERO es obligatorio si id_titulos está vacío
+                'nullable',
+                'required_without:id_titulos',
                 'integer',
-                // Asumiendo que la tabla en BD se llama titulo_pnfs
-                'exists:titulo_pnfs,id_titulos_pnf', 
+                'exists:titulos_pnf,id_titulos_pnf', // <--- Asegúrate que sea 'titulos_pnf' y no 'titulo_pnf'
             ],
             'observacion_formacion_academica' => [
                 'nullable', // Es un campo opcional
@@ -49,7 +48,7 @@ class StorePersonaFormacionAcademicaRequest extends FormRequest
         return [
             'id_titulos.required_without' => 'Debe ingresar un Título Base si no selecciona un Título PNF.',
             'id_titulos.exists'           => 'El Título Base seleccionado no existe en el catálogo.',
-            
+
             'id_titulos_pnf.required_without' => 'Debe ingresar un Título PNF si no selecciona un Título Base.',
             'id_titulos_pnf.exists'           => 'El Título PNF seleccionado no existe en el catálogo.',
 

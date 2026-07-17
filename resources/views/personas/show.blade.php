@@ -1,8 +1,15 @@
 @extends('layouts.admin')
 
+<!-- LOS STYLES VAN FUERA DEL CONTENT -->
+@section('styles')
+<!-- Select2 CSS y Tema para Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+@endsection
+
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    
+
     <!-- HEADER Y BOTONERA SUPERIOR -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-dark mb-0">
@@ -26,57 +33,50 @@
                 <div class="col-md-2 d-flex justify-content-center align-items-center border-end">
                     <i class="bi bi-person-bounding-box text-secondary" style="font-size: 5rem;"></i>
                 </div>
-                
+
                 <!-- Columna de Información -->
                 <div class="col-md-10">
                     <div class="row g-3">
+                        <!-- NOMBRES DE VARIABLES CORREGIDOS -->
                         <div class="col-md-4">
                             <span class="text-muted d-block small fw-bold">Cédula</span>
-                            <span class="fs-5">{{ $persona->cedula }}</span>
+                            <span class="fs-5">{{ $persona->cedula_personas }}</span>
                         </div>
                         <div class="col-md-4">
                             <span class="text-muted d-block small fw-bold">Nombres</span>
-                            <span class="fs-5">{{ $persona->nombres }}</span>
+                            <span class="fs-5">{{ $persona->primer_nombre_personas }} {{ $persona->segundo_nombre_personas }}</span>
                         </div>
                         <div class="col-md-4">
                             <span class="text-muted d-block small fw-bold">Apellidos</span>
-                            <span class="fs-5">{{ $persona->apellidos }}</span>
+                            <span class="fs-5">{{ $persona->primer_apellido_personas }} {{ $persona->segundo_apellido_personas }}</span>
                         </div>
                         <div class="col-md-4">
                             <span class="text-muted d-block small fw-bold">Fecha de Nacimiento</span>
-                            <span>{{ \Carbon\Carbon::parse($persona->fecha_nacimiento)->format('d/m/Y') }}</span>
+                            <span>{{ \Carbon\Carbon::parse($persona->fecha_nacimiento_personas)->format('d/m/Y') }}</span>
                         </div>
                         <div class="col-md-4">
                             <span class="text-muted d-block small fw-bold">Correo Electrónico</span>
-                            <span>{{ $persona->correo_electronico ?? 'No registrado' }}</span>
+                            <span>{{ $persona->email_personas ?? 'No registrado' }}</span>
                         </div>
                         <div class="col-md-4">
                             <span class="text-muted d-block small fw-bold">Lugar de Nacimiento</span>
-                            <span>{{ $persona->lugar_nacimiento_personas }}</span>
+                            <span>
+                                @if($persona->lugarNacimiento)
+                                ID Estado: {{ $persona->lugarNacimiento->id_estado }} | ID Ciudad: {{ $persona->lugarNacimiento->id_ciudad }}
+                                @else
+                                No registrado
+                                @endif
+                            </span>
                         </div>
                         <div class="col-12">
                             <span class="text-muted d-block small fw-bold">Dirección Completa</span>
-                            <span>{{ $persona->direccion }}</span>
+                            <span>{{ $persona->direccion ?? 'No registrada' }}</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- MENSAJES DE ALERTA GLOBALES PARA LAS PESTAÑAS -->
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            <i class="bi bi-check-circle-fill me-1"></i> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
 
     <!-- ESQUELETO DEL MEGA-CRUD (SISTEMA DE PESTAÑAS) -->
     <div class="card shadow-sm border-0">
@@ -115,50 +115,32 @@
                 </li>
             </ul>
         </div>
-        <!-- Contenido de las pestañas (Fase temporal, se dividirá en Partials después) -->
+        <!-- Contenido de las pestañas -->
         <div class="card-body bg-light border-top">
             <div class="tab-content" id="expedienteTabsContent">
                 <!-- Pestaña: Teléfonos -->
                 <div class="tab-pane fade show active" id="telefonos" role="tabpanel">
-                    <div class="p-3 text-center text-muted">
-                        <i class="bi bi-tools fs-1"></i>
-                        @include('personas.partials.tab_telefonos')
-                    </div>
+                    @include('personas.partials.tab_telefonos')
                 </div>
                 <!-- Pestaña: Expediente Académico -->
                 <div class="tab-pane fade" id="academico" role="tabpanel">
-                    <div class="p-3 text-center text-muted">
-                        <i class="bi bi-tools fs-1"></i>
-                        @include('personas.partials.tab_titulacion')
-                    </div>
+                    @include('personas.partials.tab_titulacion')
                 </div>
                 <!-- Pestaña: Formación Previa -->
                 <div class="tab-pane fade" id="formacion" role="tabpanel">
-                    <div class="p-3 text-center text-muted">
-                        <i class="bi bi-tools fs-1"></i>
-                        @include('personas.partials.tab_formacion')
-                    </div>
+                    @include('personas.partials.tab_formacion')
                 </div>
                 <!-- Pestaña: Control de Estudio -->
                 <div class="tab-pane fade" id="inscripciones" role="tabpanel">
-                    <div class="p-3 text-center text-muted">
-                        <i class="bi bi-tools fs-1"></i>
-                        @include('personas.partials.tab_inscripciones')
-                    </div>
+                    @include('personas.partials.tab_inscripciones')
                 </div>
                 <!-- Pestaña: Perfil Laboral -->
                 <div class="tab-pane fade" id="laboral" role="tabpanel">
-                    <div class="p-3 text-center text-muted">
-                        <i class="bi bi-tools fs-1"></i>
-                        @include('personas.partials.tab_empresas')
-                    </div>
+                    @include('personas.partials.tab_empresas')
                 </div>
                 <!-- Pestaña: Observaciones -->
                 <div class="tab-pane fade" id="observaciones" role="tabpanel">
-                    <div class="p-3 text-center text-muted">
-                        <i class="bi bi-tools fs-1"></i>
-                        @include('personas.partials.tab_observaciones')
-                    </div>
+                    @include('personas.partials.tab_observaciones')
                 </div>
             </div>
         </div>
@@ -167,20 +149,38 @@
 @endsection
 
 @section('scripts')
+<!-- 1. PRIMERO JQUERY -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
+
+<!-- 2. LUEGO SELECT2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
-    // Pequeño script para guardar en memoria qué pestaña estaba abierta.
-    // Así, si guardamos un teléfono, la página recarga y vuelve a la pestaña de Teléfonos automáticamente.
     $(document).ready(function() {
+        // Inicializar Select2
+        $('.select2-buscador').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Escriba para buscar...',
+            language: {
+                noResults: function() {
+                    return "No se encontraron resultados";
+                }
+            }
+        });
+
+        // Lógica de pestañas unificada
         var activeTab = localStorage.getItem('activeTabPersona');
         if (activeTab) {
             $('#expedienteTabs button[data-bs-target="' + activeTab + '"]').tab('show');
         }
 
-        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
             localStorage.setItem('activeTabPersona', $(e.target).attr('data-bs-target'));
         });
     });
 </script>
+
 <script src="{{ asset('js/core-validations.js') }}" defer></script>
 <script src="{{ asset('js/admin-validations.js') }}" defer></script>
 @endsection
