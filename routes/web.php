@@ -172,4 +172,6 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
         Route::post('/inscripciones', [PersonaInscripcionController::class, 'store'])->name('inscripciones.store');
         Route::delete('/inscripciones/{inscripcion}', [PersonaInscripcionController::class, 'destroy'])->name('inscripciones.destroy');
     });
+    // Añade esta línea en tu grupo de rutas auth, preferiblemente cerca de las rutas de Persona
+Route::get('/titulos-por-pnf/{id_pnf}', [PersonaTitulacionController::class, 'getTitulosPorPnf'])->name('api.titulos.pnf');
 });

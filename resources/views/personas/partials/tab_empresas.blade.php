@@ -63,46 +63,50 @@
             <div class="card-header bg-white fw-bold">
                 <i class="bi bi-person-workspace me-1"></i> Empleo Actual
             </div>
-            <div class="card-body">
+            <div class="card-body d-flex flex-column justify-content-center">
                 @if ($persona->empresaPersona)
-                <div class="row align-items-center">
-                    <!-- Detalles del empleo -->
-                    <div class="col-md-8">
-                        <div class="mb-3">
-                            <label class="text-muted small fw-bold d-block text-uppercase">Empresa</label>
-                            <!-- Si cargaste la relación empresa en el controlador, puedes usar $persona->empresaPersona->empresa->nombre_empresa -->
-                            <span class="fs-5 fw-bold text-dark">
-                                {{ $persona->empresaPersona->empresa->nombre_empresa ?? 'ID Empresa: ' . $persona->empresaPersona->id_empresa }}
-                            </span>
+                <div class="p-4 border-start border-4 border-primary bg-light rounded shadow-sm">
+                    <div class="row align-items-center">
+
+                        <!-- Detalles del Trabajador -->
+                        <div class="col-md-8">
+                            <div class="mb-4">
+                                <label class="text-muted small fw-bold d-block text-uppercase mb-1">Empresa</label>
+                                <span class="fs-5 fw-bold text-dark">
+                                    <i class="bi bi-building text-secondary me-2"></i>
+                                    {{ $persona->empresaPersona->empresa->nombre_empresa ?? 'ID Empresa: ' . $persona->empresaPersona->id_empresa }}
+                                </span>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="text-muted small fw-bold d-block text-uppercase mb-1">Cargo Asignado</label>
+                                <div class="fs-6 text-secondary fw-bold d-flex align-items-start">
+                                    <i class="bi bi-person-badge me-2 mt-1 flex-shrink-0"></i>
+                                    <span class="text-wrap">
+                                        {{ $persona->empresaPersona->cargo->descripcion_cargo ?? 'ID Cargo: ' . $persona->empresaPersona->id_cargo }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="text-muted small fw-bold d-block text-uppercase">Cargo Asignado</label>
-                            <!-- Si cargaste la relación cargo en el controlador, puedes usar $persona->empresaPersona->cargo->descripcion_cargo -->
-                            <span class="fs-6 text-secondary">
-                                <i class="bi bi-person-badge me-1"></i>
-                                {{ $persona->empresaPersona->cargo->descripcion_cargo ?? 'ID Cargo: ' . $persona->empresaPersona->id_cargo }}
-                            </span>
+                        <!-- Botón de Acción -->
+                        <div class="col-md-4 text-md-end text-center mt-4 mt-md-0 border-start ps-4">
+                            <label class="text-muted small fw-bold d-block text-uppercase mb-3">Acción</label>
+                            <form action="{{ route('personas.empresas.destroy', ['persona' => $persona->id_personas, 'empresa' => $persona->empresaPersona->id_empresa_personas]) }}" method="POST" class="form-delete">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger w-50" title="Eliminar registro laboral">
+                                    <i class="bi bi-trash3-fill me-1"></i> Eliminar
+                                </button>
+                            </form>
                         </div>
-                    </div>
 
-                    <!-- Botón de Acción -->
-                    <div class="col-md-4 text-md-end text-center mt-3 mt-md-0 border-start ps-4">
-                        <span class="badge bg-success mb-3 px-3 py-2 fs-6"><i class="bi bi-check-circle me-1"></i> Empleado</span>
-
-                        <form action="{{ route('personas.empresas.destroy', ['persona' => $persona->id_personas, 'empresa' => $persona->empresaPersona->id_empresa_personas]) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar el perfil laboral actual del estudiante?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger w-100">
-                                <i class="bi bi-trash me-1"></i> Eliminar
-                            </button>
-                        </form>
                     </div>
                 </div>
                 @else
                 <div class="text-center text-muted py-5">
                     <i class="bi bi-briefcase fs-1 d-block mb-3 text-secondary" style="opacity: 0.5;"></i>
-                    <h5 class="fw-light">Sin experiencia laboral</h5>
+                    <h5 class="fw-light">Sin perfil de trabajador</h5>
                     <p class="small">El estudiante no tiene asignada ninguna empresa o cargo actualmente.</p>
                 </div>
                 @endif

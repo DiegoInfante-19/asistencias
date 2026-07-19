@@ -11,7 +11,7 @@ class LugarNacimientoPersona extends Model
     // Configuración de tabla y llave primaria (Paso 5)
     protected $table = 'lugar_nacimiento_personas';
     protected $primaryKey = 'id_lugar_nacimiento';
-    
+
     // Seguridad de Asignación Masiva (Paso 5)
     protected $fillable = [
         'id_estado',
@@ -24,13 +24,13 @@ class LugarNacimientoPersona extends Model
      */
 
     // El lugar de nacimiento pertenece a un estado
-    public function estado(): BelongsTo
+    public function estado()
     {
+        // Asegúrate de que las llaves foráneas coincidan con tu base de datos
         return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
     }
 
-    // El lugar de nacimiento pertenece a una ciudad
-    public function ciudad(): BelongsTo
+    public function ciudad()
     {
         return $this->belongsTo(Ciudad::class, 'id_ciudad', 'id_ciudad');
     }
@@ -44,12 +44,10 @@ class LugarNacimientoPersona extends Model
     // Permite usar $lugar->direccion_completa en las vistas
     public function getDireccionCompletaAttribute()
     {
-        $direccion = "{$this->ciudad->nombre_ciudad}, {$this->estado->nombre_estado}";
-        
-        if (!empty($this->detalles_adicionales)) {
-            $direccion .= " - Detalles: {$this->detalles_adicionales}";
-        }
-        
+        // Accedemos a la relación 'ciudad' y 'estado' y a sus columnas reales
+        $ciudad = $this->ciudad ? $this->ciudad->nombre_ciudad : 'Ciudad desconocida';
+        $estado = $this->estado ? $this->estado->nombre_estado : 'Estado desconocido';
+        $direccion = "{$ciudad}, {$estado}";
         return $direccion;
     }
 }

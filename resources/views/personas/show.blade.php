@@ -60,17 +60,15 @@
                         </div>
                         <div class="col-md-4">
                             <span class="text-muted d-block small fw-bold">Lugar de Nacimiento</span>
-                            <span>
-                                @if($persona->lugarNacimiento)
-                                ID Estado: {{ $persona->lugarNacimiento->id_estado }} | ID Ciudad: {{ $persona->lugarNacimiento->id_ciudad }}
-                                @else
-                                No registrado
-                                @endif
+                            <span class="fs-6 text-dark fw-semibold">
+                                <i class="bi bi-geo-alt-fill text-secondary me-1"></i>
+                                {{ $persona->lugarNacimiento ? $persona->lugarNacimiento->direccion_completa : 'No registrado' }}
                             </span>
                         </div>
                         <div class="col-12">
-                            <span class="text-muted d-block small fw-bold">Dirección Completa</span>
-                            <span>{{ $persona->direccion ?? 'No registrada' }}</span>
+                            <span class="text-muted d-block small fw-bold">Detalles de Dirección</span>
+                            <!-- Llamamos a detalles_adicionales que es donde realmente guardas esta info -->
+                            <span class="fs-6">{{ $persona->lugarNacimiento->detalles_adicionales ?? 'Sin detalles adicionales registrados' }}</span>
                         </div>
                     </div>
                 </div>

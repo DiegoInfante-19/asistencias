@@ -24,37 +24,38 @@ class PersonaController extends Controller
     public function store(StorePersonaRequest $request)
     {
         try {
-            // 1. Obtenemos los datos validados
+            \DB::beginTransaction();
+
+            // 1. Validamos (esto ya incluye los campos de lugar)
             $data = $request->validated();
 
-            // 2. Buscamos o creamos el registro de lugar_nacimiento
-            // Usamos firstOrCreate para evitar duplicados si ya existe el mismo lugar
-            $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate(
-                [
-                    'id_estado' => $request->id_estado,
-                    'id_ciudad' => $request->id_ciudad,
-                    'detalles_adicionales' => $request->detalles_adicionales
-                ]
-            );
+            // 2. Creamos o buscamos el lugar de nacimiento
+            $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate([
+                'id_estado' => $data['id_estado'],
+                'id_ciudad' => $data['id_ciudad'],
+                'detalles_adicionales' => $data['detalles_adicionales'] ?? null
+            ]);
 
-            // 3. Asignamos el ID del lugar al array de datos de la persona
-            $data['id_lugar_nacimiento'] = $lugar->id_lugar_nacimiento;
+            // 3. Preparamos los datos de Persona (eliminamos los del lugar)
+            $personaData = array_diff_key($data, array_flip(['id_estado', 'id_ciudad', 'detalles_adicionales']));
+            $personaData['id_lugar_nacimiento'] = $lugar->id_lugar_nacimiento;
 
-            // 4. Creamos la persona
-            \App\Models\Persona::create($data);
+            // 4. Creamos
+            \App\Models\Persona::create($personaData);
 
-            return redirect()->route('personas.index')
-                ->with('success', 'Estudiante registrado exitosamente.');
+            \DB::commit();
+            return redirect()->route('personas.index')->with('success', 'Registrado con éxito.');
         } catch (\Exception $e) {
-            Log::error('Error registrando persona: ' . $e->getMessage());
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Ocurrió un error al intentar registrar al estudiante.');
+            \DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
-    public function show($id){
+    public function show($id)
+    {
         $persona = Persona::with([
+            'lugarNacimiento.estado', // <-- Carga el Estado asociado
+            'lugarNacimiento.ciudad', // <-- Carga la Ciudad asociada
             'telefonos',
             'observacion',
             'empresaPersona.empresa',
@@ -77,7 +78,7 @@ class PersonaController extends Controller
             'persona',
             'pnfs',
             'titulos',
-            'titulos_pnf', 
+            'titulos_pnf',
             'estatusExpedientes',
             'cohortes',
             'empresas',
@@ -129,17 +130,27 @@ class PersonaController extends Controller
     public function update(UpdatePersonaRequest $request, Persona $persona)
     {
         try {
-            $persona->update($request->validated());
+            \DB::beginTransaction();
 
-            // Redirigimos de vuelta al expediente (show) para que la secretaria
-            // siga viendo el perfil actualizado.
+            $data = $request->validated();
+
+            $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate([
+                'id_estado' => $data['id_estado'],
+                'id_ciudad' => $data['id_ciudad'],
+                'detalles_adicionales' => $data['detalles_adicionales'] ?? null
+            ]);
+
+            $personaData = array_diff_key($data, array_flip(['id_estado', 'id_ciudad', 'detalles_adicionales']));
+            $personaData['id_lugar_nacimiento'] = $lugar->id_lugar_nacimiento;
+
+            $persona->update($personaData);
+
+            \DB::commit();
             return redirect()->route('personas.show', $persona->id_personas)
-                ->with('success', 'Datos del estudiante actualizados correctamente.');
+                ->with('success', 'Actualizado correctamente.');
         } catch (\Exception $e) {
-            Log::error('Error actualizando persona: ' . $e->getMessage());
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Ocurrió un error al actualizar los datos.');
+            \DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Error al actualizar.');
         }
     }
 
