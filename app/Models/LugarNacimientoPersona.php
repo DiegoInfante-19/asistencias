@@ -8,45 +8,48 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LugarNacimientoPersona extends Model
 {
-    // Configuración de tabla y llave primaria (Paso 5)
     protected $table = 'lugar_nacimiento_personas';
     protected $primaryKey = 'id_lugar_nacimiento';
 
-    // Seguridad de Asignación Masiva (Paso 5)
+    // CORREGIDO: Se elimina 'id_estado' para evitar escrituras masivas fantasma
     protected $fillable = [
-        'id_estado',
         'id_ciudad',
         'detalles_adicionales'
     ];
 
     /**
-     * RELACIONES (Paso 6)
+     * RELACIONES REFACTORIZADAS
      */
 
-    // El lugar de nacimiento pertenece a un estado
+    // CORREGIDO: El estado ahora se obtiene de forma indirecta cruzando con la ciudad
     public function estado()
     {
-        // Asegúrate de que las llaves foráneas coincidan con tu base de datos
-        return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
+        // Si existe la ciudad cargada, accedemos a su relación estado.
+        // Nota: Asegúrate de que el modelo Ciudad tenga definida la relación 'estado'.
+        return $this->ciudad ? $this->ciudad->belongsTo(Estado::class, 'id_estado', 'id_estado') : null;
     }
 
-    public function ciudad()
+    public function ciudad(): BelongsTo
     {
         return $this->belongsTo(Ciudad::class, 'id_ciudad', 'id_ciudad');
     }
 
-    // Un lugar de nacimiento puede estar asociado a muchas personas
     public function personas(): HasMany
     {
         return $this->hasMany(Persona::class, 'id_lugar_nacimiento', 'id_lugar_nacimiento');
     }
 
-    // Permite usar $lugar->direccion_completa en las vistas
+    /**
+     * ACCESSORS
+     */
     public function getDireccionCompletaAttribute()
     {
-        // Accedemos a la relación 'ciudad' y 'estado' y a sus columnas reales
+        // Buscamos el nombre de la ciudad de la relación directa
         $ciudad = $this->ciudad ? $this->ciudad->nombre_ciudad : 'Ciudad desconocida';
-        $estado = $this->estado ? $this->estado->nombre_estado : 'Estado desconocido';
+        
+        // CORREGIDO: Buscamos el estado cruzando de forma segura a través del modelo Ciudad
+        $estado = ($this->ciudad && $this->ciudad->estado) ? $this->ciudad->estado->nombre_estado : 'Estado desconocido';
+        
         $direccion = "{$ciudad}, {$estado}";
         return $direccion;
     }

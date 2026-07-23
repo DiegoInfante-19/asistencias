@@ -5,7 +5,7 @@
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white py-3 d-flex align-items-center">
             <h3 class="card-title fw-bold text-dark mb-0">
-                Editar Datos Básicos: 
+                Editar Datos Básicos:
                 <span class="text-primary">{{ $persona->primer_nombre_personas }} {{ $persona->primer_apellido_personas }}</span>
             </h3>
             <!-- Botón para regresar al expediente principal (show) -->
@@ -94,10 +94,10 @@
                     <div class="col-12 mt-4">
                         <h5 class="fw-bold border-bottom pb-2"><i class="bi bi-geo-alt-fill me-2"></i>Lugar de Nacimiento</h5>
                     </div>
-                    
+
                     @php
-                        // Obtenemos los valores actuales de la base de datos a través de la relación (o vacíos si fallan)
-                        $estadoActual = $persona->lugarNacimiento->id_estado ?? '';
+                        // CORREGIDO: El estado actual ya no se lee de lugarNacimiento directamente, sino a través de la ciudad
+                        $estadoActual = $persona->lugarNacimiento->ciudad->id_estado ?? '';
                         $ciudadActual = $persona->lugarNacimiento->id_ciudad ?? '';
                         $detallesActual = $persona->lugarNacimiento->detalles_adicionales ?? '';
                     @endphp
@@ -236,7 +236,7 @@
         // Tomamos el 'old' si hubo error, sino tomamos el valor actual de la BD que inyectamos en Blade
         let oldEstado = "{{ old('id_estado', $estadoActual ?? '') }}";
         let oldCiudad = "{{ old('id_ciudad', $ciudadActual ?? '') }}";
-        
+
         if (oldEstado) {
             cargarCiudades(oldEstado, oldCiudad);
         }

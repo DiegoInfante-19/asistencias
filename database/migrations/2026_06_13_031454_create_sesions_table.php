@@ -8,8 +8,11 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('sesiones', function (Blueprint $table) {
             $table->id('id_sesiones');
-            $table->foreignId('id_cohortes')->constrained('cohortes', 'id_cohortes')->onDelete('restrict');
+            
+            // CORREGIDO: La clase/sesión pertenece a un Grupo Académico específico
+            $table->foreignId('id_grupo')->constrained('grupos_academicos', 'id_grupo')->onDelete('restrict');
             $table->foreignId('id_profesor')->constrained('profesores', 'id_profesor')->onDelete('restrict');
+            
             $table->dateTime('fecha_sesion');
             $table->text('observacion_sesion')->nullable();
             $table->softDeletes();

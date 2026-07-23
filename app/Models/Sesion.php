@@ -11,26 +11,24 @@ class Sesion extends Model
 {
     use SoftDeletes;
 
-    // Configuración de tabla y llave primaria (Paso 5)
     protected $table = 'sesiones';
     protected $primaryKey = 'id_sesiones';
 
-    // Seguridad de Asignación Masiva (Paso 5)
     protected $fillable = [
-        'id_cohortes', 
+        'id_grupo', 
         'id_profesor', 
         'fecha_sesion', 
         'observacion_sesion'
     ];
 
     /**
-     * RELACIONES (Paso 6)
+     * RELACIONES
      */
 
-    // Una sesión pertenece a una cohorte
-    public function cohorte(): BelongsTo
+    // CORREGIDO: Una sesión pertenece a un grupo académico
+    public function grupo(): BelongsTo
     {
-        return $this->belongsTo(Cohorte::class, 'id_cohortes', 'id_cohortes');
+        return $this->belongsTo(GrupoAcademico::class, 'id_grupo', 'id_grupo');
     }
 
     // Una sesión es impartida por un profesor

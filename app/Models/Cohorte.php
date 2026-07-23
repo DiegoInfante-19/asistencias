@@ -3,17 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cohorte extends Model
 {
-    // Configuración de tabla y llave primaria (Paso 5)
     protected $table = 'cohortes';
     protected $primaryKey = 'id_cohortes';
 
-    // Desactivar timestamps si no los incluiste en la migración de cohortes (Paso 5)
     public $timestamps = false;
     
-    // Seguridad de Asignación Masiva (Paso 5)
     protected $fillable = [
         'numero_cohorte',
         'fecha_inicio_cohorte',
@@ -23,18 +21,12 @@ class Cohorte extends Model
     ];
 
     /**
-     * RELACIONES (Paso 6)
+     * RELACIONES
      */
 
-    // Una cohorte tiene muchas inscripciones de participantes
-    public function inscripciones()
+    // Una cohorte se subdivide en grupos académicos (por PNF y Nivel)
+    public function gruposAcademicos(): HasMany
     {
-        return $this->hasMany(InscripcionCohorte::class, 'id_cohortes', 'id_cohortes');
-    }
-
-    // Una cohorte tiene muchas sesiones académicas
-    public function sesiones()
-    {
-        return $this->hasMany(Sesion::class, 'id_cohortes', 'id_cohortes');
+        return $this->hasMany(GrupoAcademico::class, 'id_cohortes', 'id_cohortes');
     }
 }

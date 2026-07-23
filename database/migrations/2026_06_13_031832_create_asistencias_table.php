@@ -10,7 +10,9 @@ return new class extends Migration {
             $table->id('id_asistencias');
             $table->foreignId('id_sesiones')->constrained('sesiones', 'id_sesiones')->onDelete('cascade');
             $table->foreignId('id_inscripcion_cohortes')->constrained('inscripcion_cohortes', 'id_inscripcion_cohortes')->onDelete('cascade');
-            $table->enum('estado_asistencia', ['presente', 'ausente', 'justificada']);
+            
+            $table->string('estado_asistencia', 20);
+            
             $table->text('observacion_asistencia')->nullable();
             $table->softDeletes();
             $table->timestamps();

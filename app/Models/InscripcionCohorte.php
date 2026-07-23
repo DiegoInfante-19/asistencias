@@ -11,20 +11,18 @@ class InscripcionCohorte extends Model
 {
     use SoftDeletes;
 
-    // Configuración de tabla y llave primaria (Paso 5)
     protected $table = 'inscripcion_cohortes';
     protected $primaryKey = 'id_inscripcion_cohortes';
 
-    // Seguridad de Asignación Masiva (Paso 5)
     protected $fillable = [
         'id_personas',
-        'id_cohortes',
+        'id_grupo',
         'fecha_inscripcion',
         'estatus_inscripcion_cohortes'
     ];
 
     /**
-     * RELACIONES (Paso 6)
+     * RELACIONES
      */
 
     // Una inscripción pertenece a una persona
@@ -33,10 +31,10 @@ class InscripcionCohorte extends Model
         return $this->belongsTo(Persona::class, 'id_personas', 'id_personas');
     }
 
-    // Una inscripción pertenece a una cohorte
-    public function cohorte(): BelongsTo
+    // CORREGIDO: Una inscripción pertenece a un grupo académico
+    public function grupo(): BelongsTo
     {
-        return $this->belongsTo(Cohorte::class, 'id_cohortes', 'id_cohortes');
+        return $this->belongsTo(GrupoAcademico::class, 'id_grupo', 'id_grupo');
     }
 
     // Una inscripción tiene muchas asistencias registradas

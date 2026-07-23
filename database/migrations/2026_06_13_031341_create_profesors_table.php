@@ -15,6 +15,9 @@ return new class extends Migration
             $table->foreignId('id_users')->constrained('users', 'id_users')->onDelete('cascade');
             $table->foreignId('id_pnf')->constrained('pnfs', 'id_pnf')->onDelete('restrict');
             
+            // NUEVO: Nivel Académico (TSU o Ingeniería) en string para usar Backed Enums
+            $table->string('nivel_asignado', 20);
+            
             $table->date('fecha_asignacion_profesor');
         });
     }

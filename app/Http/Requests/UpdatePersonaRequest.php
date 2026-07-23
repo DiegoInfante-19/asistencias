@@ -14,8 +14,6 @@ class UpdatePersonaRequest extends FormRequest
 
     public function rules()
     {
-        // Al usar Route Model Binding en Laravel, la variable contiene el modelo completo.
-        // Accedemos a su clave primaria para ignorarla en las reglas 'unique'.
         $id = $this->route('persona')->id_personas;
 
         return [
@@ -52,13 +50,11 @@ class UpdatePersonaRequest extends FormRequest
                 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
             ],
             
-            // --- NUEVA LÓGICA DE LUGAR DE NACIMIENTO ---
-            
-            // El campo original es nullable porque se procesará manual en el controlador
+            // --- LÓGICA DE LUGAR DE NACIMIENTO 3NF ---
             'id_lugar_nacimiento' => [
                 'nullable', 'integer', 'exists:lugar_nacimiento_personas,id_lugar_nacimiento'
             ],
-            // Validamos los pedazos que componen el lugar de nacimiento desde la vista
+            // Validamos la integridad del estado para el flujo dinámico del formulario
             'id_estado' => [
                 'required', 'integer', 'exists:estados,id_estado'
             ],
@@ -79,14 +75,12 @@ class UpdatePersonaRequest extends FormRequest
             'email_personas.unique' => 'Este correo electrónico ya le pertenece a otro registro.',
             'sexo_personas.in' => 'El género seleccionado no es válido.',
             
-            // Mensajes para el lugar de nacimiento dinámico
             'id_estado.required' => 'Debe seleccionar un estado.',
             'id_estado.exists' => 'El estado seleccionado no es válido.',
             'id_ciudad.required' => 'Debe seleccionar una ciudad.',
             'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
             'id_lugar_nacimiento.exists' => 'El lugar de nacimiento procesado no es válido.',
 
-            // Mensajes regex
             'cedula_personas.regex' => 'La cédula debe tener entre 6 y 8 números exactos. Sin espacios ni puntos.',
             'primer_nombre_personas.regex' => 'Solo se permiten letras y espacios.',
             'segundo_nombre_personas.regex' => 'Solo se permiten letras y espacios.',

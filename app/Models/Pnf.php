@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Pnf extends Model{
-
+class Pnf extends Model 
+{
     protected $table = 'pnfs';
     protected $primaryKey = 'id_pnf';
 
@@ -16,26 +16,38 @@ class Pnf extends Model{
         'vigencia_pnf'
     ];
 
-    // Aseguramos que Laravel trate la vigencia estrictamente como true/false
     protected $casts = [
         'vigencia_pnf' => 'boolean',
     ];
 
-    /*
-     * RELACIONES (Paso 6)
+    /**
+     * RELACIONES
      */
 
-    public function acreditaciones(): HasMany{
+    public function acreditaciones(): HasMany 
+    {
         return $this->hasMany(Acreditacion::class, 'id_pnf', 'id_pnf');
     }
 
-    // Trae todas las vinculaciones con empresas
-    public function empresasPnf(): HasMany{
+    public function empresasPnf(): HasMany 
+    {
         return $this->hasMany(EmpresaPnf::class, 'id_pnf', 'id_pnf');
     }
 
-    // Trae todas las vinculaciones con títulos
-    public function titulosPnf(): HasMany{
+    public function titulosPnf(): HasMany 
+    {
         return $this->hasMany(TituloPnf::class, 'id_pnf', 'id_pnf');
+    }
+
+    // Un PNF tiene varios grupos académicos (TSU, Ingeniería en distintas cohortes)
+    public function gruposAcademicos(): HasMany 
+    {
+        return $this->hasMany(GrupoAcademico::class, 'id_pnf', 'id_pnf');
+    }
+
+    // Un PNF tiene asignados varios profesores
+    public function profesores(): HasMany 
+    {
+        return $this->hasMany(Profesor::class, 'id_pnf', 'id_pnf');
     }
 }
