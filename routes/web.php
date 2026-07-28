@@ -22,6 +22,9 @@ use App\Http\Controllers\PersonaTitulacionController;
 use App\Http\Controllers\PersonaFormacionAcademicaController;
 use App\Http\Controllers\PersonaInscripcionController;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\SesionController;
+use App\Http\Controllers\AsistenciaController;
+
 
 
 // 
@@ -39,6 +42,16 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
     // NUEVA RUTA: Procesar el formulario de asignación académica (Paso 3.2)
     Route::post('/usuarios/{usuario}/asignar-pnf', [UserController::class, 'asignarPnf'])
         ->name('usuarios.asignar_pnf');
+
+    Route::post('/usuarios/{usuario}/asignar-pnf', [UserController::class, 'asignarPnf'])
+        ->name('usuarios.asignar_pnf');
+
+    // NUEVAS RUTAS: Carga Académica del Profesor (Grupos)
+    Route::post('/usuarios/{usuario}/asignar-grupo', [UserController::class, 'asignarGrupo'])
+        ->name('usuarios.asignar_grupo');
+
+    Route::delete('/usuarios/{id_usuario}/remover-grupo/{id_grupo}', [UserController::class, 'removerGrupo'])
+        ->name('usuarios.remover_grupo');
 
     // Nuestra ruta especial para la tabla profesional de administración
     Route::get('/profesores', [UserController::class, 'index'])->name('profesores.index');
@@ -139,6 +152,19 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
         Route::delete('/periodos-recesos/{periodo_receso}', 'destroy')->name('periodos_recesos.destroy');
     });
 
+
+    // ==========================================
+    // RUTAS DEL DOCENTE (PORTAL DE CLASES Y ASISTENCIAS)
+    // ==========================================
+    Route::controller(SesionController::class)->group(function () {
+        Route::get('/sesiones/crear', 'create')->name('sesiones.create');
+        Route::get('/sesiones', 'index')->name('sesiones.index');
+        Route::post('/sesiones', 'store')->name('sesiones.store');
+        Route::get('/sesiones/{sesion}', 'show')->name('sesiones.show');
+        Route::post('/asistencias/guardar-lote', [App\Http\Controllers\AsistenciaController::class, 'guardarLote'])
+        ->name('asistencias.guardar_lote');
+    });
+
     // ==========================================
     // RUTAS PRINCIPALES DEL MEGA-CRUD (PERSONAS)
     // ==========================================
@@ -172,6 +198,8 @@ Route::middleware(['auth', 'no-back-history'])->group(function () { //(Solo usua
         Route::post('/inscripciones', [PersonaInscripcionController::class, 'store'])->name('inscripciones.store');
         Route::delete('/inscripciones/{inscripcion}', [PersonaInscripcionController::class, 'destroy'])->name('inscripciones.destroy');
     });
+   
+   
     // Añade esta línea en tu grupo de rutas auth, preferiblemente cerca de las rutas de Persona
-Route::get('/titulos-por-pnf/{id_pnf}', [PersonaTitulacionController::class, 'getTitulosPorPnf'])->name('api.titulos.pnf');
+    Route::get('/titulos-por-pnf/{id_pnf}', [PersonaTitulacionController::class, 'getTitulosPorPnf'])->name('api.titulos.pnf');
 });

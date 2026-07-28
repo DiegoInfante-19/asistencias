@@ -24,6 +24,7 @@ class UserUpdateRequest extends FormRequest
             'email_users'     => ['required', 'string', 'email:rfc,dns', 'unique:users,email_users,' . $id . ',id_users', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
             'phone_users'     => ['nullable', 'string', 'unique:users,phone_users,' . $id . ',id_users', 'regex:/^\d{10,11}$/'],
             'status_users'    => ['required', 'in:Activo,Inactivo,Suspendido'],
+            'id_rol'          => ['required', 'exists:roles,id_rol'], // NUEVA REGLA
         ];
     }
 
@@ -31,6 +32,7 @@ class UserUpdateRequest extends FormRequest
     {
         return [
             'required'               => 'Este campo es obligatorio.',
+            'id_rol.exists'          => 'El rol seleccionado no es válido.',
             'email_users.unique'     => 'Este correo electrónico ya está registrado.',
             'cedula_users.unique'    => 'Esta cédula ya está registrada.',
             'phone_users.unique'     => 'Este número de teléfono ya está registrado.',

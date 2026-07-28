@@ -20,12 +20,14 @@ class StoreSesionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // CORREGIDO: Exige y valida el id_grupo en lugar de la cohorte global
+            // Valida el grupo seleccionado por el docente
             'id_grupo' => ['required', 'exists:grupos_academicos,id_grupo'],
             
-            'id_profesor' => ['required', 'exists:profesores,id_profesor'],
-            'fecha_sesion' => ['required', 'date'],
-            'observacion_sesion' => ['nullable', 'string', 'max:1000'],
+            // La fecha no puede ser futura
+            'fecha_sesion' => ['required', 'date', 'before_or_equal:today'],
+            
+            // Verificamos el nombre exacto de tu campo de observaciones en base de datos (observaciones_sesiones)
+            'observaciones_sesiones' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -37,11 +39,12 @@ class StoreSesionRequest extends FormRequest
         return [
             'id_grupo.required' => 'Debe seleccionar el grupo académico al que pertenece la sesión.',
             'id_grupo.exists'   => 'El grupo académico seleccionado no es válido.',
-            'id_profesor.required' => 'Debe indicar el profesor que dictó la sesión.',
-            'id_profesor.exists'   => 'El profesor seleccionado no existe.',
-            'fecha_sesion.required' => 'La fecha y hora de la sesión es obligatoria.',
-            'fecha_sesion.date'     => 'La fecha debe ser un formato de fecha y hora válido.',
-            'observacion_sesion.max' => 'La observación no puede superar los 1000 caracteres.',
+            
+            'fecha_sesion.required' => 'La fecha de la sesión es obligatoria.',
+            'fecha_sesion.date'     => 'Debe ingresar un formato de fecha válido.',
+            'fecha_sesion.before_or_equal' => 'No puedes registrar clases con fechas futuras.',
+            
+            'observaciones_sesiones.max' => 'La observación no puede superar los 1000 caracteres.',
         ];
     }
 }

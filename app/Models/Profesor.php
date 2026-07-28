@@ -26,10 +26,6 @@ class Profesor extends Model
         'nivel_asignado' => NivelAcademico::class,
     ];
 
-    /**
-     * RELACIONES
-     */
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_users', 'id_users');

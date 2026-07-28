@@ -7,28 +7,27 @@ use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
 use App\DataTables\PersonasDataTable;
 use Illuminate\Support\Facades\Log;
+use App\Models\Cohorte;
+use App\Models\GrupoAcademico;
+use Illuminate\Support\Facades\DB; // Añadido para el manejo de transacciones
 
-class PersonaController extends Controller
-{
-    public function index(PersonasDataTable $dataTable)
-    {
+class PersonaController extends Controller{
+
+    public function index(PersonasDataTable $dataTable){
         return $dataTable->render('personas.index');
     }
 
-    public function create()
-    {
+    public function create(){
         $estados = \App\Models\Estado::all();
         return view('personas.create', compact('estados'));
     }
 
-    public function store(StorePersonaRequest $request)
-    {
+    public function store(StorePersonaRequest $request){
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
             $data = $request->validated();
 
-            // CORREGIDO: Se elimina 'id_estado' ya que no pertenece a la tabla lugar_nacimiento_personas
             $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate([
                 'id_ciudad' => $data['id_ciudad'],
                 'detalles_adicionales' => $data['detalles_adicionales'] ?? null
@@ -39,17 +38,16 @@ class PersonaController extends Controller
 
             \App\Models\Persona::create($personaData);
 
-            \DB::commit();
+            DB::commit();
             return redirect()->route('personas.index')->with('success', 'Registrado con éxito.');
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
     public function show($id)
     {
-        // CORREGIDO: Carga ansiosa adaptada en cascada (.ciudad.estado) debido al cambio de relaciones
         $persona = Persona::with([
             'lugarNacimiento.ciudad.estado', 
             'telefonos',
@@ -59,17 +57,35 @@ class PersonaController extends Controller
             'titulacionPersona',
             'formacionAcademica.titulo',
             'formacionAcademica.tituloPnf',
-            'inscripciones'
+            'inscripciones.grupo.cohorte', // Optimización: Cargar cohorte y pnf desde la inscripción
+            'inscripciones.grupo.pnf'
         ])->findOrFail($id);
 
+        // Catálogos para el resto de los Tabs
         $pnfs               = \App\Models\Pnf::all();
         $titulos            = \App\Models\Titulo::all();
         $titulos_pnf        = \App\Models\TituloPnf::all();
         $estatusExpedientes = \App\Models\EstatusExpediente::all();
-        $cohortes           = \App\Models\Cohorte::all();
+        $cohortes           = Cohorte::all();
         $empresas           = \App\Models\Empresa::all();
         $cargos             = \App\Models\Cargo::all();
 
+        // Data Específica para el Tab de Inscripciones (Cascada JS)
+        $gruposData = GrupoAcademico::with('pnf')
+            ->whereHas('cohorte', function($q) { $q->where('estatus_cohorte', 'Activo'); })
+            ->where('estatus_grupo', 'Activo')
+            ->get()
+            ->map(function ($grupo) {
+                return [
+                    'id_grupo' => $grupo->id_grupo,
+                    'id_cohortes' => $grupo->id_cohortes,
+                    'id_pnf' => $grupo->id_pnf,
+                    'nombre_pnf' => $grupo->pnf->nombre_pnf,
+                    'nivel_academico' => $grupo->nivel_academico->value ?? $grupo->nivel_academico,
+                ];
+            });
+
+        // UN SOLO RETURN con TODAS las variables
         return view('personas.show', compact(
             'persona',
             'pnfs',
@@ -78,13 +94,13 @@ class PersonaController extends Controller
             'estatusExpedientes',
             'cohortes',
             'empresas',
-            'cargos'
+            'cargos',
+            'gruposData'
         ));
     }
 
     public function edit($id)
     {
-        // Se carga la ruta en cascada para el formulario de edición si es requerido
         $persona = \App\Models\Persona::with('lugarNacimiento.ciudad')->findOrFail($id);
         $estados = \App\Models\Estado::all();
 
@@ -94,11 +110,10 @@ class PersonaController extends Controller
     public function update(UpdatePersonaRequest $request, Persona $persona)
     {
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
             $data = $request->validated();
 
-            // CORREGIDO: Se remueve 'id_estado' del proceso de consulta/creación de la entidad satélite
             $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate([
                 'id_ciudad' => $data['id_ciudad'],
                 'detalles_adicionales' => $data['detalles_adicionales'] ?? null
@@ -109,11 +124,11 @@ class PersonaController extends Controller
 
             $persona->update($personaData);
 
-            \DB::commit();
+            DB::commit();
             return redirect()->route('personas.show', $persona->id_personas)
                 ->with('success', 'Actualizado correctamente.');
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             return redirect()->back()->withInput()->with('error', 'Error al actualizar.');
         }
     }

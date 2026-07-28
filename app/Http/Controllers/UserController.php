@@ -69,6 +69,7 @@ class UserController extends Controller
             'email_users'     => $request->email_users,
             'phone_users'     => $request->phone_users,
             'status_users'    => $request->status_users,
+            'id_rol'          => $request->id_rol,
         ]);
 
         return redirect()->back()->with('success', 'Los datos del usuario han sido actualizados correctamente.');
@@ -90,22 +91,30 @@ class UserController extends Controller
        NUEVOS MÉTODOS: GESTIÓN DE PERFIL Y ASIGNACIÓN DE PROFESORES
        ===================================================================== */
 
-    /**
-     * Muestra el panel administrativo de un usuario específico.
-     */
+
     public function show($id)
     {
         // 1. Buscamos al usuario cargando sus relaciones para optimizar consultas
-        $user = User::with(['rol', 'profesor.pnf'])->findOrFail($id);
+        $user = User::with(['rol', 'profesor.pnf', 'profesor.grupos.cohorte'])->findOrFail($id);
 
-        $pnfs = collect(); // Inicializamos una colección vacía
+        $pnfs = collect();
+        $gruposDisponibles = collect(); // Inicializamos la variable
 
-        // 2. Si el usuario es profesor, consultamos los PNFs activos para el formulario
         if ($user->isProfesor()) {
             $pnfs = Pnf::where('vigencia_pnf', true)->orderBy('nombre_pnf', 'asc')->get();
+
+            // Si el profesor ya tiene PNF y Nivel, buscamos los grupos compatibles
+            if ($user->profesor && $user->profesor->id_pnf && $user->profesor->nivel_asignado) {
+                $gruposDisponibles = \App\Models\GrupoAcademico::with('cohorte')
+                    ->where('id_pnf', $user->profesor->id_pnf)
+                    ->where('nivel_academico', $user->profesor->nivel_asignado)
+                    ->where('estatus_grupo', 'Activo')
+                    ->get();
+            }
         }
 
-        return view('profesores.show', compact('user', 'pnfs'));
+        // Importante: Mandamos también $gruposDisponibles a la vista
+        return view('profesores.show', compact('user', 'pnfs', 'gruposDisponibles'));
     }
 
     /**
@@ -115,23 +124,54 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Seguridad: Solo los profesores pueden tener asignación académica
         if (!$user->isProfesor()) {
             return redirect()->back()
                 ->with('error', 'Acción denegada: Este usuario no posee el rol de Profesor.');
         }
 
-        // updateOrCreate busca por 'id_users' y actualiza o inserta el PNF y la fecha
+        // GUARDAR EL NIVEL ASIGNADO
         Profesor::updateOrCreate(
             ['id_users' => $user->id_users],
             [
                 'id_pnf' => $request->id_pnf,
+                'nivel_asignado' => $request->nivel_asignado, // Añadido
                 'fecha_asignacion_profesor' => $request->fecha_asignacion_profesor
             ]
         );
 
         return redirect()->route('usuarios.show', $id)
             ->with('success', 'Asignación académica actualizada correctamente.');
+    }
+
+    public function asignarGrupo(Request $request, $id)
+    {
+        // Solo necesitamos validar que el id_grupo exista en la base de datos
+        $request->validate([
+            'id_grupo' => 'required|exists:grupos_academicos,id_grupo'
+        ]);
+
+        $user = User::with('profesor')->findOrFail($id);
+
+        if (!$user->profesor) {
+            return redirect()->back()->with('error', 'Debe asignar un PNF y Nivel primero.');
+        }
+
+        // attach / syncWithoutDetaching conecta la llave foránea sin duplicar registros
+        $user->profesor->grupos()->syncWithoutDetaching([$request->id_grupo]);
+
+        return redirect()->back()->with('success', 'Grupo académico asignado exitosamente a la carga del profesor.');
+    }
+
+    public function removerGrupo($id_usuario, $id_grupo)
+    {
+        $user = User::with('profesor')->findOrFail($id_usuario);
+        
+        if ($user->profesor) {
+            // detach elimina la relación en la tabla pivote
+            $user->profesor->grupos()->detach($id_grupo);
+        }
+
+        return redirect()->back()->with('success', 'El grupo ha sido removido de la carga del profesor.');
     }
 }
 

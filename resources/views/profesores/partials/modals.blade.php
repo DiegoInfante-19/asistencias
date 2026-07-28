@@ -98,23 +98,35 @@
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Cédula</label>
                             <input type="text" class="form-control @error('cedula_users') is-invalid @enderror" name="cedula_users" id="edit-cedula" value="{{ old('_method') == 'PUT' ? old('cedula_users') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Teléfono</label>
                             <input type="text" class="form-control @error('phone_users') is-invalid @enderror" name="phone_users" id="edit-phone" value="{{ old('_method') == 'PUT' ? old('phone_users') : '' }}" autocomplete="off">
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Estado</label>
                             <select class="form-select @error('status_users') is-invalid @enderror" name="status_users" id="edit-status" required>
                                 <option value="Activo" {{ old('_method') == 'PUT' && old('status_users') == 'Activo' ? 'selected' : '' }}>Activo</option>
                                 <option value="Inactivo" {{ old('_method') == 'PUT' && old('status_users') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
                                 <option value="Suspendido" {{ old('_method') == 'PUT' && old('status_users') == 'Suspendido' ? 'selected' : '' }}>Suspendido</option>
                             </select>
+                        </div>
+                        
+                        <!-- NUEVO CAMPO: ROL -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Rol del Sistema</label>
+                            <select class="form-select @error('id_rol') is-invalid @enderror" name="id_rol" id="edit-rol" required style="color: black;">
+                                <option value="" disabled>Seleccione un rol...</option>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->id_rol }}" {{ old('_method') == 'PUT' && old('id_rol') == $role->id_rol ? 'selected' : '' }}>{{ $role->nombre_rol }}</option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
                     </div>
                 </form>

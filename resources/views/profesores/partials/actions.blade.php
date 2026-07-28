@@ -14,7 +14,8 @@
         data-cedula="{{ $user->cedula_users }}"
         data-email="{{ $user->email_users }}"
         data-phone="{{ $user->phone_users }}"
-        data-status="{{ $user->status_users }}">
+        data-status="{{ $user->status_users }}"
+        data-rol="{{ $user->id_rol }}"> <!-- NUEVO DATO -->
         <i class="bi bi-pencil"></i>
     </button>
 

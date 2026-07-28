@@ -20,7 +20,7 @@ class Asistencia extends Model
         'observacion_asistencia'
     ];
 
-    // CORREGIDO: Casteo automático del campo hacia la clase Enum
+    // Casteo automático del campo hacia la clase Enum
     protected $casts = [
         'estado_asistencia' => EstadoAsistencia::class,
     ];
@@ -34,7 +34,8 @@ class Asistencia extends Model
         return $this->belongsTo(Sesion::class, 'id_sesiones', 'id_sesiones');
     }
 
-    public function Jiang()
+    // CORREGIDO: Cambiamos Jiang() por el nombre de relación estándar y profesional
+    public function inscripcionCohorte()
     {
         return $this->belongsTo(InscripcionCohorte::class, 'id_inscripcion_cohortes', 'id_inscripcion_cohortes');
     }

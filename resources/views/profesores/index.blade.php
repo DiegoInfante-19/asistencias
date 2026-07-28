@@ -87,9 +87,7 @@
             modal.find('#edit-phone').val(button.data('phone'));
             modal.find('#edit-email').val(button.data('email'));
             modal.find('#edit-status').val(button.data('status'));
-            // --- ESTO ES LO QUE FALTABA AQUÍ ADENTRO ---
-            // Simula que el usuario acaba de escribir en los campos para que 
-            // el script de validación los revise y encienda el botón "Guardar Cambios".
+            modal.find('#edit-rol').val(button.data('rol'));
             modal.find('input, select').trigger('input');
         });
 

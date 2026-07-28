@@ -43,10 +43,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css" integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0=" crossorigin="anonymous" />
   <!-- jsvectormap -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css" integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4=" crossorigin="anonymous" />
-  
+
   <!--DataTables-->
   <!-- <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.8/datatables.min.css" rel="stylesheet" integrity="sha384-nD9P196GmYuiIASpxI7+7/0LqD6BBA74CfgIOSQUo7brmKKeph8lSEMm2sGgSAvK" crossorigin="anonymous"> -->
-  
+
   @yield('styles')
   <link href="{{ asset('css/custom-datatables.css') }}?v={{ time() }}" rel="stylesheet">
 </head><!--end::Head-->
@@ -165,16 +165,22 @@
               </ul>
             </li>
 
-            <li class="nav-item">
-              <a href="#" class="nav-link">
+            <li class="nav-item {{ request()->routeIs('profesores.*') || request()->routeIs('sesiones.*') ? 'menu-open' : '' }}">
+              <a href="#" class="nav-link {{ request()->routeIs('profesores.*') || request()->routeIs('sesiones.*') ? 'active' : '' }}">
                 <i class="bi bi-person-video3"></i>
                 <p>Profesores<i class="nav-arrow bi bi-chevron-right"></i></p>
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
-                  <a href="{{ route('profesores.index') }}" class="nav-link">
+                  <a href="{{ route('profesores.index') }}" class="nav-link {{ request()->routeIs('profesores.*') ? 'active' : '' }}">
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-person-lines-fill"></i>
                     <p>Listado</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{ route('sesiones.index') }}" class="nav-link {{ request()->routeIs('sesiones.*') ? 'active' : '' }}">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-journal-check"></i>
+                    <p>Portal de Clases</p>
                   </a>
                 </li>
               </ul>
@@ -279,12 +285,12 @@
     </aside>
     <!--end::Sidebar-->
 
-    
+
     <main class="app-main">
       @hasSection('header')
-        @yield('header')
+      @yield('header')
       @else
-        <x-page-header title="ViceRectorado Académico" />
+      <x-page-header title="ViceRectorado Académico" />
       @endif
 
 
