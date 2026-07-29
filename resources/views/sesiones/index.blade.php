@@ -44,8 +44,9 @@
                                 <div class="fw-bold text-dark">{{ $sesion->grupo->pnf->nombre_pnf }}</div>
                                 <div class="small text-muted">{{ $sesion->grupo->nivel_academico }}</div>
                             </td>
-                            <td class="text-truncate" style="max-width: 200px;">
-                                {{ $sesion->observaciones_sesiones ?? 'Sin observaciones' }}
+                            <!-- CORREGIDO: Apuntando a la propiedad en singular observacion_sesion -->
+                            <td class="text-truncate" style="max-width: 200px;" title="{{ $sesion->observacion_sesion }}">
+                                {{ $sesion->observacion_sesion ?? 'Sin observaciones' }}
                             </td>
                             <td class="text-center pe-4">
                                 <a href="{{ route('sesiones.show', $sesion->id_sesiones) }}" class="btn btn-sm btn-outline-primary fw-bold">

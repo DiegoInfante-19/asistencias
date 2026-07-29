@@ -77,7 +77,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Nombre de Usuario</label>
-                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" id="edit-username" value="{{ old('_method') == 'PUT' ? old('username') : '' }}" autocomplete="off" required pattern="^[A-Z](?=.*\d)[a-z0-9]{3,19}$">
+                            <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" id="edit-username" value="{{ old('_method') == 'PUT' ? old('username') : '' }}" autocomplete="off" required>
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
 

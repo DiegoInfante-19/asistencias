@@ -5,24 +5,20 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdatePeriodoRecesoRequest extends FormRequest
-{
-    public function authorize(): bool
-    {
+class UpdatePeriodoRecesoRequest extends FormRequest{
+    
+    public function authorize(): bool{
         return true;
     }
 
-    protected function prepareForValidation()
-    {
+    protected function prepareForValidation(){
         $this->merge([
             'suspension_actividades' => $this->boolean('suspension_actividades'),
         ]);
     }
 
-    public function rules(): array
-    {
+    public function rules(): array{
         $id = $this->route('periodo_receso');
-
         return [
             'nombre_periodo_receso' => [
                 'required',
@@ -55,12 +51,18 @@ class UpdatePeriodoRecesoRequest extends FormRequest
                 'required',
                 'boolean'
             ],
+            'tipo_receso' => [
+                'required',
+                'string',
+                'in:1,2,3'
+            ],
         ];
     }
 
-    public function messages(): array
-    {
+    public function messages(): array{
         return [
+            'tipo_receso.required'                 => 'Debe seleccionar el tipo de proyección del receso.',
+            'tipo_receso.in'                       => 'El tipo de receso seleccionado no es válido.',
             'nombre_periodo_receso.required'       => 'El nombre del periodo es obligatorio.',
             'nombre_periodo_receso.max'            => 'El nombre no puede exceder los 100 caracteres.',
             'nombre_periodo_receso.unique'         => 'Ya existe otro periodo con este mismo nombre.',

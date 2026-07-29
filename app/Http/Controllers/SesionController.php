@@ -7,6 +7,7 @@ use App\Models\GrupoAcademico;
 use App\Models\Profesor;
 use App\Models\InscripcionCohorte; // <--- 1. IMPORTACIÓN CORRECTA DEL MODELO
 use App\Models\Asistencia;
+use App\Models\PeriodoReceso;
 use App\Http\Requests\StoreSesionRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,7 +41,13 @@ class SesionController extends Controller
             ->where('estatus_grupo', 'Activo')
             ->get();
 
-        return view('sesiones.create', compact('grupos', 'profesor'));
+        // 2. NUEVO (Fase 1.2): Consultar los recesos que suspenden actividades
+        $periodosRecesos = PeriodoReceso::where('suspension_actividades', 1)
+            ->select('fecha_inicio_periodo_receso', 'fecha_fin_periodo_receso')
+            ->get();
+
+        // 3. Pasar $periodosRecesos a la vista
+        return view('sesiones.create', compact('grupos', 'profesor', 'periodosRecesos'));
     }
 
     public function store(StoreSesionRequest $request)

@@ -41,6 +41,16 @@
                         <textarea class="form-control" name="descripcion_periodo_receso" rows="2"></textarea>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tipo de Proyección Anual <span class="text-danger">*</span></label>
+                        <select class="form-select border-secondary" name="tipo_receso" id="tipo_receso" required>
+                            <option value="" disabled selected>Seleccione...</option>
+                            <option value="1">Fijo (Se repite en la misma fecha ej: Navidad)</option>
+                            <option value="2">Móvil (Depende del calendario lunar ej: Semana Santa)</option>
+                            <option value="3">Único (No se proyecta al próximo año ej: Elecciones)</option>
+                        </select>
+                    </div>
+
                     <div class="form-check form-switch mt-4">
                         <input class="form-check-input" type="checkbox" role="switch" name="suspension_actividades" id="createSuspension" value="1">
                         <label class="form-check-label fw-bold" for="createSuspension">
@@ -98,6 +108,16 @@
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Descripción (Opcional)</label>
                         <textarea class="form-control" name="descripcion_periodo_receso" id="edit-descripcion-periodo" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tipo de Proyección Anual <span class="text-danger">*</span></label>
+                        <select class="form-select border-secondary" name="tipo_receso" id="tipo_receso" required>
+                            <option value="" disabled selected>Seleccione...</option>
+                            <option value="1">Fijo (Se repite en la misma fecha ej: Navidad)</option>
+                            <option value="2">Móvil (Depende del calendario lunar ej: Semana Santa)</option>
+                            <option value="3">Único (No se proyecta al próximo año ej: Elecciones)</option>
+                        </select>
                     </div>
 
                     <div class="form-check form-switch mt-4">
