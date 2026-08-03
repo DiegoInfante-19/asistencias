@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\PreguntaSecreta;
-use App\Models\Profesor; // IMPORTANTE: Asegúrate de importar el modelo Profesor
+use App\Models\Profesor; 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,6 +42,18 @@ class User extends Authenticatable
             'password_users' => 'hashed',
         ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONSTANTES DE ROLES (RBAC)
+    |--------------------------------------------------------------------------
+    | Usar constantes evita los "números mágicos" y hace que verificar 
+    | los roles sea instantáneo, sin hacer consultas extra a la Base de Datos.
+    */
+    public const ROLE_ADMINISTRADOR = 1;
+    public const ROLE_COORDINADOR   = 2;
+    public const ROLE_PROFESOR      = 3;
+
 
     /**
      * ==========================================================
@@ -81,7 +94,6 @@ class User extends Authenticatable
         return $this->hasOne(PreguntaSecreta::class, 'id_users', 'id_users');
     }
 
-    // NUEVO: Relación 1 a 1 con el perfil de Profesor
     public function profesor(): HasOne
     {
         return $this->hasOne(Profesor::class, 'id_users', 'id_users');
@@ -89,15 +101,23 @@ class User extends Authenticatable
 
     /**
      * ==========================================================
-     * HELPERS (Funciones auxiliares)
+     * HELPERS DE IDENTIDAD Y SEGURIDAD (RBAC)
      * ==========================================================
      */
 
-    // NUEVO: Verifica si el usuario activo tiene el rol de Profesor
+    public function isAdmin(): bool
+    {
+        return (int) $this->id_rol === self::ROLE_ADMINISTRADOR;
+    }
+
+    public function isCoordinador(): bool
+    {
+        return (int) $this->id_rol === self::ROLE_COORDINADOR;
+    }
+
     public function isProfesor(): bool
     {
-        // Importante: Verifica que el nombre exacto de tu rol de profesor en la BD sea 'Profesor'.
-        // Si lo guardaste como 'Docente' u otra cosa, debes cambiar la palabra 'Profesor' de abajo.
-        return $this->rol && strtolower($this->rol->nombre_rol) === 'profesor';
+        // Refactorizado: Ahora verifica el ID directamente (Más rápido y seguro)
+        return (int) $this->id_rol === self::ROLE_PROFESOR;
     }
 }

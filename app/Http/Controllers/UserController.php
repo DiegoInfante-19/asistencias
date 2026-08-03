@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
-use App\Models\Pnf; // NUEVO: Importación del modelo PNF
-use App\Models\Profesor; // NUEVO: Importación del modelo Profesor
-
+use App\Models\Pnf;
+use App\Models\Profesor;
 use Illuminate\Support\Facades\Hash;
 use App\DataTables\UsersDataTable;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
-use App\Http\Requests\AsignarPnfRequest; // NUEVO: Importación de nuestro escudo de validación
+use App\Http\Requests\AsignarPnfRequest;
+
 
 class UserController extends Controller
 {
@@ -87,23 +87,16 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'El usuario ha sido eliminado del sistema exitosamente.');
     }
 
-    /* =====================================================================
-       NUEVOS MÉTODOS: GESTIÓN DE PERFIL Y ASIGNACIÓN DE PROFESORES
-       ===================================================================== */
-
-
     public function show($id)
     {
-        // 1. Buscamos al usuario cargando sus relaciones para optimizar consultas
         $user = User::with(['rol', 'profesor.pnf', 'profesor.grupos.cohorte'])->findOrFail($id);
 
         $pnfs = collect();
-        $gruposDisponibles = collect(); // Inicializamos la variable
+        $gruposDisponibles = collect();
 
         if ($user->isProfesor()) {
             $pnfs = Pnf::where('vigencia_pnf', true)->orderBy('nombre_pnf', 'asc')->get();
 
-            // Si el profesor ya tiene PNF y Nivel, buscamos los grupos compatibles
             if ($user->profesor && $user->profesor->id_pnf && $user->profesor->nivel_asignado) {
                 $gruposDisponibles = \App\Models\GrupoAcademico::with('cohorte')
                     ->where('id_pnf', $user->profesor->id_pnf)
@@ -113,13 +106,9 @@ class UserController extends Controller
             }
         }
 
-        // Importante: Mandamos también $gruposDisponibles a la vista
         return view('profesores.show', compact('user', 'pnfs', 'gruposDisponibles'));
     }
 
-    /**
-     * Asigna o actualiza el PNF vinculado a un usuario con rol Profesor.
-     */
     public function asignarPnf(AsignarPnfRequest $request, $id)
     {
         $user = User::findOrFail($id);
@@ -129,12 +118,11 @@ class UserController extends Controller
                 ->with('error', 'Acción denegada: Este usuario no posee el rol de Profesor.');
         }
 
-        // GUARDAR EL NIVEL ASIGNADO
         Profesor::updateOrCreate(
             ['id_users' => $user->id_users],
             [
                 'id_pnf' => $request->id_pnf,
-                'nivel_asignado' => $request->nivel_asignado, // Añadido
+                'nivel_asignado' => $request->nivel_asignado,
                 'fecha_asignacion_profesor' => $request->fecha_asignacion_profesor
             ]
         );
@@ -145,7 +133,6 @@ class UserController extends Controller
 
     public function asignarGrupo(Request $request, $id)
     {
-        // Solo necesitamos validar que el id_grupo exista en la base de datos
         $request->validate([
             'id_grupo' => 'required|exists:grupos_academicos,id_grupo'
         ]);
@@ -156,7 +143,6 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Debe asignar un PNF y Nivel primero.');
         }
 
-        // attach / syncWithoutDetaching conecta la llave foránea sin duplicar registros
         $user->profesor->grupos()->syncWithoutDetaching([$request->id_grupo]);
 
         return redirect()->back()->with('success', 'Grupo académico asignado exitosamente a la carga del profesor.');
@@ -167,13 +153,13 @@ class UserController extends Controller
         $user = User::with('profesor')->findOrFail($id_usuario);
         
         if ($user->profesor) {
-            // detach elimina la relación en la tabla pivote
             $user->profesor->grupos()->detach($id_grupo);
         }
 
         return redirect()->back()->with('success', 'El grupo ha sido removido de la carga del profesor.');
     }
 }
+
 
 /*
 namespace App\Http\Controllers;

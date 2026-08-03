@@ -10,6 +10,20 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
 
+    {{-- Comprobación previa de autorización para la vista --}}
+    @php
+        $puedeEditar = auth()->user()->can('update', $sesion);
+    @endphp
+
+    @unless($puedeEditar)
+    <div class="alert alert-warning border-0 shadow-sm mb-4 d-flex align-items-center">
+        <i class="bi bi-lock-fill fs-4 me-3"></i>
+        <div>
+            <strong>Modo Solo Lectura:</strong> El tiempo límite de 48 horas para modificar esta asistencia ha expirado o no posee privilegios de edición sobre esta sesión. Los registros se muestran únicamente con fines de auditoría.
+        </div>
+    </div>
+    @endunless
+
     <!-- TARJETA DE INFORMACIÓN DE LA CLASE -->
     <div class="card border-0 shadow-sm mb-4 border-top border-primary border-3">
         <div class="card-body p-4">
@@ -24,9 +38,9 @@
                         <strong>Nivel:</strong> {{ $sesion->grupo->nivel_academico }} |
                         <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($sesion->fecha_sesion)->format('d/m/Y') }}
                     </p>
-                    @if($sesion->observaciones_sesiones)
+                    @if($sesion->observacion_sesion)
                     <div class="alert alert-light mt-3 mb-0 border-0 small text-dark">
-                        <i class="bi bi-info-circle me-1 text-info"></i> <strong>Tema/Observación:</strong> {{ $sesion->observaciones_sesiones }}
+                        <i class="bi bi-info-circle me-1 text-info"></i> <strong>Tema/Observación:</strong> {{ $sesion->observacion_sesion }}
                     </div>
                     @endif
                 </div>
@@ -70,32 +84,34 @@
                                 $estadoActual = $asistenciasRegistradas[$inscripcion->id_inscripcion_cohortes] ?? 'Presente';
                             @endphp
 
-                            <!-- CORREGIDO: Usamos data-inscripcion apuntando a id_inscripcion_cohortes -->
                             <tr class="fila-estudiante" data-inscripcion="{{ $inscripcion->id_inscripcion_cohortes }}">
                                 <td class="ps-4 fw-semibold text-secondary">
                                     {{ $inscripcion->persona->nacionalidad ?? 'V' }}-{{ $inscripcion->persona->cedula }}
                                 </td>
                                 <td class="fw-bold text-dark">
-                                    {{ $inscripcion->persona->apellidos }} {{ $inscripcion->persona->nombres }}
+                                    {{ $inscripcion->persona->last_name_users ?? $inscripcion->persona->apellidos }} {{ $inscripcion->persona->name_users ?? $inscripcion->persona->nombres }}
                                 </td>
                                 <td class="text-center pe-4">
                                     <div class="btn-group w-100 shadow-sm" role="group">
                                         <!-- Presente -->
                                         <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_cohortes }}"
                                                id="presente_{{ $inscripcion->id_inscripcion_cohortes }}" value="Presente"
-                                               {{ $estadoActual == 'Presente' ? 'checked' : '' }} autocomplete="off">
+                                               {{ $estadoActual == 'Presente' ? 'checked' : '' }} autocomplete="off"
+                                               {{ !$puedeEditar ? 'disabled' : '' }}>
                                         <label class="btn btn-outline-success fw-bold" for="presente_{{ $inscripcion->id_inscripcion_cohortes }}">Presente</label>
 
                                         <!-- Ausente -->
                                         <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_cohortes }}"
                                                id="ausente_{{ $inscripcion->id_inscripcion_cohortes }}" value="Ausente"
-                                               {{ $estadoActual == 'Ausente' ? 'checked' : '' }} autocomplete="off">
+                                               {{ $estadoActual == 'Ausente' ? 'checked' : '' }} autocomplete="off"
+                                               {{ !$puedeEditar ? 'disabled' : '' }}>
                                         <label class="btn btn-outline-danger fw-bold" for="ausente_{{ $inscripcion->id_inscripcion_cohortes }}">Ausente</label>
 
                                         <!-- Justificado -->
                                         <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_cohortes }}"
                                                id="justificado_{{ $inscripcion->id_inscripcion_cohortes }}" value="Justificado"
-                                               {{ $estadoActual == 'Justificado' ? 'checked' : '' }} autocomplete="off">
+                                               {{ $estadoActual == 'Justificado' ? 'checked' : '' }} autocomplete="off"
+                                               {{ !$puedeEditar ? 'disabled' : '' }}>
                                         <label class="btn btn-outline-warning fw-bold text-dark" for="justificado_{{ $inscripcion->id_inscripcion_cohortes }}">Justificado</label>
                                     </div>
                                 </td>
@@ -111,12 +127,18 @@
         @if($inscripciones->isNotEmpty())
         <div class="card-footer bg-white py-4 border-top d-flex justify-content-end">
             <input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
-            <!-- Input con ID coherente: id_sesiones -->
             <input type="hidden" id="id_sesiones" value="{{ $sesion->id_sesiones }}">
 
+            {{-- BOTÓN DE GUARDADO CONDICIONADO POR POLICY --}}
+            @can('update', $sesion)
             <button type="button" id="btn-procesar-asistencia" class="btn btn-primary btn-lg fw-bold px-5 shadow">
                 <i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar Asistencia
             </button>
+            @else
+            <a href="{{ route('sesiones.index') }}" class="btn btn-secondary btn-lg fw-bold px-4 shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i> Volver al Listado
+            </a>
+            @endcan
         </div>
         @endif
     </div>
@@ -135,11 +157,9 @@
         if (btnProcesar) {
             btnProcesar.addEventListener('click', function() {
 
-                // 1. Deshabilitar el botón y mostrar estado de carga
                 btnProcesar.disabled = true;
                 btnProcesar.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Procesando...';
 
-                // 2. Recolectar la data usando id_sesiones y data-inscripcion
                 let idSesiones = document.getElementById('id_sesiones').value;
                 let token = document.getElementById('csrf_token').value;
                 let arregloAsistencias = [];
@@ -148,7 +168,9 @@
 
                 filas.forEach(function(fila) {
                     let idInscripcion = fila.getAttribute('data-inscripcion');
-                    let estadoSeleccionado = fila.querySelector('input[type="radio"]:checked').value;
+                    // Obtenemos el radio seleccionado (incluso si está bloqueado, captura el valor actual)
+                    let radioSeleccionado = fila.querySelector('input[type="radio"]:checked');
+                    let estadoSeleccionado = radioSeleccionado ? radioSeleccionado.value : 'Presente';
 
                     arregloAsistencias.push({
                         id_inscripcion_cohortes: idInscripcion,
@@ -156,13 +178,11 @@
                     });
                 });
 
-                // 3. Empaquetar con las llaves que espera el controlador
                 let payload = {
                     id_sesiones: idSesiones,
                     asistencias: arregloAsistencias
                 };
 
-                // 4. Enviar mediante Fetch API de forma asíncrona
                 fetch('/asistencias/guardar-lote', {
                     method: 'POST',
                     headers: {

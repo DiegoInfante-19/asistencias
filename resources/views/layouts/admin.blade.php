@@ -73,7 +73,7 @@
       <!--begin::Sidebar Brand-->
       <div class="sidebar-brand">
         <!--begin::Brand Link-->
-        <a href="./index.html" class="brand-link">
+        <a href="{{ route('admin.index') }}" class="brand-link">
           <!--begin::Brand Image-->
           <img
             src="{{ asset('images/upt_logo-modified.png') }}"
@@ -100,6 +100,11 @@
                 <p>Página de Inicio</p>
               </a>
             </li>
+
+            {{-- ========================================================= --}}
+            {{-- MÓDULOS RESTRINGIDOS: Solo Admin y Coordinador            --}}
+            {{-- ========================================================= --}}
+            @if(auth()->user()->isAdmin() || auth()->user()->isCoordinador())
 
             <!-- Módulo Cohortes -->
             <li class="nav-item {{ request()->routeIs('cohortes.*', 'periodos_recesos.*') ? 'menu-open' : '' }}">
@@ -161,7 +166,7 @@
               </ul>
             </li>
 
-            <!-- Módulo Profesores (Portal de Clases) -->
+            <!-- Módulo Profesores (Gestión completa) -->
             <li class="nav-item {{ request()->routeIs('profesores.*') || request()->routeIs('sesiones.*') ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ request()->routeIs('profesores.*') || request()->routeIs('sesiones.*') ? 'active' : '' }}">
                 <i class="bi bi-person-video3"></i>
@@ -237,6 +242,20 @@
               </ul>
             </li>
 
+            @else
+
+            {{-- ========================================================= --}}
+            {{-- VISTA EXCLUSIVA PARA PROFESORES (UX Optimizada: Enlace directo) --}}
+            {{-- ========================================================= --}}
+            <li class="nav-item">
+              <a href="{{ route('sesiones.index') }}" class="nav-link {{ request()->routeIs('sesiones.*') ? 'active' : '' }}">
+                <i class="bi bi-journal-check"></i>
+                <p>Mis Clases y Asistencias</p>
+              </a>
+            </li>
+
+            @endif
+
             <!-- Opciones -->
             <li class="nav-item {{ request()->routeIs('perfil.*') ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ request()->routeIs('perfil.*') ? 'active' : '' }}">
@@ -271,7 +290,6 @@
       <!--end::Sidebar Wrapper-->
     </aside>
     <!--end::Sidebar-->
-
 
     <main class="app-main">
       @hasSection('header')
@@ -493,11 +511,9 @@
 
     });
   </script>
-
   @endif
   @yield('scripts')
   @include('partials.alerts')
-
 </body>
 <!--end::Body-->
 

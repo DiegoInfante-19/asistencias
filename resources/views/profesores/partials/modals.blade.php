@@ -1,4 +1,3 @@
-
 <div class="modal fade" id="viewUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -117,12 +116,15 @@
                             </select>
                         </div>
                         
-                        <!-- NUEVO CAMPO: ROL -->
+                        <!-- ROL CONDICIONAL: Si es Coordinador, ocultamos la opción de Administrador -->
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-muted text-uppercase">Rol del Sistema</label>
                             <select class="form-select @error('id_rol') is-invalid @enderror" name="id_rol" id="edit-rol" required style="color: black;">
                                 <option value="" disabled>Seleccione un rol...</option>
                                 @foreach($roles as $role)
+                                    @if(auth()->user()->isCoordinador() && (int)$role->id_rol === App\Models\User::ROLE_ADMINISTRADOR)
+                                        @continue
+                                    @endif
                                     <option value="{{ $role->id_rol }}" {{ old('_method') == 'PUT' && old('id_rol') == $role->id_rol ? 'selected' : '' }}>{{ $role->nombre_rol }}</option>
                                 @endforeach
                             </select>
@@ -190,15 +192,19 @@
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Teléfono</label>
                             <input type="text" class="form-control @error('phone_users') is-invalid @enderror" name="phone_users" value="{{ old('origen') == 'modal' ? old('phone_users') : '' }}" autocomplete="off" pattern="^\d{10,11}$">
-
                             <div class="invalid-feedback dynamic-feedback fw-bold"></div>
                         </div>
+                        
+                        <!-- ROL CONDICIONAL: Si es Coordinador, omitimos el rol Administrador -->
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted text-uppercase">Rol del Sistema</label>
                             <select class="form-select @error('id_rol') is-invalid @enderror" name="id_rol" required style="color: black;">
                                 <option value="" disabled {{ !old('id_rol') ? 'selected' : '' }}>Seleccione un rol...</option>
                                 @foreach($roles as $role)
-                                <option value="{{ $role->id_rol }}" {{ old('origen') == 'modal' && old('id_rol') == $role->id_rol ? 'selected' : '' }}>{{ $role->nombre_rol }}</option>
+                                    @if(auth()->user()->isCoordinador() && (int)$role->id_rol === App\Models\User::ROLE_ADMINISTRADOR)
+                                        @continue
+                                    @endif
+                                    <option value="{{ $role->id_rol }}" {{ old('origen') == 'modal' && old('id_rol') == $role->id_rol ? 'selected' : '' }}>{{ $role->nombre_rol }}</option>
                                 @endforeach
                             </select>
                         </div>

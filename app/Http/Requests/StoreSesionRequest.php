@@ -7,19 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 class StoreSesionRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true; 
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -51,8 +43,24 @@ class StoreSesionRequest extends FormRequest
                         $fail("El día seleccionado es feriado por el motivo: {$recesoOcupado->nombre_periodo_receso}");
                     }
                 },
+                function ($attribute, $value, $fail) {
+                    // Regla 4: PREVENCIÓN DE DOBLE SESIÓN (Unicidad compuesta por día)
+                    $idGrupo = $this->input('id_grupo');
+                    
+                    if ($idGrupo) {
+                        $sesionDuplicada = DB::table('sesiones')
+                            ->where('id_grupo', $idGrupo)
+                            // Usamos whereDate para extraer solo la fecha (Y-m-d) ignorando las horas
+                            ->whereDate('fecha_sesion', '=', date('Y-m-d', strtotime($value)))
+                            ->whereNull('deleted_at') // Fundamental: ignorar sesiones eliminadas (SoftDeletes)
+                            ->exists();
+
+                        if ($sesionDuplicada) {
+                            $fail('Ya existe una sesión de clase registrada para este grupo en la fecha seleccionada.');
+                        }
+                    }
+                }
             ],
-            // CORREGIDO: Cambiado a singular para que coincida con la columna y la vista
             'observacion_sesion' => [
                 'nullable',
                 'string',
@@ -61,9 +69,6 @@ class StoreSesionRequest extends FormRequest
         ];
     }
 
-    /**
-     * Mensajes de error estándar para las reglas nativas.
-     */
     public function messages(): array
     {
         return [

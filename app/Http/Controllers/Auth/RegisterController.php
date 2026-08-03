@@ -21,7 +21,6 @@ class RegisterController extends Controller
 
     protected function validator(array $data)
     {
-        // 1. Mensajes actualizados para que coincidan con las nuevas reglas
         $mensajes = [
             'username.regex'     => 'Debe iniciar con mayúscula, tener al menos un número y entre 4-20 caracteres.',
             'email.regex'        => 'Ingrese un correo electrónico válido.',
@@ -38,7 +37,6 @@ class RegisterController extends Controller
             'cedula.unique'      => 'Esta cédula ya está registrada.',
         ];
 
-        // 2. Reglas sincronizadas con el FormRequest y el JS
         return Validator::make($data, [
             'username'  => ['required', 'string', 'min:4', 'max:20', 'unique:users,username', 'regex:/^[A-Z](?=.*\d)[a-zA-Z0-9_]{3,19}$/'],
             'email'     => ['required', 'string', 'email:rfc,dns', 'unique:users,email_users', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
@@ -50,6 +48,7 @@ class RegisterController extends Controller
                 'required', 'string', 'confirmed',
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.+-])[A-Za-z\d@$!%*?&.+-]{8,64}$/'
             ],
+            // IMPORTANTE: NO validamos id_rol aquí porque es público.
         ], $mensajes);
     }
 
@@ -63,7 +62,9 @@ class RegisterController extends Controller
             'cedula_users'    => $data['cedula'],
             'phone_users'     => $data['phone'] ?? null, 
             'status_users'    => 'Activo',
-            'id_rol'          => 3, 
+            // SEGURIDAD: Asignación forzosa del rol más bajo (Profesor) 
+            // usando la constante para evitar números mágicos
+            'id_rol'          => User::ROLE_PROFESOR, 
             'password_users'  => Hash::make($data['password']),
         ]);
     }

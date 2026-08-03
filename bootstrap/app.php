@@ -4,8 +4,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-
-
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
@@ -16,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Tus alias
         $middleware->alias([
             'no-back-history' => \App\Http\Middleware\NoBackHistory::class,
+            'role'            => \App\Http\Middleware\CheckRole::class, // <--- NUEVO ALIAS PARA RBAC
         ]);
 
         // Tu middleware global para rutas web
