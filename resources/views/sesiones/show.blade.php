@@ -86,10 +86,10 @@
 
                             <tr class="fila-estudiante" data-inscripcion="{{ $inscripcion->id_inscripcion_cohortes }}">
                                 <td class="ps-4 fw-semibold text-secondary">
-                                    {{ $inscripcion->persona->nacionalidad ?? 'V' }}-{{ $inscripcion->persona->cedula }}
+                                    V-{{ $inscripcion->persona->cedula_personas ?? 'S/C' }}
                                 </td>
                                 <td class="fw-bold text-dark">
-                                    {{ $inscripcion->persona->last_name_users ?? $inscripcion->persona->apellidos }} {{ $inscripcion->persona->name_users ?? $inscripcion->persona->nombres }}
+                                    {{ $inscripcion->persona->primer_apellido_personas ?? '' }} {{ $inscripcion->persona->segundo_apellido_personas ?? '' }} {{ $inscripcion->persona->primer_nombre_personas ?? '' }} {{ $inscripcion->persona->segundo_nombre_personas ?? '' }}
                                 </td>
                                 <td class="text-center pe-4">
                                     <div class="btn-group w-100 shadow-sm" role="group">
@@ -168,7 +168,6 @@
 
                 filas.forEach(function(fila) {
                     let idInscripcion = fila.getAttribute('data-inscripcion');
-                    // Obtenemos el radio seleccionado (incluso si está bloqueado, captura el valor actual)
                     let radioSeleccionado = fila.querySelector('input[type="radio"]:checked');
                     let estadoSeleccionado = radioSeleccionado ? radioSeleccionado.value : 'Presente';
 

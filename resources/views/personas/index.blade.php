@@ -35,11 +35,11 @@
             <a href="{{ route('personas.create') }}" class="btn btn-outline-secondary ms-auto">
                 <i class="bi bi-person-plus-fill me-1"></i><b>Nuevo Estudiante</b>
             </a>
-        </div>
+        </div>+
 
         <div class="card-body">
             <div class="w-100" style="overflow: hidden;">
-                {!! $dataTable->table(['class' => 'table table-bordered table-striped table-hover align-middle nowrap dt-responsive', 'style' => 'width:100%;']) !!}
+                {!! $dataTable->table(['class' => 'table table-bordered table-hover align-middle nowrap dt-responsive', 'style' => 'width:100%;']) !!}
             </div>
         </div>
 

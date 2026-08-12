@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
 
             // Nivel 3: Asignación y vinculación de Profesores
             ProfesoresSeeder::class,
+            PersonasSeeder::class,
         ]);
     }
 }

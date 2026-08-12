@@ -10,7 +10,7 @@
             </h3>
             <!-- Botón para regresar al expediente principal (show) -->
             <a href="{{ route('personas.show', $persona->id_personas) }}" class="btn btn-outline-secondary ms-auto">
-                <i class="bi bi-arrow-left-circle me-1"></i><b>Volver al Expediente</b>
+                <b>Revisar Expediente</b>
             </a>
         </div>
 
@@ -163,7 +163,7 @@
 
                 <hr class="my-4">
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('personas.show', $persona->id_personas) }}" class="btn btn-secondary">
+                    <a href="{{ route('personas.index') }}" class="btn btn-secondary">
                         <i class="bi bi-x-circle me-1"></i> Cancelar
                     </a>
                     <button type="submit" class="btn btn-warning text-dark fw-bold">

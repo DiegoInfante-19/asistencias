@@ -12,15 +12,19 @@ class GrupoAcademicoSeeder extends Seeder
 {
     public function run(): void
     {
-        $cohortes = Cohorte::all();
+        // RESTRICCIÓN: Solo tomamos las cohortes que estén activas/en curso
+        $cohortes = Cohorte::where('estatus_cohorte', 'Activo')
+                    ->orWhere('estatus_cohorte', 'En curso')
+                    ->get();
+                    
         $pnfs = Pnf::all();
 
-        // Si no existen cohortes o PNFs registrados, se interrumpe para evitar inconsistencias
+        // Si no existen cohortes activas o PNFs registrados, se interrumpe
         if ($cohortes->isEmpty() || $pnfs->isEmpty()) {
             return;
         }
 
-        // Genera los sub-grupos (TSU e Ingeniería) para cada combinación PNF-Cohorte
+        // Genera los sub-grupos (TSU e Ingeniería) únicamente para las cohortes ACTIVAS
         foreach ($cohortes as $cohorte) {
             foreach ($pnfs as $pnf) {
                 // 1. Grupo TSU

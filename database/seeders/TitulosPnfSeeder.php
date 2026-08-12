@@ -61,20 +61,20 @@ class TitulosPnfSeeder extends Seeder
             ['Electricidad', 'Ingeniero', 'INGENIERO ELECTRICISTA'],
             
             // Distribución y logística
-            ['Distribución y logística', 'TSU', 'TÉCNICO SUPERIOR UNIVERSITARIO EN DISTRIBUCIÓN Y LOGÍSTICA'],
+            ['Distribución y logística', 'TSU', 'TSU EN DISTRIBUCIÓN Y LOGÍSTICA'],
             ['Distribución y logística', 'Licenciado', 'LICENCIADO EN DISTRIBUCIÓN Y LOGÍSTICA'],
             
             // Electrónica
-            ['Electrónica', 'TSU', 'TÉCNICO SUPERIOR UNIVERSITARIO EN ELECTRÓNICA'],
+            ['Electrónica', 'TSU', 'TSU EN ELECTRÓNICA'],
             ['Electrónica', 'Ingeniero', 'INGENIERO EN ELECTRÓNICA'],
             
             // Geociencias
             ['Geociencias', 'Certificado', 'ASISTENTE TÉCNICO EN GEOCIENCIAS'],
-            ['Geociencias', 'TSU', 'TÉCNICO SUPERIOR UNIVERSITARIO EN GEOCIENCIAS'],
+            ['Geociencias', 'TSU', 'TSU EN GEOCIENCIAS'],
             ['Geociencias', 'Ingeniero', 'INGENIERO EN GEOCIENCIAS'],
             
             // Instrumentación y control
-            ['Instrumentación y control', 'TSU', 'TÉCNICO SUPERIOR UNIVERSITARIO EN INSTRUMENTACIÓN Y CONTROL'],
+            ['Instrumentación y control', 'TSU', 'TSU EN INSTRUMENTACIÓN Y CONTROL'],
             ['Instrumentación y control', 'Ingeniero', 'INGENIERO EN INSTRUMENTACIÓN Y CONTROL']
         ];
 

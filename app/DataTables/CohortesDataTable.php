@@ -14,10 +14,30 @@ class CohortesDataTable extends BaseDataTable
     {
         return EloquentDataTable::create($query)
             ->addIndexColumn()
-            // Si deseas un distintivo visual según el estatus
+            // Distintivo visual mejorado según el estatus de la cohorte
             ->editColumn('estatus_cohorte', function ($cohorte) {
-                $color = $cohorte->estatus_cohorte === 'Finalizada' ? 'secondary' : 'primary';
-                return '<span class="badge bg-' . $color . ' px-3 py-2">' . $cohorte->estatus_cohorte . '</span>';
+                $estatus = strtolower(trim($cohorte->estatus_cohorte));
+                
+                switch ($estatus) {
+                    case 'activo':
+                    case 'en curso':
+                        $badgeClass = 'bg-success text-white';
+                        $icono = '<i class="bi bi-check-circle-fill me-1"></i>';
+                        break;
+                    case 'proxima':
+                    case 'próxima':
+                        $badgeClass = 'bg-info text-dark';
+                        $icono = '<i class="bi bi-clock-fill me-1"></i>';
+                        break;
+                    case 'finalizada':
+                    case 'finalizado':
+                    default:
+                        $badgeClass = 'bg-secondary text-white';
+                        $icono = '<i class="bi bi-archive-fill me-1"></i>';
+                        break;
+                }
+
+                return '<span class="badge ' . $badgeClass . ' px-3 py-2 shadow-sm">' . $icono . ucfirst($cohorte->estatus_cohorte) . '</span>';
             })
             ->addColumn('action', function ($cohorte) {
                 return view('cohortes.partials.actions', compact('cohorte'))->render();

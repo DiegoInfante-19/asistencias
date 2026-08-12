@@ -130,7 +130,7 @@
             </div>
         </div>
 
-        <!-- SECCIÓN INFERIOR: CARGA ACADÉMICA (EL ESLABÓN PERDIDO) -->
+        <!-- SECCIÓN INFERIOR: CARGA ACADÉMICA (GRUPOS ASIGNADOS) -->
         @if($user->profesor && $user->profesor->id_pnf && $user->profesor->nivel_asignado)
         <div class="col-12 mb-4">
             <div class="card border-0 shadow-sm">
@@ -148,16 +148,22 @@
                                     <label class="form-label small text-muted fw-bold">Seleccione el Grupo disponible</label>
                                     <select class="form-select" name="id_grupo" required>
                                         <option value="" selected disabled>Seleccione un grupo...</option>
-                                        @forelse($gruposDisponibles as $grupo)
-                                            <!-- Validamos visualmente que no asigne el mismo grupo dos veces -->
-                                            @if(!$user->profesor->grupos->contains('id_grupo', $grupo->id_grupo))
-                                                <option value="{{ $grupo->id_grupo }}">
-                                                    Cohorte: {{ $grupo->cohorte->numero_cohorte }}
-                                                </option>
+                                        @php $hayDisponibles = false; @endphp
+                                        @foreach($gruposDisponibles as $grupo)
+                                            {{-- RESTRICCIÓN ESTRICTA: Coincidir PNF, Nivel y no estar ya asignado --}}
+                                            @if($grupo->id_pnf == $user->profesor->id_pnf && $grupo->nivel_academico == $user->profesor->nivel_asignado)
+                                                @if(!$user->profesor->grupos->contains('id_grupo', $grupo->id_grupo))
+                                                    @php $hayDisponibles = true; @endphp
+                                                    <option value="{{ $grupo->id_grupo }}">
+                                                        Cohorte: {{ $grupo->cohorte->numero_cohorte ?? 'N/D' }} ({{ $grupo->nivel_academico }})
+                                                    </option>
+                                                @endif
                                             @endif
-                                        @empty
+                                        @endforeach
+
+                                        @if(!$hayDisponibles)
                                             <option value="" disabled>No hay grupos disponibles para este PNF/Nivel</option>
-                                        @endforelse
+                                        @endif
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">
@@ -182,7 +188,7 @@
                                     <tbody>
                                         @forelse($user->profesor->grupos as $grupoAsignado)
                                         <tr>
-                                            <td class="fw-bold">{{ $grupoAsignado->cohorte->numero_cohorte }}</td>
+                                            <td class="fw-bold">{{ $grupoAsignado->cohorte->numero_cohorte ?? 'N/D' }}</td>
                                             <td>{{ $user->profesor->pnf->nombre_pnf }}</td>
                                             <td>
                                                 <span class="badge bg-secondary">{{ $grupoAsignado->nivel_academico }}</span>
