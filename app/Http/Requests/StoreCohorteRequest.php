@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Requests;
-
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCohorteRequest extends FormRequest
@@ -11,9 +9,6 @@ class StoreCohorteRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Saneamiento preventivo: convierte a mayúsculas antes de pasar por las reglas
-     */
     protected function prepareForValidation(): void
     {
         if ($this->has('numero_cohorte')) {
@@ -31,23 +26,21 @@ class StoreCohorteRequest extends FormRequest
                 'string',
                 'max:20',
                 'unique:cohortes,numero_cohorte',
-                'regex:/^[A-Z0-9\s-]+$/' // Expresión regular solo para letras MAYÚSCULAS, números, espacios y guiones
+                'regex:/[3]+$/' 
             ],
-            'fecha_inicio_cohorte' => ['required', 'date'],
-            'fecha_fin_cohorte'    => ['required', 'date', 'after:fecha_inicio_cohorte'],
-            'descripcion_cohorte'  => ['nullable', 'string', 'max:1000', 'regex:/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,\-]+$/'],
-            'estatus_cohorte'      => ['required', 'string', 'max:50'],
+            // SE ELIMINARON LAS FECHAS DE LA COHORTE (Ahora son de periodos_academicos)
+            'descripcion_cohorte' => ['nullable', 'string', 'max:1000', 'regex:/[4]+$/'],
+            'estatus_cohorte'     => ['required', 'string', 'max:50'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'numero_cohorte.required' => 'El número de cohorte es obligatorio.',
-            'numero_cohorte.unique'   => 'Este número de cohorte ya existe.',
-            'numero_cohorte.regex'    => 'El número de cohorte debe contener únicamente letras mayúsculas y números.',
-            'fecha_fin_cohorte.after' => 'La fecha de fin debe ser posterior a la fecha de inicio.',
-            'descripcion_cohorte.regex' => 'La descripción contiene caracteres no permitidos.',
+            'numero_cohorte.required'  => 'El número de cohorte es obligatorio.',
+            'numero_cohorte.unique'    => 'Este número de cohorte ya existe.',
+            'numero_cohorte.regex'     => 'El número de cohorte debe contener únicamente letras mayúsculas y números.',
+            'descripcion_cohorte.regex'=> 'La descripción contiene caracteres no permitidos.',
             'estatus_cohorte.required' => 'El estatus es obligatorio.',
         ];
     }
