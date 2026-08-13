@@ -16,10 +16,11 @@ class PersonaFormacionAcademica extends Model
 
     // Seguridad de Asignación Masiva (Paso 5)
     protected $fillable = [
-        'id_personas', 
-        'id_titulos_pnf', 
-        'id_titulos', 
-        'observacion_formacion_academica'
+        'id_personas',
+        'id_titulos_pnf',
+        'id_titulos',
+        'observacion_formacion_academica',
+        'origen_formacion' // <-- NUEVO
     ];
 
     /**

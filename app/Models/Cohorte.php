@@ -14,8 +14,6 @@ class Cohorte extends Model
     
     protected $fillable = [
         'numero_cohorte',
-        'fecha_inicio_cohorte',
-        'fecha_fin_cohorte',
         'descripcion_cohorte',
         'estatus_cohorte'
     ];
@@ -25,8 +23,8 @@ class Cohorte extends Model
      */
 
     // Una cohorte se subdivide en grupos académicos (por PNF y Nivel)
-    public function gruposAcademicos(): HasMany
+    public function periodosAcademicos(): HasMany
     {
-        return $this->hasMany(GrupoAcademico::class, 'id_cohortes', 'id_cohortes');
+        return $this->hasMany(PeriodoAcademico::class, 'id_cohortes', 'id_cohortes');
     }
 }

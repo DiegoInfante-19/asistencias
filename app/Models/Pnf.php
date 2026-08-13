@@ -40,9 +40,9 @@ class Pnf extends Model
     }
 
     // Un PNF tiene varios grupos académicos (TSU, Ingeniería en distintas cohortes)
-    public function gruposAcademicos(): HasMany 
+    public function secciones(): HasMany
     {
-        return $this->hasMany(GrupoAcademico::class, 'id_pnf', 'id_pnf');
+        return $this->hasMany(Seccion::class, 'id_pnf', 'id_pnf');
     }
 
     // Un PNF tiene asignados varios profesores

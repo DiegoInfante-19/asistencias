@@ -15,9 +15,9 @@ class Sesion extends Model
     protected $primaryKey = 'id_sesiones';
 
     protected $fillable = [
-        'id_grupo', 
-        'id_profesor', 
-        'fecha_sesion', 
+        'id_seccion', // <-- REEMPLAZA id_grupo
+        'id_profesor',
+        'fecha_sesion',
         'observacion_sesion'
     ];
 
@@ -26,9 +26,9 @@ class Sesion extends Model
      */
 
     // CORREGIDO: Una sesión pertenece a un grupo académico
-    public function grupo(): BelongsTo
+    public function seccion(): BelongsTo
     {
-        return $this->belongsTo(GrupoAcademico::class, 'id_grupo', 'id_grupo');
+        return $this->belongsTo(Seccion::class, 'id_seccion', 'id_seccion');
     }
 
     // Una sesión es impartida por un profesor

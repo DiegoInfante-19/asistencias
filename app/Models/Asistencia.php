@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- ¡FALTABA ESTA LÍNEA!
 use App\Enums\EstadoAsistencia; // IMPORTANTE: Importar el Enum
 
 class Asistencia extends Model
@@ -15,7 +18,7 @@ class Asistencia extends Model
 
     protected $fillable = [
         'id_sesiones',
-        'id_inscripcion_cohortes',
+        'id_inscripcion_seccion', // <-- REEMPLAZA id_inscripcion_cohortes
         'estado_asistencia',
         'observacion_asistencia'
     ];
@@ -35,8 +38,8 @@ class Asistencia extends Model
     }
 
     // CORREGIDO: Cambiamos Jiang() por el nombre de relación estándar y profesional
-    public function inscripcionCohorte()
+    public function inscripcionSeccion(): BelongsTo
     {
-        return $this->belongsTo(InscripcionCohorte::class, 'id_inscripcion_cohortes', 'id_inscripcion_cohortes');
+        return $this->belongsTo(InscripcionSeccion::class, 'id_inscripcion_seccion', 'id_inscripcion_seccion');
     }
 }

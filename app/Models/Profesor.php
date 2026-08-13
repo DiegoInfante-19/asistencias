@@ -37,9 +37,9 @@ class Profesor extends Model
     }
 
     // Grupos académicos asignados a este profesor
-    public function grupos(): BelongsToMany
+    public function secciones(): BelongsToMany
     {
-        return $this->belongsToMany(GrupoAcademico::class, 'profesor_grupo', 'id_profesor', 'id_grupo')
+        return $this->belongsToMany(Seccion::class, 'profesor_seccion', 'id_profesor', 'id_seccion')
                     ->withTimestamps();
     }
 

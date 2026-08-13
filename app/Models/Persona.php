@@ -92,13 +92,12 @@ class Persona extends Model
     // Historial completo de Inscripciones a lo largo de los años
     public function inscripciones(): HasMany
     {
-        return $this->hasMany(InscripcionCohorte::class, 'id_personas', 'id_personas');
+        return $this->hasMany(InscripcionSeccion::class, 'id_personas', 'id_personas');
     }
 
-    // Filtro especial: Obtiene SOLAMENTE la cohorte actual (la más reciente)
     public function inscripcionActual(): HasOne
     {
-        return $this->hasOne(InscripcionCohorte::class, 'id_personas', 'id_personas')->latestOfMany();
+        return $this->hasOne(InscripcionSeccion::class, 'id_personas', 'id_personas')->latestOfMany();
     }
 
     /**
@@ -110,10 +109,10 @@ class Persona extends Model
     // Permite usar $persona->nombre_completo en las vistas
     public function getNombreCompletoAttribute()
     {
-        // Limpia espacios dobles en caso de no tener segundo nombre o segundo apellido
+        // SE AGREGARON LOS SÍMBOLOS $ FALTANTES
         $nombres = trim("{$this->primer_nombre_personas} {$this->segundo_nombre_personas}");
         $apellidos = trim("{$this->primer_apellido_personas} {$this->segundo_apellido_personas}");
-
+        
         return preg_replace('/\s+/', ' ', "{$nombres} {$apellidos}");
     }
 }
