@@ -3,53 +3,40 @@
 namespace App\Http\Controllers;
 
 use App\Models\Persona;
-use App\Models\InscripcionCohorte;
-use App\Http\Requests\StoreInscripcionCohorteRequest;
+use App\Models\InscripcionSeccion; // Reemplaza a InscripcionCohorte
+use App\Http\Requests\StoreInscripcionSeccionRequest; // Reemplaza al request viejo
 use Illuminate\Support\Facades\Log;
 
 class PersonaInscripcionController extends Controller
 {
-    /**
-     * Almacena una nueva inscripción a una cohorte para la persona.
-     */
-    public function store(StoreInscripcionCohorteRequest $request, Persona $persona)
+    public function store(StoreInscripcionSeccionRequest $request, Persona $persona)
     {
         try {
-            // Asumiendo que en Persona.php tienes la relación definida como:
-            // public function inscripciones() { return $this->hasMany(InscripcionCohorte::class, 'id_personas', 'id_personas'); }
-            
-            $persona->inscripciones()->create($request->validated());
+            // El request ya validó la coherencia de PNF y exclusividad de estatus activo
+            $persona->inscripcionesSecciones()->create($request->validated());
 
-            return redirect()->back()->with('success', 'Estudiante inscrito en la cohorte exitosamente.');
+            return redirect()->back()->with('success', 'Estudiante inscrito en la sección académica exitosamente.');
             
         } catch (\Exception $e) {
-            Log::error('Error inscribiendo al estudiante: ' . $e->getMessage());
+            Log::error('Error inscribiendo al estudiante en la sección: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Ocurrió un error al intentar registrar la inscripción.');
         }
     }
 
-    /**
-     * Elimina una inscripción (Escenario de anulación o retiro).
-     */
-    public function destroy(Persona $persona, InscripcionCohorte $inscripcion)
+    public function destroy(Persona $persona, InscripcionSeccion $inscripcion)
     {
         try {
-            // Medida de seguridad Senior:
-            // Validamos que esta inscripción realmente le pertenezca a la persona del contexto.
             if ($inscripcion->id_personas !== $persona->id_personas) {
                 return redirect()->back()->with('error', 'No tienes permiso para eliminar esta inscripción.');
             }
 
-            // Recordando el inicio de nuestra arquitectura: 
-            // InscripcionCohorte.php usa SoftDeletes. 
-            // Así que esto mantiene el registro histórico por auditoría (deleted_at).
             $inscripcion->delete();
 
-            return redirect()->back()->with('success', 'Inscripción anulada correctamente.');
+            return redirect()->back()->with('success', 'Inscripción de sección retirada correctamente.');
             
         } catch (\Exception $e) {
-            Log::error('Error eliminando inscripción: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Ocurrió un error al intentar eliminar la inscripción.');
+            Log::error('Error anulando inscripción de sección: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Ocurrió un error al intentar anular la inscripción.');
         }
     }
 }

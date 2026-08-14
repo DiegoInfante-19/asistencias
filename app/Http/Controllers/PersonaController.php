@@ -57,8 +57,8 @@ class PersonaController extends Controller{
             'titulacionPersona',
             'formacionAcademica.titulo',
             'formacionAcademica.tituloPnf',
-            'inscripciones.grupo.cohorte', // Optimización: Cargar cohorte y pnf desde la inscripción
-            'inscripciones.grupo.pnf'
+            'inscripcionesSecciones.seccion.periodoAcademico.cohorte', // Actualizado
+            'inscripcionesSecciones.seccion.pnf'                       // Actualizado
         ])->findOrFail($id);
 
         // Catálogos para el resto de los Tabs
@@ -70,18 +70,20 @@ class PersonaController extends Controller{
         $empresas           = \App\Models\Empresa::all();
         $cargos             = \App\Models\Cargo::all();
 
-        // Data Específica para el Tab de Inscripciones (Cascada JS)
-        $gruposData = GrupoAcademico::with('pnf')
-            ->whereHas('cohorte', function($q) { $q->where('estatus_cohorte', 'Activo'); })
-            ->where('estatus_grupo', 'Activo')
+        // Data Específica para el Tab de Inscripciones (Cascada JS adaptada a Secciones y Periodos)
+        $seccionesData = \App\Models\Seccion::with(['pnf', 'periodoAcademico.cohorte'])
+            ->whereHas('periodoAcademico', function($q) { 
+                $q->where('estatus_periodo', 'Activo'); 
+            })
+            ->where('estatus_seccion', 'Activa')
             ->get()
-            ->map(function ($grupo) {
+            ->map(function ($seccion) {
                 return [
-                    'id_grupo' => $grupo->id_grupo,
-                    'id_cohortes' => $grupo->id_cohortes,
-                    'id_pnf' => $grupo->id_pnf,
-                    'nombre_pnf' => $grupo->pnf->nombre_pnf,
-                    'nivel_academico' => $grupo->nivel_academico->value ?? $grupo->nivel_academico,
+                    'id_seccion'      => $seccion->id_seccion,
+                    'id_periodo'      => $seccion->id_periodo,
+                    'id_pnf'          => $seccion->id_pnf,
+                    'nombre_seccion'  => $seccion->nombre_seccion,
+                    'nombre_pnf'      => $seccion->pnf->nombre_pnf ?? '',
                 ];
             });
 
@@ -95,7 +97,7 @@ class PersonaController extends Controller{
             'cohortes',
             'empresas',
             'cargos',
-            'gruposData'
+            'seccionesData' // Reemplaza a gruposData
         ));
     }
 

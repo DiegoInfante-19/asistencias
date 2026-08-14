@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Asistencia;
 use App\Models\Sesion;
-use App\Models\InscripcionCohorte;
+use App\Models\InscripcionSeccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
@@ -14,30 +14,28 @@ class AsistenciaController extends Controller
     public function guardarLote(Request $request)
     {
         $request->validate([
-            'id_sesiones'                           => 'required|exists:sesiones,id_sesiones',
-            'asistencias'                           => 'required|array',
-            'asistencias.*.id_inscripcion_cohortes' => 'required|exists:inscripcion_cohortes,id_inscripcion_cohortes',
-            'asistencias.*.estado'                  => 'required|in:Presente,Ausente,Justificado',
+            'id_sesiones'               => 'required|exists:sesiones,id_sesiones',
+            'asistencias'               => 'required|array',
+            'asistencias.*.id_inscripcion_seccion' => 'required|exists:inscripciones_secciones,id_inscripcion_seccion',
+            'asistencias.*.estado'      => 'required|in:Presente,Ausente,Justificado',
         ]);
 
         $sesion = Sesion::findOrFail($request->id_sesiones);
 
-        // =========================================================
-        // PREVENCIÓN IDOR Y VENTANA DE TIEMPO (Policies)
-        // =========================================================
+        // Prevención IDOR y ventana de tiempo
         Gate::authorize('update', $sesion);
 
-        // =========================================================
-        // VALIDACIÓN DE GUARDADO PARCIAL (Integridad de Asistencia)
-        // =========================================================
-        // Contamos cuántos estudiantes están inscritos en el grupo de esta sesión
-        $totalAlumnosInscritos = InscripcionCohorte::where('id_grupo', $sesion->id_grupo)->count();
+        // Contamos cuántos estudiantes están inscritos en la sección mixta de esta sesión
+        $totalAlumnosInscritos = InscripcionSeccion::where('id_seccion', $sesion->id_seccion)
+            ->where('estatus_inscripcion', 'Activo')
+            ->count();
+            
         $totalEnviadosEnLote = count($request->asistencias);
 
         if ($totalEnviadosEnLote !== $totalAlumnosInscritos) {
             return response()->json([
                 'success' => false,
-                'message' => "Error de integridad: El lote enviado contiene {$totalEnviadosEnLote} registros, pero el grupo posee {$totalAlumnosInscritos} estudiantes inscritos. No se permiten guardados parciales."
+                'message' => "Error de integridad: El lote enviado contiene {$totalEnviadosEnLote} registros, pero la sección posee {$totalAlumnosInscritos} estudiantes activos. No se permiten guardados parciales."
             ], 422);
         }
 
@@ -49,11 +47,11 @@ class AsistenciaController extends Controller
             foreach ($request->asistencias as $registro) {
                 Asistencia::updateOrCreate(
                     [
-                        'id_sesiones'             => $idSesiones,
-                        'id_inscripcion_cohortes' => $registro['id_inscripcion_cohortes']
+                        'id_sesiones'           => $idSesiones,
+                        'id_inscripcion_seccion' => $registro['id_inscripcion_seccion']
                     ],
                     [
-                        'estado_asistencia'       => $registro['estado']
+                        'estado_asistencia'     => $registro['estado']
                     ]
                 );
             }

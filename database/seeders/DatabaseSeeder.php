@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // Nivel 0: Catálogos Base
+            // Nivel 0: Catálogos Base (Sin dependencias)
             RoleSeeder::class,
             CargosSeeder::class,
             EstadosSeeder::class,
@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             PnfsSeeder::class,
             EmpresasSeeder::class,
             PeriodoRecesosSeeder::class,
-            CohorteSeeder::class,
+            CohorteSeeder::class, // Sello estático
 
             // Nivel 1: Entidades con dependencias directas
             CiudadesSeeder::class,
@@ -29,11 +29,13 @@ class DatabaseSeeder extends Seeder
             UsersSeeder::class,
             EmpresaPnfSeeder::class,
 
-            // Nivel 2: Generación automática de Grupos Académicos
-            GrupoAcademicoSeeder::class,
+            // Nivel 2: Temporalidad y Estructura Académica (Reemplaza a Grupos)
+            PeriodosAcademicosSeeder::class,
+            SeccionesSeeder::class,
 
-            // Nivel 3: Asignación y vinculación de Profesores
+            // Nivel 3: Asignaciones y Vínculos Operativos
             ProfesoresSeeder::class,
+            ProfesorSeccionSeeder::class, // Pobla la tabla pivot N:M
             PersonasSeeder::class,
         ]);
     }
