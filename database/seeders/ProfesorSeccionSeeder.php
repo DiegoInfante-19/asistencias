@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-import App\Models\Profesor;
-import App\Models\Seccion;
+use App\Models\Profesor;
+use App\Models\Seccion;
 
 class ProfesorSeccionSeeder extends Seeder
 {

@@ -1,116 +1,160 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6"> <!-- Aumenté un poco el ancho para que los campos dobles respiren mejor -->
-            <div class="card card-primary card-outline shadow">
-                <div class="card-header">
-                    <h3>Registro de Usuario</h3>
-                </div>
-
-                <div class="card-body">
-                    <form method="POST" action="{{ route('register') }}">
-                        @csrf
-
-                        <!-- FILA 1: Username y Email -->
-                        <div class="row">
-                            <div class="col-md-6 form-group mb-3 mb-md-0">
-                                <label for="username"><b>Nombre de Usuario</b><span class="text-danger">*</span></label>
-                                <input id="username" type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required  autocomplete="off">
-                                <div class="invalid-feedback dynamic-feedback text-bold"></div>
-                                @error('username') <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span> @enderror
-                            </div>
-                                
-                            <div class="col-md-6 form-group">
-                                <label for="email"><b>Correo Electrónico</b><span class="text-danger">*</span></label>
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="off">
-                                <div class="invalid-feedback dynamic-feedback text-bold"></div>
-                                @error('email') <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span> @enderror
-                            </div>
-                        </div>
-
-                        <br>
-
-                        <!-- FILA 2: Nombres y Apellidos -->
-                        <div class="row">
-                            <div class="col-md-6 form-group mb-3 mb-md-0">
-                                <label for="name"><b>Nombres</b><span class="text-danger">*</span></label>
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="off">
-                                <div class="invalid-feedback dynamic-feedback text-bold"></div>
-                                @error('name') <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span> @enderror
-                            </div>
-
-                            <div class="col-md-6 form-group">
-                                <label for="last_name"><b>Apellidos</b><span class="text-danger">*</span></label>
-                                <input id="last_name" type="text" class="form-control @error('last_name') is-invalid @enderror" name="last_name" value="{{ old('last_name') }}" required autocomplete="off">
-                                <div class="invalid-feedback dynamic-feedback text-bold"></div>
-                                @error('last_name') <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span> @enderror
-                            </div>
-                        </div>
-
-                        <br>
-
-                        <!-- FILA 3: Cédula y Teléfono -->
-                        <!-- Ejemplo para Cédula -->
-                        <div class="row">
-                            <div class="col-md-6 form-group mb-3 mb-md-0">
-                                <label for="cedula"><b>Cédula de Identidad</b> <span class="text-danger">*</span></label>
-                                <input id="cedula" type="text" class="form-control @error('cedula') is-invalid @enderror" name="cedula" value="{{ old('cedula') }}" required autocomplete="off">
-                                <div class="invalid-feedback dynamic-feedback text-bold"></div>
-                                <!-- Mensaje dinámico si está vacío (HTML5) -->
-                                <div class="invalid-feedback d-none" id="cedula-error">
-                                    Este campo es obligatorio para el registro. 
-                                </div>
-                                @error('cedula') <span class="invalid-feedback d-block" role="alert"><strong>{{ $message }}</strong></span> @enderror
-                            </div>
-                            <!-- Ejemplo para Teléfono -->
-                            <div class="col-md-6 form-group">
-                                <label for="phone"><b>Teléfono</b></label>
-                                <input id="phone" type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" autocomplete="off">
-                                <div class="invalid-feedback dynamic-feedback text-bold"></div>
-                            </div>
-                        </div>
-
-                        <br>
-
-                        <!-- FILA 4: Contraseña y Confirmar -->
-                        <div class="row">
-                            <div class="col-md-6 form-group mb-3 mb-md-0">
-                                <label for="password"><b>Contraseña</b><span class="text-danger">*</span></label>
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="off">
-                                <div class="invalid-feedback dynamic-feedback text-bold"></div>
-                                @error('password') <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span> @enderror
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label for="password-confirm"><b>Confirmar Contraseña</b><span class="text-danger">*</span></label>
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="off">
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <div class="row">
-                            <div class="col-md-12 text-center">
-                                <button type="submit" class="btn btn-primary px-5">
-                                    <b>Completar Registro</b>
-                                </button>
-                            </div>
-                        </div>
-                    </form> 
-                </div>
-            </div>
+<section class="bg-gray-50 dark:bg-gray-900 py-8 lg:py-16">
+    <div class="max-w-3xl px-4 mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
+        
+        <div class="mb-6 border-b pb-4 border-gray-200 dark:border-gray-700">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Registro de Usuario</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Complete los datos requeridos para registrar una nueva cuenta en el sistema.</p>
         </div>
+
+        <form method="POST" action="{{ route('register') }}">
+            @csrf
+
+            <div class="grid gap-4 mb-6 sm:grid-cols-2 sm:gap-6">
+                
+                <!-- Nombre de Usuario -->
+                <div>
+                    <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Nombre de Usuario <span class="text-red-500">*</span>
+                    </label>
+                    <input id="username" type="text" name="username" value="{{ old('username') }}" required autocomplete="off" placeholder="Ej. Jose11"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white @error('username') border-red-500 @enderror">
+                    
+                    <!-- Feedback Dinámico de JS -->
+                    <div class="dynamic-feedback text-bold text-sm text-red-600 dark:text-red-500 mt-1" style="display: none;"></div>
+
+                    @error('username')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500 font-bold">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Correo Electrónico -->
+                <div>
+                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Correo Electrónico <span class="text-red-500">*</span>
+                    </label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="off" placeholder="Ingresa tu Correo"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white @error('email') border-red-500 @enderror">
+                    
+                    <!-- Feedback Dinámico de JS -->
+                    <div class="dynamic-feedback text-bold text-sm text-red-600 dark:text-red-500 mt-1" style="display: none;"></div>
+
+                    @error('email')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500 font-bold">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Nombres -->
+                <div>
+                    <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Nombres <span class="text-red-500">*</span>
+                    </label>
+                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autocomplete="off" placeholder="Tus nombres"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white @error('name') border-red-500 @enderror">
+                    
+                    <!-- Feedback Dinámico de JS -->
+                    <div class="dynamic-feedback text-bold text-sm text-red-600 dark:text-red-500 mt-1" style="display: none;"></div>
+
+                    @error('name')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500 font-bold">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Apellidos -->
+                <div>
+                    <label for="last_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Apellidos <span class="text-red-500">*</span>
+                    </label>
+                    <input id="last_name" type="text" name="last_name" value="{{ old('last_name') }}" required autocomplete="off" placeholder="Tus apellidos"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white @error('last_name') border-red-500 @enderror">
+                    
+                    <!-- Feedback Dinámico de JS -->
+                    <div class="dynamic-feedback text-bold text-sm text-red-600 dark:text-red-500 mt-1" style="display: none;"></div>
+
+                    @error('last_name')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500 font-bold">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Cédula de Identidad -->
+                <div>
+                    <label for="cedula" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Cédula de Identidad <span class="text-red-500">*</span>
+                    </label>
+                    <input id="cedula" type="text" name="cedula" value="{{ old('cedula') }}" required autocomplete="off" placeholder="solo numeros"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white @error('cedula') border-red-500 @enderror">
+                    
+                    <!-- Feedback Dinámico de JS -->
+                    <div class="dynamic-feedback text-bold text-sm text-red-600 dark:text-red-500 mt-1" style="display: none;"></div>
+
+                    @error('cedula')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500 font-bold">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Teléfono -->
+                <div>
+                    <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Teléfono
+                    </label>
+                    <input id="phone" type="text" name="phone" value="{{ old('phone') }}" autocomplete="off" placeholder="no es obligatorio"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white @error('phone') border-red-500 @enderror">
+                    
+                    <!-- Feedback Dinámico de JS -->
+                    <div class="dynamic-feedback text-bold text-sm text-red-600 dark:text-red-500 mt-1" style="display: none;"></div>
+
+                    @error('phone')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500 font-bold">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Contraseña -->
+                <div>
+                    <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Contraseña <span class="text-red-500">*</span>
+                    </label>
+                    <input id="password" type="password" name="password" required autocomplete="off"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('password') border-red-500 @enderror">
+                    
+                    <!-- Feedback Dinámico de JS -->
+                    <div class="dynamic-feedback text-bold text-sm text-red-600 dark:text-red-500 mt-1" style="display: none;"></div>
+
+                    @error('password')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500 font-bold">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Confirmar Contraseña -->
+                <div>
+                    <label for="password-confirm" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Confirmar Contraseña <span class="text-red-500">*</span>
+                    </label>
+                    <input id="password-confirm" type="password" name="password_confirmation" required autocomplete="off" 
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600  dark:text-white">
+                    
+                    <!-- Feedback Dinámico de JS -->
+                    <div class="dynamic-feedback text-bold text-sm text-red-600 dark:text-red-500 mt-1" style="display: none;"></div>
+                </div>
+
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex items-center space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button type="submit" class="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <b>Completar Registro</b>
+                </button>
+                <a href="{{ route('login') }}" class="text-gray-900 bg-white border border-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+                    Cancelar
+                </a>
+            </div>
+        </form>
     </div>
-</div>
+</section>
 @endsection
 
 @section('scripts')
     <script src="{{ asset('js/core-validations.js') }}" defer></script>
     <script src="{{ asset('js/auth-validations.js') }}" defer></script>
 @endsection
-
-
-<!-- 
-    quedamos en adaptar la validacion de los formularios del crud panel de usuarios 
--->

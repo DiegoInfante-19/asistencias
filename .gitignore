@@ -18,6 +18,8 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/copy_for_ai.php
+/.vscode/tasks.json
 /vendor
 Homestead.json
 Homestead.yaml

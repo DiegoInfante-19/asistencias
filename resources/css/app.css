@@ -1,11 +1,36 @@
 @import 'tailwindcss';
 
+/* 1. Declaración de la fuente local Rubik Variable */
+@font-face {
+    font-family: 'Rubik';
+    src: url('/public/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 900; /* Rango de peso de la fuente variable */
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 1. Inyectamos el plugin de Flowbite */
+@plugin 'flowbite/plugin';
+
+/* 2. Le decimos a Tailwind qué archivos escanear */
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+@source '../../node_modules/flowbite/**/*.js'; /* <-- Escáner para la interactividad de Flowbite */
 
+/* 3. Definimos nuestros colores corporativos (Paleta 'Primary') */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-}
+    --color-primary-50: #eff6ff;
+    --color-primary-100: #dbeafe;
+    --color-primary-200: #bfdbfe;
+    --color-primary-300: #93c5fd;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
+    --color-primary-700: #1d4ed8;
+    --color-primary-800: #1e40af;
+    --color-primary-900: #1e3a8a;
+    --color-primary-950: #172554;
+    
+--font-sans: 'Rubik', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';}
