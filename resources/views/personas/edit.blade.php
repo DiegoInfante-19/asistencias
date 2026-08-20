@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
@@ -96,10 +96,10 @@
                     </div>
 
                     @php
-                        // CORREGIDO: El estado actual ya no se lee de lugarNacimiento directamente, sino a través de la ciudad
-                        $estadoActual = $persona->lugarNacimiento->ciudad->id_estado ?? '';
-                        $ciudadActual = $persona->lugarNacimiento->id_ciudad ?? '';
-                        $detallesActual = $persona->lugarNacimiento->detalles_adicionales ?? '';
+                    // CORREGIDO: El estado actual ya no se lee de lugarNacimiento directamente, sino a través de la ciudad
+                    $estadoActual = $persona->lugarNacimiento->ciudad->id_estado ?? '';
+                    $ciudadActual = $persona->lugarNacimiento->id_ciudad ?? '';
+                    $detallesActual = $persona->lugarNacimiento->detalles_adicionales ?? '';
                     @endphp
 
                     <!-- Estado -->

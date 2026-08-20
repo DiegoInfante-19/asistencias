@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 <!-- LOS STYLES VAN FUERA DEL CONTENT -->
 @section('styles')

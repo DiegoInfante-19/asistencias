@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('header')
 <x-page-header title="Programa Nacional de Formación (PNF)">
@@ -190,7 +190,7 @@
 
         if (activeTabId) {
             let tabElement = document.getElementById(activeTabId);
-            if(tabElement) {
+            if (tabElement) {
                 // Instanciar y mostrar la pestaña usando la API nativa de Bootstrap 5
                 let tab = new bootstrap.Tab(tabElement);
                 tab.show();

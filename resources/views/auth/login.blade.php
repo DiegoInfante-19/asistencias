@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('content')
 <section class="bg-gray-50 dark:bg-gray-900 min-h-[85vh] flex items-center justify-center">
@@ -10,7 +10,7 @@
             <!-- COLUMNA IZQUIERDA: Texto / Branding Institucional -->
             <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                 <a href="#" class="inline-flex items-center space-x-3 rtl:space-x-reverse">
-                    <img src="{{ asset('images/upt_logo-modified.png') }}" class="h-10" alt="Logo UPT">
+                    <img src="{{ asset('images/upt_logo.png') }}" class="h-10 w-10 object-contain" alt="Logo UPT">
                     <span class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                         Sistema de Asistencias
                     </span>

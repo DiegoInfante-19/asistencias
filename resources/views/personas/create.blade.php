@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
@@ -228,7 +228,7 @@
             cargarCiudades(oldEstado, oldCiudad);
         }
 
-           // 3. Guardar Ciudad por AJAX
+        // 3. Guardar Ciudad por AJAX
         btnGuardarCiudad.on('click', function() {
             let id_estado = estadoSelect.val();
             let nombre_ciudad = inputNuevaCiudad.val().trim();

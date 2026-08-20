@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/r-2.5.0/datatables.min.css" crossorigin="anonymous">
@@ -14,7 +14,7 @@
                 <i class="bi bi-folder-plus me-1"></i> <b>Nuevo Estatus</b>
             </button>
         </div>
-        
+
         <div class="card-body">
             <div class="table-responsive">
                 {!! $dataTable->table(['class' => 'table table-bordered table-striped table-hover align-middle', 'style' => 'width:100%;']) !!}
@@ -38,10 +38,10 @@
         $('#UpdateEstatusModal').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget); // Botón que disparó el modal
             var modal = $(this);
-            
+
             // Actualizar la ruta del formulario (action)
             modal.find('#UpdateEstatusForm').attr('action', button.data('url'));
-            
+
             // Inyectar el nombre del estatus en el input
             modal.find('#edit-nombre-estatus').val(button.data('nombre'));
         });

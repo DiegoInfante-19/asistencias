@@ -1,25 +1,25 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/r-2.5.0/datatables.min.css" crossorigin="anonymous">
 
 <style>
     /* Azul muy claro (transparente) para Masculino */
-    table.dataTable tbody tr.bg-masculino > td {
+    table.dataTable tbody tr.bg-masculino>td {
         background-color: rgba(13, 110, 253, 0.05) !important;
     }
-    
+
     /* Rosa muy claro (transparente) para Femenino */
-    table.dataTable tbody tr.bg-femenino > td {
+    table.dataTable tbody tr.bg-femenino>td {
         background-color: rgba(214, 51, 132, 0.05) !important;
     }
 
     /* Mantenemos un hover un poco más oscuro para que no se pierda la interactividad */
-    table.dataTable tbody tr.bg-masculino:hover > td {
+    table.dataTable tbody tr.bg-masculino:hover>td {
         background-color: rgba(13, 110, 253, 0.1) !important;
     }
-    
-    table.dataTable tbody tr.bg-femenino:hover > td {
+
+    table.dataTable tbody tr.bg-femenino:hover>td {
         background-color: rgba(214, 51, 132, 0.1) !important;
     }
 </style>

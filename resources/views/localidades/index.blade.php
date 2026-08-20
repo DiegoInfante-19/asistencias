@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/r-2.5.0/datatables.min.css" crossorigin="anonymous">
@@ -19,7 +19,7 @@
 
             <div class="tab-content pt-4">
                 <div class="tab-pane fade show active" id="tab-estados">
-                    
+
                     <div class="card-header bg-white py-3 d-flex align-items-center">
                         <h4 class="card-title fw-bold text-dark mb-0">Gestión de Estados</h4>
                         <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#createEstateModal">
