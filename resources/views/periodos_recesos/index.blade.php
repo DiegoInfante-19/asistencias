@@ -1,23 +1,30 @@
 @extends('layouts.admin')
 
-@section('styles')
-<link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/r-2.5.0/datatables.min.css" crossorigin="anonymous">
+{{-- ELIMINAMOS @section('styles') PORQUE YA CARGAMOS TODO LOCALMENTE CON VITE --}}
+
+@section('header')
+<x-page-header title="Periodos de Recesos y Eventos">
+    <li class="breadcrumb-item active" aria-current="page" style="font-weight: 500;">Periodos de Receso</li>
+</x-page-header>
 @endsection
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    <div class="card">
+    <!-- Tarjeta Principal con diseño limpio -->
+    <div class="card border-0 shadow-sm">
 
         <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h5 class="card-title fw-bold text-dark mb-0">Catálogo de Periodos y Eventos</h5>
-            <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-toggle="modal" data-bs-target="#createPeriodoModal">
-                <i class="bi bi-calendar-plus me-1"></i> <b>Nuevo Periodo</b>
+            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">Catálogo de Periodos y Eventos</h4>
+            <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#createPeriodoModal">
+                <i class="bi bi-calendar-plus me-1" style="font-weight: 500;"></i> Añadir Periodo
             </button>
         </div>
 
-        <div class="card-body">
+        <!-- Cuerpo con fondo blanco -->
+        <div class="card-body bg-white">
             <div class="table-responsive">
-                {!! $dataTable->table(['class' => 'table table-bordered table-striped table-hover align-middle nowrap', 'style' => 'width:100%;']) !!}
+                <!-- Inyectamos las clases de Bootstrap limpias para DataTables -->
+                {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
             </div>
         </div>
     </div>
@@ -26,13 +33,11 @@
 @include('periodos_recesos.partials.modals')
 @endsection
 
-@section('scripts')
-<script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/r-2.5.0/datatables.min.js" crossorigin="anonymous"></script>
+@push('scripts')
+{{-- ELIMINAMOS LOS CDNS DE JQUERY Y DATATABLES PORQUE VITE SE ENCARGA DE ESO --}}
 
-{!! $dataTable->scripts() !!}
-
-<script>
+<!-- 1. Script del Modal: Envuelto en type="module" -->
+<script type="module">
     $(document).ready(function() {
         // --- Lógica para Modal EDITAR ---
         $('#UpdatePeriodoModal').on('show.bs.modal', function(event) {
@@ -79,5 +84,9 @@
         });
     });
 </script>
+
 <script src="{{ asset('js/admin-validations.js') }}" defer></script>
-@endsection
+
+<!-- 2. Script de Yajra: Solucionamos el error pasándole el type module -->
+{!! $dataTable->scripts(null, ['type' => 'module']) !!}
+@endpush

@@ -9,11 +9,16 @@ use App\DataTables\PersonasDataTable;
 use Illuminate\Support\Facades\Log;
 use App\Models\Cohorte;
 use App\Models\GrupoAcademico;
-use Illuminate\Support\Facades\DB; // Añadido para el manejo de transacciones
+use Illuminate\Support\Facades\DB;
 
 class PersonaController extends Controller{
 
     public function index(PersonasDataTable $dataTable){
+        // Blindaje AJAX para evitar que devuelva el layout completo en peticiones asíncronas
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->ajax();
+        }
+
         return $dataTable->render('personas.index');
     }
 
@@ -57,20 +62,18 @@ class PersonaController extends Controller{
             'titulacionPersona',
             'formacionAcademica.titulo',
             'formacionAcademica.tituloPnf',
-            'inscripcionesSecciones.seccion.periodoAcademico.cohorte', // Actualizado
-            'inscripcionesSecciones.seccion.pnf'                       // Actualizado
+            'inscripcionesSecciones.seccion.periodoAcademico.cohorte',
+            'inscripcionesSecciones.seccion.pnf'                        
         ])->findOrFail($id);
 
-        // Catálogos para el resto de los Tabs
-        $pnfs               = \App\Models\Pnf::all();
-        $titulos            = \App\Models\Titulo::all();
-        $titulos_pnf        = \App\Models\TituloPnf::all();
+        $pnfs                 = \App\Models\Pnf::all();
+        $titulos              = \App\Models\Titulo::all();
+        $titulos_pnf          = \App\Models\TituloPnf::all();
         $estatusExpedientes = \App\Models\EstatusExpediente::all();
-        $cohortes           = Cohorte::all();
-        $empresas           = \App\Models\Empresa::all();
-        $cargos             = \App\Models\Cargo::all();
+        $cohortes             = Cohorte::all();
+        $empresas             = \App\Models\Empresa::all();
+        $cargos               = \App\Models\Cargo::all();
 
-        // Data Específica para el Tab de Inscripciones (Cascada JS adaptada a Secciones y Periodos)
         $seccionesData = \App\Models\Seccion::with(['pnf', 'periodoAcademico.cohorte'])
             ->whereHas('periodoAcademico', function($q) { 
                 $q->where('estatus_periodo', 'Activo'); 
@@ -87,7 +90,6 @@ class PersonaController extends Controller{
                 ];
             });
 
-        // UN SOLO RETURN con TODAS las variables
         return view('personas.show', compact(
             'persona',
             'pnfs',
@@ -97,7 +99,7 @@ class PersonaController extends Controller{
             'cohortes',
             'empresas',
             'cargos',
-            'seccionesData' // Reemplaza a gruposData
+            'seccionesData'
         ));
     }
 

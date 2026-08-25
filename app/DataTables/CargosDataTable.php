@@ -15,7 +15,6 @@ class CargosDataTable extends BaseDataTable
         return EloquentDataTable::create($query)
             ->addIndexColumn()
             ->addColumn('action', function ($cargo) {
-                // Renderizamos la vista de acciones que crearemos en el siguiente paso
                 return view('cargos.partials.actions', compact('cargo'))->render();
             })
             ->rawColumns(['action'])
@@ -24,7 +23,6 @@ class CargosDataTable extends BaseDataTable
 
     public function query(Cargo $model): EloquentBuilder
     {
-        // Traemos todos los campos necesarios para la tabla
         return $model->newQuery()->select([
             'id_cargo',
             'descripcion_cargo'

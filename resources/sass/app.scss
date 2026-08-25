@@ -1,8 +1,27 @@
-// Fonts
-@import url('https://fonts.bunny.net/css?family=Nunito');
+/* 1. Declaración de la fuente local Rubik Variable (Cero CDNs) */
+@font-face {
+    font-family: 'Rubik';
+    src: url('/public/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
 
-// Variables
+// 2. Variables (Carga tu color $primary y tipografía)
 @import 'variables';
 
-// Bootstrap
+// 3. Importar Bootstrap (Absorberá las variables automáticamente)
 @import 'bootstrap/scss/bootstrap';
+
+// 4. Importar AdminLTE
+@import 'admin-lte/dist/css/adminlte.css';
+
+// 5. Estilos locales de librerías de terceros (Cero CDNs)
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
+@import 'datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css'; // <-- AÑADIDO PARA LOS BOTONES
+@import 'select2/dist/css/select2.min.css';
+
+// RUTA CORREGIDA DE OVERLAYSCROLLBARS:
+@import 'overlayscrollbars/styles/overlayscrollbars.css';
+
+@import 'bootstrap-icons/font/bootstrap-icons.css';

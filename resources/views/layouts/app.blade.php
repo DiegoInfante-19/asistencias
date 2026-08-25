@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="light">
 
 <head>
     <meta charset="utf-8">
@@ -8,166 +8,140 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'SisControl') }}</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/upt_logo-modified.png') }}">
 
-    <!-- Fonts (Rubik local vía app.css) -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-
-    <!-- Scripts y Estilos (Tailwind v4 + Vite) -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @yield('scripts')
+    <!-- Carga de Estilos y Scripts (Bootstrap + AdminLTE vía Vite) -->
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @yield('styles')
 </head>
 
-<body class="bg-gray-50 text-gray-800 antialiased dark:bg-gray-900 dark:text-gray-200 min-h-screen flex flex-col font-sans">
+<body class="d-flex flex-column min-vh-100 bg-body-tertiary antialiased">
 
-    <!-- NAVBAR MODERNO CON FLOWBITE -->
-    <nav class="bg-white fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-
+    <!-- NAVBAR MODERNO CON BOOTSTRAP 5 -->
+    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm sticky-top border-bottom">
+        <div class="container">
             <!-- Logo y Marca -->
-            <a href="{{ url('/') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
-                <img src="{{ asset('images/upt_logo-modified.png') }}" class="h-8" alt="Logo UPT">
-                <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white text-primary-600">
-                    {{ config('app.name', 'Laravel') }}
-                </span>
+            <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+                <img src="{{ asset('images/upt_logo-modified.png') }}" alt="Logo UPT" height="32" class="me-2">
+                <span class="fw-bold text-primary">{{ config('app.name', 'SisControl') }}</span>
             </a>
 
             <!-- Botón del Menú Móvil (Hamburguesa) -->
-            <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
-                <span class="sr-only">Abrir menú principal</span>
-                <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h14" />
-                </svg>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Abrir menú principal">
+                <span class="navbar-toggler-icon"></span>
             </button>
 
             <!-- Opciones del Navbar -->
-            <div class="hidden w-full md:block md:w-auto" id="navbar-default">
-                <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-800 dark:border-gray-700 items-center">
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <!-- Espacio a la izquierda -->
+                <ul class="navbar-nav me-auto">
+                </ul>
 
+                <!-- Opciones a la derecha -->
+                <ul class="navbar-nav ms-auto align-items-center">
                     @guest
                         @if (Route::has('login'))
-                        <li>
-                            <a href="{{ route('login') }}" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary-600 md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white">
-                                Inicio de Sesión
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-medium" href="{{ route('login') }}">Inicio de Sesión</a>
+                            </li>
                         @endif
 
                         @if (Route::has('register'))
-                        <li>
-                            <a href="{{ route('register') }}" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary-600 md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white">
-                                Registro de Usuario
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-medium" href="{{ route('register') }}">Registro de Usuario</a>
+                            </li>
                         @endif
                     @else
                         <!-- Menú de Usuario Autenticado -->
-                        <li class="relative">
-                            <button id="dropdownUserButton" data-dropdown-toggle="dropdownUser" class="flex items-center text-sm font-medium text-gray-900 rounded-full hover:text-primary-600 dark:hover:text-primary-500 md:me-0 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-white" type="button">
-                                <span class="sr-only">Abrir menú de usuario</span>
-                                <div class="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold mr-2">
+                        <li class="nav-item dropdown">
+                            <a id="navbarUserDropdown" class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                <!-- Avatar dinámico circular -->
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-2" style="width: 32px; height: 32px;">
                                     {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
                                 </div>
-                                <span>{{ Auth::user()->name ?? 'Usuario' }}</span>
-                                <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
-                                </svg>
-                            </button>
+                                <span class="fw-medium text-dark">{{ Auth::user()->name ?? 'Usuario' }}</span>
+                            </a>
 
                             <!-- Dropdown menu -->
-                            <div id="dropdownUser" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600">
-                                <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                    <div class="font-medium truncate">{{ Auth::user()->email ?? '' }}</div>
+                            <div class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="navbarUserDropdown">
+                                <div class="dropdown-item-text text-muted small">
+                                    {{ Auth::user()->email ?? '' }}
                                 </div>
-                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUserButton">
-                                    <li>
-                                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-red-600 dark:text-red-400">
-                                            Cerrar Sesión
-                                        </a>
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                                            @csrf
-                                        </form>
-                                    </li>
-                                </ul>
+                                <hr class="dropdown-divider">
+                                <a class="dropdown-item text-danger fw-bold" href="{{ route('logout') }}"
+                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                                </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
                             </div>
                         </li>
                     @endguest
-
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- CONTENIDO PRINCIPAL (Con pt-24 para compensar el navbar fijo y centrado limpio) -->
-    <main class="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-        <div class="max-w-7xl mx-auto w-full">
-            @yield('content')
-        </div>
+    <!-- CONTENIDO PRINCIPAL -->
+    <!-- flex-grow-1 asegura que el main ocupe el espacio disponible empujando el footer abajo -->
+    <main class="flex-grow-1 d-flex flex-column">
+        @yield('content')
     </main>
 
     <!-- FOOTER INSTITUCIONAL -->
-   <footer class="p-4 bg-white sm:p-6 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-        <div class="mx-auto max-w-screen-xl">
-            <div class="md:flex md:justify-between">
-                <div class="mb-6 md:mb-0">
-                    <a href="{{ url('/') }}" class="flex items-center">
-                        <img src="{{ asset('images/upt_logo-modified.png') }}" class="mr-3 h-8" alt="Logo UPT" />
-                        <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">SisControl</span>
+    <footer class="bg-white border-top py-5 mt-auto">
+        <div class="container">
+            <div class="row gy-4">
+                <!-- Columna 1: Branding -->
+                <div class="col-12 col-md-5">
+                    <a href="{{ url('/') }}" class="d-flex align-items-center text-decoration-none mb-3">
+                        <img src="{{ asset('images/upt_logo-modified.png') }}" alt="Logo UPT" height="32" class="me-3">
+                        <span class="fs-5 fw-bold text-dark">SisControl</span>
                     </a>
-                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs">
-                        Sistema de Control de Asistencias y Acreditaciones de los Trabajadores.
+                    <p class="text-muted small mb-0 pe-md-5">
+                        Sistema de Control de Asistencias y Acreditaciones de los Trabajadores para la Oficina de Vice Rectorado Académico.
                     </p>
                 </div>
-                <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
-                    <div>
-                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Navegación</h2>
-                        <ul class="text-gray-600 dark:text-gray-400 text-sm">
-                            <li class="mb-4">
-                                <a href="{{ url('/') }}" class="hover:underline">Inicio</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('login') }}" class="hover:underline">Iniciar Sesión</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Enlaces</h2>
-                        <ul class="text-gray-600 dark:text-gray-400 text-sm">
-                            <li class="mb-4">
-                                <a href="#" class="hover:underline">Vicerrectorado</a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:underline">Soporte Técnico</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Legal</h2>
-                        <ul class="text-gray-600 dark:text-gray-400 text-sm">
-                            <li class="mb-4">
-                                <a href="#" class="hover:underline">Privacidad</a>
-                            </li>
-                            <li>
-                                <a href="#" class="hover:underline">Términos</a>
-                            </li>
-                        </ul>
-                    </div>
+
+                <!-- Columna 2: Navegación -->
+                <div class="col-6 col-md-3">
+                    <h6 class="text-uppercase fw-bold mb-3 small text-dark">Navegación</h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="{{ url('/') }}" class="text-muted text-decoration-none text-primary-hover">Inicio</a></li>
+                        <li class="mb-2"><a href="{{ route('login') }}" class="text-muted text-decoration-none text-primary-hover">Iniciar Sesión</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Enlaces -->
+                <div class="col-6 col-md-2">
+                    <h6 class="text-uppercase fw-bold mb-3 small text-dark">Enlaces</h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none text-primary-hover">Vicerrectorado</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none text-primary-hover">Soporte Técnico</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 4: Legal -->
+                <div class="col-12 col-md-2">
+                    <h6 class="text-uppercase fw-bold mb-3 small text-dark">Legal</h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none text-primary-hover">Privacidad</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none text-primary-hover">Términos</a></li>
+                    </ul>
                 </div>
             </div>
-            <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-            <div class="sm:flex sm:items-center sm:justify-between">
-                <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">
-                    © {{ date('Y') }} <a href="#" class="hover:underline">Oficina de Vice Rectorado Académico</a>. Todos los derechos reservados.
+            
+            <hr class="my-4 border-secondary opacity-25">
+            
+            <!-- Derechos de autor -->
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center">
+                <span class="text-muted small text-center text-sm-start">
+                    © {{ date('Y') }} <a href="#" class="text-decoration-none text-muted fw-bold">Oficina de Vice Rectorado Académico</a>. Todos los derechos reservados.
                 </span>
-                <div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
-                    <a href="#" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">
-                        <span class="sr-only">Portal</span>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
-                    </a>
-                </div>
             </div>
         </div>
     </footer>
@@ -175,6 +149,7 @@
     <!-- Alertas globales -->
     @include('partials.alerts', ['default' => ''])
 
+    @yield('scripts')
 </body>
 
 </html>

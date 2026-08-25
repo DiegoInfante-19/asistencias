@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Services\DataTable;
 
 class UsersDataTable extends BaseDataTable
 {
@@ -15,17 +14,15 @@ class UsersDataTable extends BaseDataTable
     {
         return EloquentDataTable::create($query)
             ->addIndexColumn()
-
-            // Nueva columna combinada: Nombre y Apellido
             ->addColumn('full_name', function ($user) {
                 return $user->name_users . ' ' . $user->last_name_users;
             })
-
+            // Badge estandarizado visualmente
             ->editColumn('status_users', function ($user) {
-                if (strtolower($user->status_users) === 'activo') {
-                    return '<span class="badge bg-success">Activo</span>';
+                if (strtolower(trim($user->status_users)) === 'activo') {
+                    return '<span class="badge bg-success px-3 py-2 shadow-sm" style="font-weight: 500; font-size: 0.9rem;">Activo</span>';
                 }
-                return '<span class="badge bg-danger">' . e($user->status_users) . '</span>';
+                return '<span class="badge bg-danger px-3 py-2 shadow-sm" style="font-weight: 500; font-size: 0.9rem;">' . ucfirst(e($user->status_users)) . '</span>';
             })
             ->addColumn('action', function ($user) {
                 return view('profesores.partials.actions', compact('user'))->render();
@@ -35,7 +32,6 @@ class UsersDataTable extends BaseDataTable
 
     public function query(User $model): EloquentBuilder
     {
-        // Concatenamos para que el buscador de DataTables encuentre por nombre completo
         return $model->newQuery()
             ->with('rol')
             ->selectRaw("*, CONCAT(name_users, ' ', last_name_users) as full_name");

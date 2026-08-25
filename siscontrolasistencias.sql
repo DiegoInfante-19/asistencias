@@ -1,3 +1,12 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 23-08-2026 a las 01:06:43
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -51,11 +60,11 @@ CREATE TABLE `ciudades` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/* Cohorte: Sello de origen estático del estudiante */
 CREATE TABLE `cohortes` (
   `id_cohortes` bigint(20) UNSIGNED NOT NULL,
   `numero_cohorte` varchar(20) NOT NULL,
-  `descripcion_cohorte` text DEFAULT NULL
+  `descripcion_cohorte` text DEFAULT NULL,
+  `estatus_cohorte` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `empresas` (
@@ -91,29 +100,6 @@ CREATE TABLE `estatus_expedientes` (
   `nombre_estatus_expediente` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/* Períodos Académicos vinculados a su cohorte correspondiente y sin campo de nombre redundante */
-CREATE TABLE `periodos_academicos` (
-  `id_periodo` bigint(20) UNSIGNED NOT NULL,
-  `id_cohortes` bigint(20) UNSIGNED NOT NULL,
-  `fecha_inicio` date NOT NULL,
-  `fecha_fin` date NOT NULL,
-  `estatus_periodo` varchar(50) NOT NULL DEFAULT 'Activo',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/* Secciones Flexibles dentro de un Período Académico */
-CREATE TABLE `secciones` (
-  `id_seccion` bigint(20) UNSIGNED NOT NULL,
-  `id_periodo` bigint(20) UNSIGNED NOT NULL,
-  `id_pnf` bigint(20) UNSIGNED NOT NULL,
-  `nombre_seccion` varchar(50) NOT NULL,
-  `estatus_seccion` varchar(50) NOT NULL DEFAULT 'Activo',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/* Inscripciones a secciones (permite convivencia mixta de cohortes) */
 CREATE TABLE `inscripciones_secciones` (
   `id_inscripcion_seccion` bigint(20) UNSIGNED NOT NULL,
   `id_personas` bigint(20) UNSIGNED NOT NULL,
@@ -171,6 +157,16 @@ CREATE TABLE `observacion_personas` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `periodos_academicos` (
+  `id_periodo` bigint(20) UNSIGNED NOT NULL,
+  `id_cohortes` bigint(20) UNSIGNED NOT NULL,
+  `fecha_inicio` date NOT NULL,
+  `fecha_fin` date NOT NULL,
+  `estatus_periodo` varchar(50) NOT NULL DEFAULT 'Activo',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `periodo_recesos` (
   `id_periodo_receso` bigint(20) UNSIGNED NOT NULL,
   `nombre_periodo_receso` varchar(100) NOT NULL,
@@ -178,7 +174,8 @@ CREATE TABLE `periodo_recesos` (
   `fecha_fin_periodo_receso` date NOT NULL,
   `descripcion_periodo_receso` text DEFAULT NULL,
   `nivel_periodo_receso` varchar(50) NOT NULL,
-  `suspension_actividades` tinyint(1) NOT NULL DEFAULT 0
+  `suspension_actividades` tinyint(1) NOT NULL DEFAULT 1,
+  `tipo_receso` enum('1','2','3') NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `personas` (
@@ -203,7 +200,7 @@ CREATE TABLE `persona_formacion_academica` (
   `id_titulos_pnf` bigint(20) UNSIGNED DEFAULT NULL,
   `id_titulos` bigint(20) UNSIGNED DEFAULT NULL,
   `observacion_formacion_academica` text DEFAULT NULL,
-  `origen_formacion` varchar(50) NOT NULL DEFAULT 'Externo', /* Interno o Externo */
+  `origen_formacion` varchar(50) NOT NULL DEFAULT 'Externo' COMMENT 'Interno o Externo',
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -230,6 +227,8 @@ CREATE TABLE `preguntas_secretas` (
 CREATE TABLE `profesores` (
   `id_profesor` bigint(20) UNSIGNED NOT NULL,
   `id_users` bigint(20) UNSIGNED NOT NULL,
+  `id_pnf` bigint(20) UNSIGNED NOT NULL,
+  `nivel_asignado` varchar(20) NOT NULL,
   `fecha_asignacion_profesor` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -245,6 +244,16 @@ CREATE TABLE `roles` (
   `id_rol` bigint(20) UNSIGNED NOT NULL,
   `nombre_rol` varchar(50) NOT NULL,
   `descripcion_rol` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `secciones` (
+  `id_seccion` bigint(20) UNSIGNED NOT NULL,
+  `id_periodo` bigint(20) UNSIGNED NOT NULL,
+  `id_pnf` bigint(20) UNSIGNED NOT NULL,
+  `nombre_seccion` varchar(50) NOT NULL,
+  `estatus_seccion` varchar(50) NOT NULL DEFAULT 'Activo',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -281,7 +290,6 @@ CREATE TABLE `titulacion_personas` (
   `id_personas` bigint(20) UNSIGNED NOT NULL,
   `id_titulacion` bigint(20) UNSIGNED NOT NULL,
   `id_pnf` bigint(20) UNSIGNED NOT NULL,
-  `id_cohortes` bigint(20) UNSIGNED NOT NULL,
   `id_estatus_expediente` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -318,10 +326,6 @@ CREATE TABLE `users` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-/* --------------------------------------------------------
-   ÍNDICES (PRIMARY & UNIQUE KEYS)
--------------------------------------------------------- */
 ALTER TABLE `acreditaciones`
   ADD PRIMARY KEY (`id_acreditaciones`),
   ADD KEY `acreditaciones_id_personas_foreign` (`id_personas`),
@@ -368,6 +372,7 @@ ALTER TABLE `empresa_pnf`
   ADD KEY `empresa_pnf_id_empresa_foreign` (`id_empresa`),
   ADD KEY `empresa_pnf_id_pnf_foreign` (`id_pnf`);
 
+
 ALTER TABLE `estados`
   ADD PRIMARY KEY (`id_estado`),
   ADD UNIQUE KEY `estados_nombre_estado_unique` (`nombre_estado`);
@@ -375,15 +380,6 @@ ALTER TABLE `estados`
 ALTER TABLE `estatus_expedientes`
   ADD PRIMARY KEY (`id_estatus_expediente`),
   ADD UNIQUE KEY `estatus_expedientes_nombre_estatus_expediente_unique` (`nombre_estatus_expediente`);
-
-ALTER TABLE `periodos_academicos`
-  ADD PRIMARY KEY (`id_periodo`),
-  ADD KEY `periodos_id_cohortes_foreign` (`id_cohortes`);
-
-ALTER TABLE `secciones`
-  ADD PRIMARY KEY (`id_seccion`),
-  ADD UNIQUE KEY `uk_seccion_periodo_pnf` (`id_periodo`,`id_pnf`,`nombre_seccion`),
-  ADD KEY `secciones_id_pnf_foreign` (`id_pnf`);
 
 ALTER TABLE `inscripciones_secciones`
   ADD PRIMARY KEY (`id_inscripcion_seccion`),
@@ -408,8 +404,13 @@ ALTER TABLE `observacion_personas`
   ADD PRIMARY KEY (`id_observacion_personas`),
   ADD KEY `observacion_personas_id_personas_foreign` (`id_personas`);
 
+ALTER TABLE `periodos_academicos`
+  ADD PRIMARY KEY (`id_periodo`),
+  ADD KEY `periodos_academicos_id_cohortes_foreign` (`id_cohortes`);
+
 ALTER TABLE `periodo_recesos`
-  ADD PRIMARY KEY (`id_periodo_receso`);
+  ADD PRIMARY KEY (`id_periodo_receso`),
+  ADD UNIQUE KEY `periodo_recesos_nombre_periodo_receso_unique` (`nombre_periodo_receso`);
 
 ALTER TABLE `personas`
   ADD PRIMARY KEY (`id_personas`),
@@ -433,7 +434,8 @@ ALTER TABLE `preguntas_secretas`
 
 ALTER TABLE `profesores`
   ADD PRIMARY KEY (`id_profesor`),
-  ADD KEY `profesores_id_users_foreign` (`id_users`);
+  ADD KEY `profesores_id_users_foreign` (`id_users`),
+  ADD KEY `profesores_id_pnf_foreign` (`id_pnf`);
 
 ALTER TABLE `profesor_seccion`
   ADD PRIMARY KEY (`id_profesor_seccion`),
@@ -444,9 +446,14 @@ ALTER TABLE `roles`
   ADD PRIMARY KEY (`id_rol`),
   ADD UNIQUE KEY `roles_nombre_rol_unique` (`nombre_rol`);
 
+ALTER TABLE `secciones`
+  ADD PRIMARY KEY (`id_seccion`),
+  ADD UNIQUE KEY `uk_seccion_periodo_pnf` (`id_periodo`,`id_pnf`,`nombre_seccion`),
+  ADD KEY `secciones_id_pnf_foreign` (`id_pnf`);
+
 ALTER TABLE `sesiones`
   ADD PRIMARY KEY (`id_sesiones`),
-  ADD KEY `sesiones_id_seccion_foreign` (`id_seccion`),
+  ADD UNIQUE KEY `uq_seccion_fecha_sesion` (`id_seccion`,`fecha_sesion`),
   ADD KEY `sesiones_id_profesor_foreign` (`id_profesor`);
 
 ALTER TABLE `sessions`
@@ -463,7 +470,6 @@ ALTER TABLE `titulacion_personas`
   ADD KEY `titulacion_personas_id_personas_foreign` (`id_personas`),
   ADD KEY `titulacion_personas_id_titulacion_foreign` (`id_titulacion`),
   ADD KEY `titulacion_personas_id_pnf_foreign` (`id_pnf`),
-  ADD KEY `titulacion_personas_id_cohortes_foreign` (`id_cohortes`),
   ADD KEY `titulacion_personas_id_estatus_expediente_foreign` (`id_estatus_expediente`);
 
 ALTER TABLE `titulos`
@@ -481,44 +487,99 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `users_username_unique` (`username`),
   ADD KEY `users_id_rol_foreign` (`id_rol`);
 
-/* --------------------------------------------------------
-   AUTO_INCREMENTs
--------------------------------------------------------- */
-ALTER TABLE `acreditaciones` MODIFY `id_acreditaciones` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `asistencias` MODIFY `id_asistencias` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `cargos` MODIFY `id_cargo` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `ciudades` MODIFY `id_ciudad` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `cohortes` MODIFY `id_cohortes` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `empresas` MODIFY `id_empresa` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `empresa_personas` MODIFY `id_empresa_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `empresa_pnf` MODIFY `id_empresa_pnf` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `estados` MODIFY `id_estado` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `estatus_expedientes` MODIFY `id_estatus_expediente` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `periodos_academicos` MODIFY `id_periodo` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `secciones` MODIFY `id_seccion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `inscripciones_secciones` MODIFY `id_inscripcion_seccion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `jobs` MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `lugar_nacimiento_personas` MODIFY `id_lugar_nacimiento` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `migrations` MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `observacion_personas` MODIFY `id_observacion_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `periodo_recesos` MODIFY `id_periodo_receso` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `personas` MODIFY `id_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `persona_formacion_academica` MODIFY `id_persona_formacion_academica` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `pnfs` MODIFY `id_pnf` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `preguntas_secretas` MODIFY `id_preguntas_secretas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `profesores` MODIFY `id_profesor` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `profesor_seccion` MODIFY `id_profesor_seccion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `roles` MODIFY `id_rol` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `sesiones` MODIFY `id_sesiones` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `telefonos_personas` MODIFY `id_telefonos_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `titulacion_personas` MODIFY `id_titulacion_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `titulos` MODIFY `id_titulos` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `titulos_pnf` MODIFY `id_titulos_pnf` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE `users` MODIFY `id_users` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `acreditaciones`
+  MODIFY `id_acreditaciones` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
-/* --------------------------------------------------------
-   LLAVES FORÁNEAS (FOREIGN KEYS)
--------------------------------------------------------- */
+ALTER TABLE `asistencias`
+  MODIFY `id_asistencias` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `cargos`
+  MODIFY `id_cargo` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=216;
+
+ALTER TABLE `ciudades`
+  MODIFY `id_ciudad` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+
+ALTER TABLE `cohortes`
+  MODIFY `id_cohortes` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+ALTER TABLE `empresas`
+  MODIFY `id_empresa` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+ALTER TABLE `empresa_personas`
+  MODIFY `id_empresa_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `empresa_pnf`
+  MODIFY `id_empresa_pnf` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+
+ALTER TABLE `estados`
+  MODIFY `id_estado` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+ALTER TABLE `estatus_expedientes`
+  MODIFY `id_estatus_expediente` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+ALTER TABLE `inscripciones_secciones`
+  MODIFY `id_inscripcion_seccion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `jobs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `lugar_nacimiento_personas`
+  MODIFY `id_lugar_nacimiento` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+ALTER TABLE `observacion_personas`
+  MODIFY `id_observacion_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+ALTER TABLE `periodos_academicos`
+  MODIFY `id_periodo` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+ALTER TABLE `periodo_recesos`
+  MODIFY `id_periodo_receso` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+ALTER TABLE `personas`
+  MODIFY `id_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+
+ALTER TABLE `persona_formacion_academica`
+  MODIFY `id_persona_formacion_academica` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `pnfs`
+  MODIFY `id_pnf` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+ALTER TABLE `preguntas_secretas`
+  MODIFY `id_preguntas_secretas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+ALTER TABLE `profesores`
+  MODIFY `id_profesor` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `profesor_seccion`
+  MODIFY `id_profesor_seccion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `roles`
+  MODIFY `id_rol` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+ALTER TABLE `secciones`
+  MODIFY `id_seccion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+
+ALTER TABLE `sesiones`
+  MODIFY `id_sesiones` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `telefonos_personas`
+  MODIFY `id_telefonos_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+
+ALTER TABLE `titulacion_personas`
+  MODIFY `id_titulacion_personas` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `titulos`
+  MODIFY `id_titulos` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+ALTER TABLE `titulos_pnf`
+  MODIFY `id_titulos_pnf` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+
+ALTER TABLE `users`
+  MODIFY `id_users` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
 ALTER TABLE `acreditaciones`
   ADD CONSTRAINT `acreditaciones_id_empresa_foreign` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`),
   ADD CONSTRAINT `acreditaciones_id_personas_foreign` FOREIGN KEY (`id_personas`) REFERENCES `personas` (`id_personas`) ON DELETE CASCADE,
@@ -540,22 +601,19 @@ ALTER TABLE `empresa_pnf`
   ADD CONSTRAINT `empresa_pnf_id_empresa_foreign` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`),
   ADD CONSTRAINT `empresa_pnf_id_pnf_foreign` FOREIGN KEY (`id_pnf`) REFERENCES `pnfs` (`id_pnf`);
 
-ALTER TABLE `periodos_academicos`
-  ADD CONSTRAINT `periodos_id_cohortes_foreign` FOREIGN KEY (`id_cohortes`) REFERENCES `cohortes` (`id_cohortes`) ON DELETE CASCADE;
-
-ALTER TABLE `secciones`
-  ADD CONSTRAINT `secciones_id_periodo_foreign` FOREIGN KEY (`id_periodo`) REFERENCES `periodos_academicos` (`id_periodo`) ON DELETE CASCADE,
-  ADD CONSTRAINT `secciones_id_pnf_foreign` FOREIGN KEY (`id_pnf`) REFERENCES `pnfs` (`id_pnf`) ON DELETE CASCADE;
-
 ALTER TABLE `inscripciones_secciones`
-  ADD CONSTRAINT `inscripciones_secciones_id_seccion_foreign` FOREIGN KEY (`id_seccion`) REFERENCES `secciones` (`id_seccion`),
-  ADD CONSTRAINT `inscripciones_secciones_id_personas_foreign` FOREIGN KEY (`id_personas`) REFERENCES `personas` (`id_personas`);
+  ADD CONSTRAINT `inscripciones_secciones_id_personas_foreign` FOREIGN KEY (`id_personas`) REFERENCES `personas` (`id_personas`),
+  ADD CONSTRAINT `inscripciones_secciones_id_seccion_foreign` FOREIGN KEY (`id_seccion`) REFERENCES `secciones` (`id_seccion`);
 
 ALTER TABLE `lugar_nacimiento_personas`
   ADD CONSTRAINT `lugar_nacimiento_personas_id_ciudad_foreign` FOREIGN KEY (`id_ciudad`) REFERENCES `ciudades` (`id_ciudad`);
 
 ALTER TABLE `observacion_personas`
   ADD CONSTRAINT `observacion_personas_id_personas_foreign` FOREIGN KEY (`id_personas`) REFERENCES `personas` (`id_personas`) ON DELETE CASCADE;
+
+ALTER TABLE `periodos_academicos`
+  ADD CONSTRAINT `periodos_academicos_id_cohortes_foreign` FOREIGN KEY (`id_cohortes`) REFERENCES `cohortes` (`id_cohortes`) ON DELETE CASCADE;
+
 
 ALTER TABLE `personas`
   ADD CONSTRAINT `personas_id_lugar_nacimiento_foreign` FOREIGN KEY (`id_lugar_nacimiento`) REFERENCES `lugar_nacimiento_personas` (`id_lugar_nacimiento`);
@@ -569,15 +627,21 @@ ALTER TABLE `preguntas_secretas`
   ADD CONSTRAINT `preguntas_secretas_id_users_foreign` FOREIGN KEY (`id_users`) REFERENCES `users` (`id_users`) ON DELETE CASCADE;
 
 ALTER TABLE `profesores`
+  ADD CONSTRAINT `profesores_id_pnf_foreign` FOREIGN KEY (`id_pnf`) REFERENCES `pnfs` (`id_pnf`),
   ADD CONSTRAINT `profesores_id_users_foreign` FOREIGN KEY (`id_users`) REFERENCES `users` (`id_users`) ON DELETE CASCADE;
 
+
 ALTER TABLE `profesor_seccion`
-  ADD CONSTRAINT `profesor_seccion_id_seccion_foreign` FOREIGN KEY (`id_seccion`) REFERENCES `secciones` (`id_seccion`) ON DELETE CASCADE,
-  ADD CONSTRAINT `profesor_seccion_id_profesor_foreign` FOREIGN KEY (`id_profesor`) REFERENCES `profesores` (`id_profesor`) ON DELETE CASCADE;
+  ADD CONSTRAINT `profesor_seccion_id_profesor_foreign` FOREIGN KEY (`id_profesor`) REFERENCES `profesores` (`id_profesor`) ON DELETE CASCADE,
+  ADD CONSTRAINT `profesor_seccion_id_seccion_foreign` FOREIGN KEY (`id_seccion`) REFERENCES `secciones` (`id_seccion`) ON DELETE CASCADE;
+
+ALTER TABLE `secciones`
+  ADD CONSTRAINT `secciones_id_periodo_foreign` FOREIGN KEY (`id_periodo`) REFERENCES `periodos_academicos` (`id_periodo`) ON DELETE CASCADE,
+  ADD CONSTRAINT `secciones_id_pnf_foreign` FOREIGN KEY (`id_pnf`) REFERENCES `pnfs` (`id_pnf`) ON DELETE CASCADE;
 
 ALTER TABLE `sesiones`
-  ADD CONSTRAINT `sesiones_id_seccion_foreign` FOREIGN KEY (`id_seccion`) REFERENCES `secciones` (`id_seccion`),
-  ADD CONSTRAINT `sesiones_id_profesor_foreign` FOREIGN KEY (`id_profesor`) REFERENCES `profesores` (`id_profesor`);
+  ADD CONSTRAINT `sesiones_id_profesor_foreign` FOREIGN KEY (`id_profesor`) REFERENCES `profesores` (`id_profesor`),
+  ADD CONSTRAINT `sesiones_id_seccion_foreign` FOREIGN KEY (`id_seccion`) REFERENCES `secciones` (`id_seccion`);
 
 ALTER TABLE `telefonos_personas`
   ADD CONSTRAINT `telefonos_personas_id_personas_foreign` FOREIGN KEY (`id_personas`) REFERENCES `personas` (`id_personas`) ON DELETE CASCADE;
@@ -586,8 +650,7 @@ ALTER TABLE `titulacion_personas`
   ADD CONSTRAINT `titulacion_personas_id_estatus_expediente_foreign` FOREIGN KEY (`id_estatus_expediente`) REFERENCES `estatus_expedientes` (`id_estatus_expediente`),
   ADD CONSTRAINT `titulacion_personas_id_personas_foreign` FOREIGN KEY (`id_personas`) REFERENCES `personas` (`id_personas`) ON DELETE CASCADE,
   ADD CONSTRAINT `titulacion_personas_id_pnf_foreign` FOREIGN KEY (`id_pnf`) REFERENCES `pnfs` (`id_pnf`),
-  ADD CONSTRAINT `titulacion_personas_id_cohortes_foreign` FOREIGN KEY (`id_cohortes`) REFERENCES `cohortes` (`id_cohortes`),
-  ADD CONSTRAINT `titulacion_personas_id_titulacion_foreign` FOREIGN KEY (`id_titulos`) REFERENCES `titulos` (`id_titulos`);
+  ADD CONSTRAINT `titulacion_personas_id_titulacion_foreign` FOREIGN KEY (`id_titulacion`) REFERENCES `titulos` (`id_titulos`);
 
 ALTER TABLE `titulos_pnf`
   ADD CONSTRAINT `titulos_pnf_id_pnf_foreign` FOREIGN KEY (`id_pnf`) REFERENCES `pnfs` (`id_pnf`),
@@ -595,5 +658,4 @@ ALTER TABLE `titulos_pnf`
 
 ALTER TABLE `users`
   ADD CONSTRAINT `users_id_rol_foreign` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`);
-
 COMMIT;

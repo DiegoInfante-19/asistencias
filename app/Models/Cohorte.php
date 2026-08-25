@@ -21,8 +21,6 @@ class Cohorte extends Model
     /**
      * RELACIONES
      */
-
-    // Una cohorte se subdivide en grupos académicos (por PNF y Nivel)
     public function periodosAcademicos(): HasMany
     {
         return $this->hasMany(PeriodoAcademico::class, 'id_cohortes', 'id_cohortes');

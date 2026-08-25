@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Requests;
+
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -21,18 +23,27 @@ class UpdateCohorteRequest extends FormRequest
 
     public function rules(): array
     {
+        // Nota: Asegúrate de que el parámetro de ruta en web.php coincida (ej. {cohorte})
         $id = $this->route('cohorte');
+
         return [
             'numero_cohorte' => [
                 'required',
                 'string',
                 'max:20',
                 Rule::unique('cohortes', 'numero_cohorte')->ignore($id, 'id_cohortes'),
-                'regex:/[21]+$/'
+                'regex:/^[A-Z0-9\s\-]+$/' // Permite letras mayúsculas, números, espacios y guiones
             ],
-            // SE ELIMINARON LAS FECHAS DE LA COHORTE
-            'descripcion_cohorte' => ['nullable', 'string', 'max:1000', 'regex:/[22]+$/'],
-            'estatus_cohorte'     => ['required', 'string', 'max:50'],
+            'descripcion_cohorte' => [
+                'nullable', 
+                'string', 
+                'max:1000'
+            ],
+            'estatus_cohorte' => [
+                'required', 
+                'string', 
+                'max:50'
+            ],
         ];
     }
 
@@ -41,8 +52,7 @@ class UpdateCohorteRequest extends FormRequest
         return [
             'numero_cohorte.required'  => 'El número de cohorte es obligatorio.',
             'numero_cohorte.unique'    => 'Este número de cohorte ya existe.',
-            'numero_cohorte.regex'     => 'El número de cohorte debe contener únicamente letras mayúsculas y números.',
-            'descripcion_cohorte.regex'=> 'La descripción contiene caracteres no permitidos.',
+            'numero_cohorte.regex'     => 'El número de cohorte debe contener únicamente letras, números y espacios.',
             'estatus_cohorte.required' => 'El estatus es obligatorio.',
         ];
     }

@@ -37,6 +37,7 @@ class TitulosDataTable extends BaseDataTable
 
     public function html(): HtmlBuilder
     {
+        // Hereda el diseño centralizado (Botones, Buscador, Paginación)
         return $this->sharedHtmlBuilder();
     }
 
@@ -45,7 +46,7 @@ class TitulosDataTable extends BaseDataTable
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center'),
             Column::make('nombre_titulo_base')->title('Título'),
-            Column::make('nivel_academico')->title('Nivel Académico'),
+            Column::make('nivel_academico')->title('Nivel Académico')->addClass('text-center'),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width(120)->addClass('text-center'),
         ];
     }

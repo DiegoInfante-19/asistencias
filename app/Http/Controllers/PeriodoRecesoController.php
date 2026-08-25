@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PeriodoReceso;
-use App\DataTables\PeriodosRecesosDataTable; // Lo crearemos en el Paso 5
+use App\DataTables\PeriodosRecesosDataTable; 
 use App\Http\Requests\StorePeriodoRecesoRequest;
 use App\Http\Requests\UpdatePeriodoRecesoRequest;
 use Illuminate\Database\QueryException;
@@ -15,6 +15,12 @@ class PeriodoRecesoController extends Controller
      */
     public function index(PeriodosRecesosDataTable $dataTable)
     {
+        // Blindaje extra: Si es una petición asíncrona de DataTables, devolvemos exclusivamente el JSON
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->ajax();
+        }
+
+        // Si es una entrada normal por el navegador, renderizamos la vista completa
         return $dataTable->render('periodos_recesos.index');
     }
 

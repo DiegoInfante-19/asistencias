@@ -15,6 +15,11 @@ class CargoController extends Controller
      */
     public function index(CargosDataTable $dataTable)
     {
+        // Blindaje AJAX para evitar que devuelva el layout completo en peticiones asíncronas
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->ajax();
+        }
+
         return $dataTable->render('cargos.index');
     }
 

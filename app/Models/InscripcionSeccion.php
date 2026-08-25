@@ -10,15 +10,15 @@ use Illuminate\Validation\ValidationException;
 class InscripcionSeccion extends Model
 {
     use SoftDeletes;
-    
+
     protected $table = 'inscripciones_secciones';
     protected $primaryKey = 'id_inscripcion_seccion';
-    
+
     protected $fillable = [
         'id_personas',
         'id_seccion',
         'fecha_inscripcion',
-        'estatus_inscripcion'
+        'estatus_inscripcion' // Corregido según tu BD
     ];
 
     protected $casts = [
@@ -44,8 +44,6 @@ class InscripcionSeccion extends Model
     protected static function validarIntegridadAcademica($inscripcion)
     {
         $expediente = TitulacionPersona::where('id_personas', $inscripcion->id_personas)->first();
-        
-        // FALTABA EL SÍMBOLO $ EN LAS DOS VARIABLES DE ESTA LÍNEA
         $seccion = Seccion::find($inscripcion->id_seccion); 
 
         if (!$expediente) {
@@ -54,7 +52,6 @@ class InscripcionSeccion extends Model
             ]);
         }
 
-        // FALTABA EL SÍMBOLO $ EN LA VARIABLE $seccion AQUÍ TAMBIÉN
         if ($seccion && $expediente->id_pnf !== $seccion->id_pnf) {
             throw ValidationException::withMessages([
                 'seguridad_nucleo' => sprintf(

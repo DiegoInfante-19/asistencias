@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Requests;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCohorteRequest extends FormRequest
@@ -26,11 +28,18 @@ class StoreCohorteRequest extends FormRequest
                 'string',
                 'max:20',
                 'unique:cohortes,numero_cohorte',
-                'regex:/[3]+$/' 
+                'regex:/^[A-Z0-9\s\-]+$/' // Permite letras mayúsculas, números, espacios y guiones
             ],
-            // SE ELIMINARON LAS FECHAS DE LA COHORTE (Ahora son de periodos_academicos)
-            'descripcion_cohorte' => ['nullable', 'string', 'max:1000', 'regex:/[4]+$/'],
-            'estatus_cohorte'     => ['required', 'string', 'max:50'],
+            'descripcion_cohorte' => [
+                'nullable', 
+                'string', 
+                'max:1000'
+            ],
+            'estatus_cohorte' => [
+                'required', 
+                'string', 
+                'max:50'
+            ],
         ];
     }
 
@@ -39,8 +48,7 @@ class StoreCohorteRequest extends FormRequest
         return [
             'numero_cohorte.required'  => 'El número de cohorte es obligatorio.',
             'numero_cohorte.unique'    => 'Este número de cohorte ya existe.',
-            'numero_cohorte.regex'     => 'El número de cohorte debe contener únicamente letras mayúsculas y números.',
-            'descripcion_cohorte.regex'=> 'La descripción contiene caracteres no permitidos.',
+            'numero_cohorte.regex'     => 'El número de cohorte debe contener únicamente letras, números y espacios.',
             'estatus_cohorte.required' => 'El estatus es obligatorio.',
         ];
     }

@@ -12,6 +12,12 @@ class CohorteController extends Controller
 {
     public function index(CohortesDataTable $dataTable)
     {
+        // Si es una petición asíncrona de DataTables, devolvemos exclusivamente el JSON
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->ajax();
+        }
+
+        // Si es una entrada normal por el navegador, renderizamos la vista completa
         return $dataTable->render('cohortes.index');
     }
 

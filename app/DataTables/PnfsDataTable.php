@@ -14,17 +14,16 @@ class PnfsDataTable extends BaseDataTable
     {
         return EloquentDataTable::create($query)
             ->addIndexColumn()
-            // Transformamos el valor booleano en un badge visual
+            // Badge visual estandarizado
             ->editColumn('vigencia_pnf', function ($pnf) {
                 if ($pnf->vigencia_pnf) {
-                    return '<span class="badge bg-success px-3 py-2">Activo</span>';
+                    return '<span class="badge bg-success px-3 py-2 shadow-sm" style="font-weight: 500; font-size: 0.9rem;">Activo</span>';
                 }
-                return '<span class="badge bg-danger px-3 py-2">Inactivo</span>';
+                return '<span class="badge bg-danger px-3 py-2 shadow-sm" style="font-weight: 500; font-size: 0.9rem;">Inactivo</span>';
             })
             ->addColumn('action', function ($pnf) {
                 return view('pnfs.partials.actions', compact('pnf'))->render();
             })
-            // Es vital incluir 'vigencia_pnf' aquí para que el HTML se renderice
             ->rawColumns(['vigencia_pnf', 'action'])
             ->setRowId('id_pnf');
     }
@@ -54,7 +53,6 @@ class PnfsDataTable extends BaseDataTable
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center'),
             Column::make('nombre_pnf')->title('Nombre del PNF'),
-
             Column::make('vigencia_pnf')->title('Estado')->addClass('text-center'),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width(120)->addClass('text-center'),
         ];

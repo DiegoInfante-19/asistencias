@@ -15,7 +15,11 @@ class EmpresaController extends Controller
      */
     public function index(EmpresasDataTable $dataTable)
     {
-        // El método render() inyecta automáticamente la tabla en la vista
+        // Blindaje AJAX para evitar conflictos de renderizado con el layout
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->ajax();
+        }
+
         return $dataTable->render('empresas.index');
     }
 
@@ -52,13 +56,11 @@ class EmpresaController extends Controller
             $empresa->delete();
 
             return redirect()->route('empresas.index')
-                             ->with('success', 'Empresa eliminada correctamente.');
+                           ->with('success', 'Empresa eliminada correctamente.');
 
         } catch (QueryException $e) {
-            // Si la empresa tiene PNFs, acreditaciones o personal vinculado, MySQL lanzará un error.
-            // Lo capturamos y devolvemos un mensaje amigable mediante SweetAlert.
             return redirect()->route('empresas.index')
-                             ->with('error', 'No se puede eliminar la empresa porque tiene registros asociados (PNFs, personal o acreditaciones).');
+                           ->with('error', 'No se puede eliminar la empresa porque tiene registros asociados (PNFs, personal o acreditaciones).');
         }
     }
 }

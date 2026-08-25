@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Titulo;
-use App\DataTables\TitulosDataTable; // Lo crearemos en el Paso 5
+use App\DataTables\TitulosDataTable;
 use App\Http\Requests\StoreTituloRequest;
 use App\Http\Requests\UpdateTituloRequest;
 use Illuminate\Http\Request;
@@ -13,6 +13,11 @@ class TituloController extends Controller
 {
     public function index(TitulosDataTable $dataTable)
     {
+        // Blindaje AJAX: Evita que se devuelva el HTML completo del layout
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->ajax();
+        }
+
         return $dataTable->render('titulos.index');
     }
 
@@ -44,7 +49,6 @@ class TituloController extends Controller
             $titulo->delete();
             return redirect()->route('titulos.index')->with('success', 'Título eliminado correctamente.');
         } catch (QueryException $e) {
-            // Este catch es vital: captura errores de llave foránea (si el título está en uso)
             return redirect()->route('titulos.index')
                 ->with('error', 'No se puede eliminar el título porque está siendo utilizado en otros registros.');
         } catch (\Exception $e) {

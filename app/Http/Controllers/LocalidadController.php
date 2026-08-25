@@ -41,16 +41,13 @@ class LocalidadController extends Controller
 
     public function storeCiudad(StoreCiudadRequest $request)
     {
-        // 1. Guardamos la ciudad y la asignamos a una variable
         $ciudad = Ciudad::create($request->validated());
-        // 2. Si la petición es AJAX (como la de nuestro panel colapsable)
         if ($request->ajax() || $request->has('origen')) {
             return response()->json([
                 'success' => true,
                 'ciudad' => $ciudad
             ]);
         }
-        // 3. Si es una petición normal desde el módulo de localidades, redirige
         return redirect()->route('localidades.index')->with('success', 'Ciudad registrada correctamente.');
     }
 
@@ -76,8 +73,6 @@ class LocalidadController extends Controller
         return response()->json($ciudades);
     }
 
-    // app/Http/Controllers/LocalidadController.php
-
     public function destroyEstado($id)
     {
         try {
@@ -85,7 +80,6 @@ class LocalidadController extends Controller
             $estado->delete();
             return redirect()->route('localidades.index')->with('success', 'Estado eliminado correctamente.');
         } catch (\Illuminate\Database\QueryException $e) {
-            // Capturamos el error si el estado tiene ciudades asociadas
             return redirect()->route('localidades.index')->with('error', 'No puedes eliminar este estado porque tiene ciudades asociadas.');
         }
     }

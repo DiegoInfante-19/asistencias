@@ -1,21 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form');
+    if (!form) return;
+    
     const submitBtn = form.querySelector('button[type="submit"]');
     const inputs = form.querySelectorAll('input:not([type="hidden"])');
-
     const reglas = window.CoreRules;
 
-    submitBtn.disabled = true;
+    if (submitBtn) submitBtn.disabled = true;
 
     function validarInput(input) {
         const nombreCampo = input.name;
         const valor = input.value.trim();
-        const feedback = input.parentNode.querySelector('.dynamic-feedback');
+        
+        // CORRECCIÓN BOOTSTRAP 5: Buscar en el contenedor padre cercano
+        const contenedor = input.closest('.input-group, .mb-3, div');
+        const feedback = contenedor ? contenedor.querySelector('.dynamic-feedback') : null;
+        
         let esValido = true;
         let mensajeError = '';
 
         if (nombreCampo === 'password_confirmation') {
-            // Buscamos la contraseña (funciona tanto para admin como para auth)
             const passInput = document.getElementById('password') || document.querySelector('input[name="password"]');
             const passwordPrincipal = passInput ? passInput.value : '';
 
@@ -52,14 +56,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 feedback.style.display = 'none';
             }
 
-            // ¡EL ARREGLO DEFINITIVO!
-            // 1. Encontramos la "caja" principal de este campo usando closest()
-            const formGroup = input.closest('.form-group');
-            if (formGroup) {
-                // 2. Buscamos específicamente los errores de Laravel (tienen role="alert")
-                const erroresLaravel = formGroup.querySelectorAll('[role="alert"]');
+            // Ocultar errores del backend de Laravel
+            if (contenedor) {
+                const erroresLaravel = contenedor.querySelectorAll('.invalid-feedback:not(.dynamic-feedback), [role="alert"]');
                 erroresLaravel.forEach(errorLaravel => {
-                    // 3. Le quitamos la clase rebelde de Bootstrap y lo ocultamos
                     errorLaravel.classList.remove('d-block');
                     errorLaravel.style.display = 'none';
                 });
@@ -68,15 +68,16 @@ document.addEventListener('DOMContentLoaded', function () {
         return esValido;
     }
 
-    // 4. Función para verificar todo el formulario y liberar el botón
     function verificarFormularioCompleto() {
+        if (!submitBtn) return;
         let formularioValido = true;
         inputs.forEach(input => {
             const nombreCampo = input.name;
             const valor = input.value.trim();
             if (nombreCampo === 'password_confirmation') {
-                if (valor !== document.getElementById('password').value || valor === '') formularioValido = false;
-            } else if (reglas[nombreCampo]) {
+                const passInput = document.getElementById('password');
+                if (passInput && (valor !== passInput.value || valor === '')) formularioValido = false;
+            } else if (reglas && reglas[nombreCampo]) {
                 if (input.required && valor === '') formularioValido = false;
                 if (valor !== '' && !reglas[nombreCampo].regex.test(valor)) formularioValido = false;
             }
@@ -84,22 +85,14 @@ document.addEventListener('DOMContentLoaded', function () {
         submitBtn.disabled = !formularioValido;
     }
 
-    // 5. Escuchamos los eventos 'input' (mientras escribe) y 'blur' (cuando sale del campo)
     inputs.forEach(input => {
-        // Validación interactiva mientras escribe
         input.addEventListener('input', function () {
             validarInput(this);
             verificarFormularioCompleto();
         });
-
-        // Validación estricta al hacer clic fuera del campo
         input.addEventListener('blur', function () {
             validarInput(this);
             verificarFormularioCompleto();
         });
     });
 });
-
-// verificar si todavia existe redundancia
-
-

@@ -14,25 +14,22 @@ class PeriodosRecesosDataTable extends BaseDataTable
     {
         return EloquentDataTable::create($query)
             ->addIndexColumn()
-            // Formateo visual de la fecha de inicio
             ->editColumn('fecha_inicio_periodo_receso', function ($periodo) {
                 return $periodo->fecha_inicio_periodo_receso ? $periodo->fecha_inicio_periodo_receso->format('d/m/Y') : '';
             })
-            // Formateo visual de la fecha de fin
             ->editColumn('fecha_fin_periodo_receso', function ($periodo) {
                 return $periodo->fecha_fin_periodo_receso ? $periodo->fecha_fin_periodo_receso->format('d/m/Y') : '';
             })
-            // Distintivo visual para la suspensión de actividades
+            // Distintivo visual estandarizado
             ->editColumn('suspension_actividades', function ($periodo) {
                 if ($periodo->suspension_actividades) {
-                    return '<span class="badge bg-danger px-3 py-2" title="No hay clases/actividades">Sí</span>';
+                    return '<span class="badge bg-danger px-3 py-2 shadow-sm" title="No hay clases/actividades" style="font-weight: 500; font-size: 0.9rem;">Sí</span>';
                 }
-                return '<span class="badge bg-success px-3 py-2" title="Día hábil">No</span>';
+                return '<span class="badge bg-success px-3 py-2 shadow-sm" title="Día hábil" style="font-weight: 500; font-size: 0.9rem;">No</span>';
             })
             ->addColumn('action', function ($periodo) {
                 return view('periodos_recesos.partials.actions', compact('periodo'))->render();
             })
-            // Declaramos las columnas que contienen HTML para que DataTables no las escape
             ->rawColumns(['suspension_actividades', 'action'])
             ->setRowId('id_periodo_receso');
     }
@@ -56,7 +53,7 @@ class PeriodosRecesosDataTable extends BaseDataTable
 
     public function html(): HtmlBuilder
     {
-        return $this->sharedHtmlBuilder();
+        return $this->sharedHtmlBuilder(); // <-- Hereda el diseño centralizado
     }
 
     protected function getColumns(): array

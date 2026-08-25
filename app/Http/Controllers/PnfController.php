@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pnf;
-use App\Models\Titulo;      // Nuevo
-use App\Models\Empresa;     // Nuevo
-use App\Models\TituloPnf;   // Nuevo
-use App\Models\EmpresaPnf;  // Nuevo
+use App\Models\Titulo;
+use App\Models\Empresa;
+use App\Models\TituloPnf;
+use App\Models\EmpresaPnf;
 use App\DataTables\PnfsDataTable;
 use App\Http\Requests\StorePnfRequest;
 use App\Http\Requests\UpdatePnfRequest;
-use App\Http\Requests\VincularTituloPnfRequest;   // Nuevo
-use App\Http\Requests\VincularEmpresaPnfRequest;  // Nuevo
+use App\Http\Requests\VincularTituloPnfRequest;
+use App\Http\Requests\VincularEmpresaPnfRequest;
 use Illuminate\Database\QueryException;
 
 class PnfController extends Controller
@@ -21,6 +21,11 @@ class PnfController extends Controller
      */
     public function index(PnfsDataTable $dataTable)
     {
+        // Blindaje para responder con JSON si es una petición asíncrona de DataTables
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->ajax();
+        }
+
         return $dataTable->render('pnfs.index');
     }
 
@@ -43,8 +48,6 @@ class PnfController extends Controller
         $pnf = Pnf::findOrFail($id);
         $pnf->update($request->validated());
 
-        // Si la actualización se hace desde el modal del Dashboard (show), queremos regresar allá.
-        // Si viene del index, regresamos al index. Validamos de dónde viene.
         if ($request->has('origen') && $request->origen == 'update_pnf_show') {
             return redirect()->route('pnfs.show', $id)
                 ->with('success', 'PNF actualizado correctamente.');
@@ -75,27 +78,19 @@ class PnfController extends Controller
        MÉTODOS DEL DASHBOARD (VISTA SHOW Y VINCULACIONES)
        ===================================================================== */
 
-    /**
-     * Muestra el Dashboard del PNF con sus relaciones (Títulos y Empresas).
-     */
     public function show($id)
     {
-        // Cargamos el PNF junto con sus títulos y empresas aliadas usando Eager Loading
         $pnf = Pnf::with([
             'titulosPnf.titulo',
             'empresasPnf.empresa'
         ])->findOrFail($id);
 
-        // Catálogos para llenar los <select> de los modales de vinculación
         $catalogoTitulos = Titulo::orderBy('nombre_titulo_base', 'asc')->get();
         $catalogoEmpresas = Empresa::orderBy('nombre_empresa', 'asc')->get();
 
         return view('pnfs.show', compact('pnf', 'catalogoTitulos', 'catalogoEmpresas'));
     }
 
-    /**
-     * Guarda un nuevo título asociado al PNF.
-     */
     public function vincularTitulo(VincularTituloPnfRequest $request, $id)
     {
         try {
@@ -112,9 +107,6 @@ class PnfController extends Controller
         }
     }
 
-    /**
-     * Elimina el vínculo entre un título y el PNF.
-     */
     public function desvincularTitulo($id_titulos_pnf)
     {
         try {
@@ -127,9 +119,6 @@ class PnfController extends Controller
         }
     }
 
-    /**
-     * Guarda una nueva empresa aliada al PNF.
-     */
     public function vincularEmpresa(VincularEmpresaPnfRequest $request, $id)
     {
         try {
@@ -147,9 +136,6 @@ class PnfController extends Controller
         }
     }
 
-    /**
-     * Elimina el convenio/vínculo con la empresa.
-     */
     public function desvincularEmpresa($id_empresa_pnf)
     {
         try {

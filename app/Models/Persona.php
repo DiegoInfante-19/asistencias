@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne; // ¡Nuevo Import!
+use Illuminate\Database\Eloquent\Relations\HasOne; 
 
 class Persona extends Model
 {
@@ -53,7 +53,7 @@ class Persona extends Model
      * ==========================================
      */
 
-    // Observación única (Corregido de HasMany a HasOne)
+    // Observación única 
     public function observacion(): HasOne
     {
         return $this->hasOne(ObservacionPersona::class, 'id_personas', 'id_personas');
@@ -89,8 +89,8 @@ class Persona extends Model
         return $this->hasMany(Acreditacion::class, 'id_personas', 'id_personas');
     }
 
-    // Historial completo de Inscripciones a lo largo de los años
-    public function inscripciones(): HasMany
+    // Historial completo de Inscripciones en Secciones (Actualizado)
+    public function inscripcionesSecciones(): HasMany
     {
         return $this->hasMany(InscripcionSeccion::class, 'id_personas', 'id_personas');
     }
@@ -109,10 +109,9 @@ class Persona extends Model
     // Permite usar $persona->nombre_completo en las vistas
     public function getNombreCompletoAttribute()
     {
-        // SE AGREGARON LOS SÍMBOLOS $ FALTANTES
         $nombres = trim("{$this->primer_nombre_personas} {$this->segundo_nombre_personas}");
         $apellidos = trim("{$this->primer_apellido_personas} {$this->segundo_apellido_personas}");
-        
+
         return preg_replace('/\s+/', ' ', "{$nombres} {$apellidos}");
     }
 }

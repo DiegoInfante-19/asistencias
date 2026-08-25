@@ -11,19 +11,19 @@ class CohorteSeeder extends Seeder
     {
         $cohortes = [
             [
-                'numero_cohorte'      => 'I Cohorte',
-                'descripcion_cohorte' => 'Primera cohorte académica (Sello histórico)',
-                'estatus_cohorte'     => 'Finalizado',
+                'numero_cohorte'      => 'I COHORTE',
+                'descripcion_cohorte' => 'Período 2023-2024',
+                'estatus_cohorte'     => 'Finalizada',
             ],
             [
-                'numero_cohorte'      => 'II Cohorte',
-                'descripcion_cohorte' => 'Segunda cohorte académica (Sello histórico)',
-                'estatus_cohorte'     => 'Finalizado',
+                'numero_cohorte'      => 'II COHORTE',
+                'descripcion_cohorte' => 'Período 2024-2025',
+                'estatus_cohorte'     => 'Finalizada',
             ],
             [
-                'numero_cohorte'      => 'III Cohorte',
-                'descripcion_cohorte' => 'Tercera cohorte académica (Sello histórico)',
-                'estatus_cohorte'     => 'Activo',
+                'numero_cohorte'      => 'III COHORTE',
+                'descripcion_cohorte' => 'Período 2025-2026',
+                'estatus_cohorte'     => 'En curso',
             ],
         ];
 

@@ -40,8 +40,7 @@ class CiudadesDataTable extends BaseDataTable
 
     public function html(): HtmlBuilder
     {
-        // Pasamos el parámetro ?table=ciudades para que el controlador lo detecte
-        return $this->sharedHtmlBuilder($this->getTableId())
+        return $this->sharedHtmlBuilder()
             ->ajax(['url' => route('localidades.index', ['table' => 'ciudades'])]);
     }
 

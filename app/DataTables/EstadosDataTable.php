@@ -17,18 +17,23 @@ class EstadosDataTable extends BaseDataTable
             ->addColumn('action', function ($estado) {
                 return view('localidades.partials.actions_estado', compact('estado'))->render();
             })
-            ->rawColumns(['action']);
+            ->rawColumns(['action'])
+            ->setRowId('id_estado');
     }
 
     public function query(Estado $model): EloquentBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->select([
+            'id_estado',
+            'nombre_estado'
+        ]);
     }
 
     protected function getTableId(): string
     {
         return 'estados-table';
     }
+
     public function html(): HtmlBuilder
     {
         return $this->sharedHtmlBuilder();

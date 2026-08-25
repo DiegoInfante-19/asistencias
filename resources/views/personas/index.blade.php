@@ -1,45 +1,50 @@
 @extends('layouts.admin')
 
 @section('styles')
-<link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/r-2.5.0/datatables.min.css" crossorigin="anonymous">
-
 <style>
     /* Azul muy claro (transparente) para Masculino */
     table.dataTable tbody tr.bg-masculino > td {
         background-color: rgba(13, 110, 253, 0.05) !important;
     }
-    
+
     /* Rosa muy claro (transparente) para Femenino */
     table.dataTable tbody tr.bg-femenino > td {
         background-color: rgba(214, 51, 132, 0.05) !important;
     }
 
-    /* Mantenemos un hover un poco más oscuro para que no se pierda la interactividad */
+    /* Mantenemos un hover un poco más oscuro para interactividad */
     table.dataTable tbody tr.bg-masculino:hover > td {
         background-color: rgba(13, 110, 253, 0.1) !important;
     }
-    
+
     table.dataTable tbody tr.bg-femenino:hover > td {
         background-color: rgba(214, 51, 132, 0.1) !important;
     }
 </style>
+@endsection
 
+@section('header')
+    <x-page-header title="Personal y Profesores">
+        <li class="breadcrumb-item active" aria-current="page" style="font-weight: 500;">Estudiantes</li>
+    </x-page-header>
 @endsection
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    <div class="card">
+    <!-- Tarjeta Principal con diseño limpio -->
+    <div class="card border-0 shadow-sm">
 
         <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h3 class="card-title fw-bold text-dark mb-0">Directorio de Estudiantes</h3>
-            <a href="{{ route('personas.create') }}" class="btn btn-outline-secondary ms-auto">
-                <i class="bi bi-person-plus-fill me-1"></i><b>Nuevo Estudiante</b>
+            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">Directorio de Estudiantes</h4>
+            <a href="{{ route('personas.create') }}" class="btn btn-primary ms-auto">
+                <i class="bi bi-person-plus-fill me-1" style="font-weight: 500;"></i> Añadir Estudiante
             </a>
-        </div>+
+        </div>
 
-        <div class="card-body">
-            <div class="w-100" style="overflow: hidden;">
-                {!! $dataTable->table(['class' => 'table table-bordered table-hover align-middle nowrap dt-responsive', 'style' => 'width:100%;']) !!}
+        <!-- Cuerpo con fondo blanco -->
+        <div class="card-body bg-white">
+            <div class="table-responsive">
+                {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
             </div>
         </div>
 
@@ -51,15 +56,9 @@
 </div>
 @endsection
 
-@section('scripts')
-<script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js" crossorigin="anonymous"></script>
-<script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/r-2.5.0/datatables.min.js" crossorigin="anonymous"></script>
-
-{!! $dataTable->scripts() !!}
-
-<script>
+@push('scripts')
+<!-- Script modular envuelto en type="module" -->
+<script type="module">
     $(document).ready(function() {
         // REAJUSTE DE DATATABLES (Responsive)
         $(window).on('resize', function() {
@@ -72,4 +71,7 @@
 
 <script src="{{ asset('js/core-validations.js') }}" defer></script>
 <script src="{{ asset('js/admin-validations.js') }}" defer></script>
-@endsection
+
+<!-- Inicialización de DataTables de forma modular -->
+{!! $dataTable->scripts(null, ['type' => 'module']) !!}
+@endpush

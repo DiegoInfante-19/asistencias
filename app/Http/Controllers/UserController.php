@@ -13,11 +13,15 @@ use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Requests\AsignarPnfRequest;
 
-
 class UserController extends Controller
 {
     public function index(UsersDataTable $dataTable)
     {
+        // Blindaje AJAX para prevenir que devuelva el layout completo en peticiones asíncronas
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->ajax();
+        }
+
         $roles = Role::all();
         return $dataTable->render('profesores.index', compact('roles'));
     }
@@ -98,7 +102,6 @@ class UserController extends Controller
             $pnfs = Pnf::where('vigencia_pnf', true)->orderBy('nombre_pnf', 'asc')->get();
 
             if ($user->profesor && $user->profesor->id_pnf) {
-                // Secciones disponibles para asignar al profesor dentro de su PNF
                 $seccionesDisponibles = \App\Models\Seccion::with(['periodoAcademico.cohorte', 'pnf'])
                     ->where('id_pnf', $user->profesor->id_pnf)
                     ->where('estatus_seccion', 'Activa')
@@ -143,7 +146,6 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Debe configurar el PNF del profesor antes de asignarle secciones.');
         }
 
-        // Sincronización N:M usando la relación Eloquent
         $user->profesor->secciones()->syncWithoutDetaching([$request->id_seccion]);
 
         return redirect()->back()->with('success', 'Sección académica asignada exitosamente a la carga del profesor.');
@@ -160,4 +162,3 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'La sección ha sido removida de la carga del profesor.');
     }
 }
-

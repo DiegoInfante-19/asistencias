@@ -1,5 +1,5 @@
 <div class="row g-4 mt-2">
-    <!-- COLUMNA IZQUIERDA: FORMULARIO DE ASIGNACIÓN (Calibrado a md-6 para mayor simetría) -->
+    <!-- COLUMNA IZQUIERDA: FORMULARIO DE ASIGNACIÓN -->
     <div class="col-md-5">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white fw-bold">
@@ -16,7 +16,7 @@
                 <form action="{{ route('personas.titulacion.store', $persona->id_personas) }}" method="POST">
                     @csrf
 
-                    <!-- 1. Selección del PNF (Fila Completa) -->
+                    <!-- 1. Selección del PNF -->
                     <div class="mb-3">
                         <label for="id_pnf" class="form-label fw-bold">Programa Nacional de Formación (PNF) <span class="text-danger">*</span></label>
                         <select class="form-select select2-buscador @error('id_pnf') is-invalid @enderror" id="id_pnf" name="id_pnf" required>
@@ -76,8 +76,8 @@
         </div>
     </div>
 
-    <!-- COLUMNA DERECHA: EXPEDIENTE ACTUAL REGISTRADO (Calibrado a md-6) -->
-    <div class="col-md-6">
+    <!-- COLUMNA DERECHA: EXPEDIENTE ACTUAL REGISTRADO -->
+    <div class="col-md-7">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white fw-bold">
                 <i class="bi bi-folder-check me-1"></i> Estado del Expediente Académico
@@ -100,7 +100,6 @@
                         <div class="col-md-6">
                             <label class="text-muted small fw-bold d-block text-uppercase mb-1">Título a Optar</label>
                             <div class="fs-6 text-secondary fw-bold d-flex align-items-start">
-                                <!-- flex-shrink-0 evita que el icono se deforme si el texto es muy largo -->
                                 <i class="bi bi-award me-2 mt-1 flex-shrink-0"></i>
                                 <span class="text-wrap">
                                     {{ $persona->titulacionPersona->titulacion->nombre_titulo_base ?? 'Sin nombre' }}
@@ -108,10 +107,9 @@
                             </div>
                         </div>
 
-                        <!-- Estatus Visual (Corregido) -->
+                        <!-- Estatus Visual -->
                         <div class="col-md-6 text-md-end">
                             <label class="text-muted small fw-bold d-block text-uppercase mb-1">Estatus Actual</label>
-                            <!-- Usamos d-flex y text-wrap para manejar múltiples líneas sin parecer un botón -->
                             <div class="fs-6 text-primary fw-bold d-flex align-items-start justify-content-md-end justify-content-start">
                                 <i class="bi bi-info-circle-fill me-2 mt-1 flex-shrink-0"></i>
                                 <span class="text-wrap text-start text-md-end">
@@ -138,6 +136,13 @@
 @parent
 <script>
     $(document).ready(function() {
+        // 1. INICIALIZACIÓN GENERAL DE SELECT2
+        $('.select2-buscador').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            language: 'es'
+        });
+
         // Variable para recordar el título guardado previamente (si estamos editando)
         let preselectedTitulo = "{{ old('id_titulacion', $persona->titulacionPersona->id_titulacion ?? '') }}";
 
@@ -145,7 +150,8 @@
             let pnfId = $(this).val();
             let $tituloSelect = $('#id_titulacion');
 
-            $tituloSelect.prop('disabled', true).html('<option>Cargando títulos...</option>');
+            // Deshabilitar momentáneamente y mostrar indicador de carga
+            $tituloSelect.prop('disabled', true).html('<option value="">Cargando títulos...</option>').trigger('change.select2');
 
             if (pnfId) {
                 $.ajax({
@@ -154,13 +160,14 @@
                     success: function(data) {
                         $tituloSelect.empty().append('<option value="">Seleccione un título...</option>');
                         $.each(data, function(key, item) {
-                            // Comparamos si este item es el que ya tenía guardado el estudiante para autoseleccionarlo
                             let isSelected = (item.id_titulo == preselectedTitulo) ? 'selected' : '';
                             $tituloSelect.append(`<option value="${item.id_titulo}" ${isSelected}>${item.nombre_titulo_pnf}</option>`);
                         });
+                        
+                        // Habilitar el select y actualizar Select2
                         $tituloSelect.prop('disabled', false).trigger('change.select2');
 
-                        // Limpiamos el valor preseleccionado para que no interfiera en selecciones futuras manuales
+                        // Limpiar el valor preseleccionado para evitar conflictos futuros
                         preselectedTitulo = "";
                     },
                     error: function() {
@@ -172,7 +179,7 @@
             }
         });
 
-        // Autodisparar el evento change si ya hay un PNF cargado al iniciar la página (Ej: Modo Edición)
+        // Autodisparar el evento change si ya hay un PNF cargado al iniciar la página (Modo Edición)
         if ($('#id_pnf').val()) {
             $('#id_pnf').trigger('change');
         }
