@@ -21,16 +21,14 @@ abstract class BaseDataTable extends DataTable
                 'responsive' => true,
                 'autoWidth'  => false,
                 
-                // 1. DOM ACTUALIZADO: 
-                // - Primera línea: 'l' y 'f' (Registros y Buscador)
-                // - Segunda línea: 'B' (Botones con separación gap-2)
-                // - Tabla: 'rt'
-                // - Pie: 'i' y 'p'
-                'dom'        => '<"d-flex flex-column flex-md-row justify-content-between align-items-center mb-2"lf><"d-flex flex-wrap gap-2 mb-3"B>rt<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-3"ip>',
-                
-                // 2. BOTONES INDIVIDUALES CON COLORES:
+                // DOM REESTRUCTURADO: Aislar la paginación 'p' en un flex independiente a la derecha
+// Reemplaza la línea 'dom' actual por esta:
+'dom' => '<"row mb-2"<"col-md-6"l><"col-md-6"f>>' .
+         '<"row mb-3"<"col-12"B>>' .
+         'rt' .
+         '<"row mt-3 align-items-center"<"col-md-5"i><"col-md-7 d-flex justify-content-md-end justify-content-center"p>>',                
                 'buttons'    => [
-                    ['extend' => 'pdf',   'text' => '<i class="bi bi-file-earmark-pdf me-1"></i> PDF',     'className' => 'btn btn-danger  shadow-sm'],
+                    ['extend' => 'pdf',   'text' => '<i class="bi bi-file-earmark-pdf me-1"></i> PDF',    'className' => 'btn btn-danger  shadow-sm'],
                     ['extend' => 'excel', 'text' => '<i class="bi bi-file-earmark-excel me-1"></i> Excel', 'className' => 'btn btn-success shadow-sm'],
                     ['extend' => 'print', 'text' => '<i class="bi bi-printer me-1"></i> Imprimir',         'className' => 'btn btn-secondary  shadow-sm'],
                     ['extend' => 'copy',  'text' => '<i class="bi bi-clipboard me-1"></i> Copiar',         'className' => 'btn btn-secondary shadow-sm']

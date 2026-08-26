@@ -38,7 +38,7 @@
                         <!-- Selección del Título (Se llena vía AJAX) -->
                         <div class="col-md-6">
                             <label for="id_titulacion" class="form-label fw-bold">Título a Optar <span class="text-danger">*</span></label>
-                            <select class="form-select select2-buscador @error('id_titulacion') is-invalid @enderror" id="id_titulacion" name="id_titulacion" required disabled>
+                            <select class="form-select select2-buscador @error('id_titulacion') is-invalid @enderror" id="id_titulacion" name="id_titulacion" required>
                                 <option value="">Seleccione primero un PNF...</option>
                             </select>
                             @error('id_titulacion')
@@ -132,57 +132,61 @@
     </div>
 </div>
 
-@section('scripts')
-@parent
+@push('scripts')
 <script>
-    $(document).ready(function() {
-        // 1. INICIALIZACIÓN GENERAL DE SELECT2
-        $('.select2-buscador').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            language: 'es'
-        });
-
-        // Variable para recordar el título guardado previamente (si estamos editando)
+    document.addEventListener('DOMContentLoaded', function() {
         let preselectedTitulo = "{{ old('id_titulacion', $persona->titulacionPersona->id_titulacion ?? '') }}";
 
-        $('#id_pnf').on('change', function() {
-            let pnfId = $(this).val();
-            let $tituloSelect = $('#id_titulacion');
+        function inicializarSelectsTitulacion() {
+            if (typeof window.$ !== 'undefined' && typeof window.$.fn.select2 !== 'undefined') {
+                let $pnfSelect = $('#id_pnf');
+                let $tituloSelect = $('#id_titulacion');
 
-            // Deshabilitar momentáneamente y mostrar indicador de carga
-            $tituloSelect.prop('disabled', true).html('<option value="">Cargando títulos...</option>').trigger('change.select2');
-
-            if (pnfId) {
-                $.ajax({
-                    url: "{{ url('/titulos-por-pnf') }}/" + pnfId,
-                    type: 'GET',
-                    success: function(data) {
-                        $tituloSelect.empty().append('<option value="">Seleccione un título...</option>');
-                        $.each(data, function(key, item) {
-                            let isSelected = (item.id_titulo == preselectedTitulo) ? 'selected' : '';
-                            $tituloSelect.append(`<option value="${item.id_titulo}" ${isSelected}>${item.nombre_titulo_pnf}</option>`);
-                        });
-                        
-                        // Habilitar el select y actualizar Select2
-                        $tituloSelect.prop('disabled', false).trigger('change.select2');
-
-                        // Limpiar el valor preseleccionado para evitar conflictos futuros
-                        preselectedTitulo = "";
-                    },
-                    error: function() {
-                        $tituloSelect.empty().append('<option value="">Error al cargar los títulos</option>').prop('disabled', true).trigger('change.select2');
+                function cargarTitulos(pnfId, tituloSeleccionado = "") {
+                    if (!pnfId) {
+                        $tituloSelect.empty().append('<option value="">Seleccione primero un PNF...</option>').prop('disabled', true);
+                        if ($tituloSelect.data('select2')) { $tituloSelect.trigger('change'); }
+                        return;
                     }
-                });
-            } else {
-                $tituloSelect.empty().append('<option value="">Seleccione primero un PNF...</option>').prop('disabled', true).trigger('change.select2');
-            }
-        });
 
-        // Autodisparar el evento change si ya hay un PNF cargado al iniciar la página (Modo Edición)
-        if ($('#id_pnf').val()) {
-            $('#id_pnf').trigger('change');
+                    $tituloSelect.prop('disabled', true).html('<option value="">Cargando títulos...</option>');
+                    if ($tituloSelect.data('select2')) { $tituloSelect.trigger('change'); }
+
+                    $.ajax({
+                        url: "{{ url('/titulos-por-pnf') }}/" + pnfId,
+                        type: 'GET',
+                        success: function(data) {
+                            $tituloSelect.empty().append('<option value="">Seleccione un título...</option>');
+                            $.each(data, function(key, item) {
+                                let isSelected = (item.id_titulo == tituloSeleccionado) ? 'selected' : '';
+                                $tituloSelect.append(`<option value="${item.id_titulo}" ${isSelected}>${item.nombre_titulo_pnf}</option>`);
+                            });
+                            
+                            $tituloSelect.prop('disabled', false);
+                            if ($tituloSelect.data('select2')) { $tituloSelect.trigger('change'); }
+                        },
+                        error: function() {
+                            $tituloSelect.empty().append('<option value="">Error al cargar los títulos</option>').prop('disabled', true);
+                            if ($tituloSelect.data('select2')) { $tituloSelect.trigger('change'); }
+                        }
+                    });
+                }
+
+                $pnfSelect.off('change.titulacion').on('change.titulacion', function() {
+                    cargarTitulos($(this).val(), preselectedTitulo);
+                    preselectedTitulo = "";
+                });
+
+                let currentPnf = $pnfSelect.val();
+                if (currentPnf) {
+                    cargarTitulos(currentPnf, preselectedTitulo);
+                }
+            } else {
+                setTimeout(inicializarSelectsTitulacion, 50);
+            }
         }
+
+        inicializarSelectsTitulacion();
     });
 </script>
-@endsection
+@endpush

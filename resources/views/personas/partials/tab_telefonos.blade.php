@@ -16,7 +16,6 @@
                     @csrf
 
                     <div class="mb-3">
-                        <!-- CORREGIDO: for, id y name ajustados a numero_telefono_personas -->
                         <label for="numero_telefono_personas" class="form-label fw-bold">Número <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('numero_telefono_personas') is-invalid @enderror"
                             id="numero_telefono_personas" name="numero_telefono_personas"
@@ -72,13 +71,11 @@
                             <tr>
                                 <td class="text-center text-muted">{{ $index + 1 }}</td>
 
-                                <!-- CORREGIDO: Muestra la variable real de la BD -->
                                 <td class="fw-bold text-dark fs-6">
                                     {{ $telefono->numero_telefono_personas }}
                                 </td>
 
                                 <td>
-                                    <!-- Estilos visuales unificados (Texto semántico sin fondo de botón) -->
                                     @if($telefono->tipo_telefono == 'WhatsApp')
                                     <div class="d-flex align-items-center text-success fw-bold">
                                         <i class="bi bi-whatsapp fs-5 me-2"></i>
@@ -98,7 +95,6 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <!-- CORREGIDO: PK en la ruta (id_telefonos_personas) y clase form-delete para SweetAlert2 -->
                                     <form action="{{ route('personas.telefonos.destroy', ['persona' => $persona->id_personas, 'telefono' => $telefono->id_telefonos_personas]) }}" method="POST" class="form-delete">
                                         @csrf
                                         @method('DELETE')

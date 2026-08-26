@@ -83,11 +83,7 @@
                             id="email_personas" name="email_personas" value="{{ old('email_personas') }}" autocomplete="off">
                     </div>
 
-                    <!-- Lugar de Nacimiento (Aquí debes hacer un select basado en tu tabla estados/ciudades) -->
-
-                    <!-- ========================================== -->
-                    <!-- SECCIÓN: LUGAR DE NACIMIENTO -->
-                    <!-- ========================================== -->
+                    <!-- LUGAR DE NACIMIENTO -->
                     <div class="col-12 mt-4">
                         <h5 class="fw-bold border-bottom pb-2"><i class="bi bi-geo-alt-fill me-2"></i>Lugar de Nacimiento</h5>
                     </div>
@@ -95,7 +91,7 @@
                     <!-- Estado -->
                     <div class="col-md-4">
                         <label for="id_estado" class="form-label fw-bold">Estado <span class="text-danger">*</span></label>
-                        <select class="form-select @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado" required>
+                        <select class="form-select select2-buscador @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado" required>
                             <option value="">Seleccione...</option>
                             @foreach($estados as $estado)
                             <option value="{{ $estado->id_estado }}" {{ old('id_estado') == $estado->id_estado ? 'selected' : '' }}>
@@ -106,14 +102,13 @@
                         @error('id_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Ciudad (Con botón Collapse) -->
+                    <!-- Ciudad -->
                     <div class="col-md-4">
                         <label for="id_ciudad" class="form-label fw-bold">Ciudad <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <select class="form-select @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
+                            <select class="form-select select2-buscador @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
                                 <option value="">Seleccione primero un estado...</option>
                             </select>
-                            <!-- Botón que activa el Collapse -->
                             <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNuevaCiudad" aria-expanded="false" aria-controls="collapseNuevaCiudad" id="btnToggleCiudad" disabled>
                                 <i class="bi bi-plus-lg"></i> Nueva
                             </button>
@@ -127,9 +122,7 @@
                         <input type="text" class="form-control" id="detalles_adicionales" name="detalles_adicionales" value="{{ old('detalles_adicionales') }}" placeholder="Ej: Hospital Ruiz y Páez">
                     </div>
 
-                    <!-- ========================================== -->
                     <!-- PANEL COLAPSABLE: NUEVA CIUDAD -->
-                    <!-- ========================================== -->
                     <div class="col-5">
                         <div class="collapse" id="collapseNuevaCiudad">
                             <div class="card card-body bg-light border-primary shadow-sm mt-2">
@@ -141,7 +134,6 @@
                                         <small class="text-muted">Se asociará automáticamente al Estado seleccionado arriba.</small>
                                     </div>
                                     <div class="col-md-4">
-                                        <!-- IMPORTANTE: type="button" para no enviar el formulario de la persona -->
                                         <button type="button" class="btn btn-primary w-100 fw-bold" id="btnGuardarCiudad">
                                             <i class="bi bi-save me-1"></i> Guardar y Seleccionar
                                         </button>
@@ -163,15 +155,7 @@
 </div>
 @endsection
 
-@section('scripts')
-<!-- 1. CARGAMOS JQUERY PRIMERO -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
-
-<!-- 2. Tus scripts de validación -->
-<script src="{{ asset('js/core-validations.js') }}" defer></script>
-<script src="{{ asset('js/admin-validations.js') }}" defer></script>
-
-<!-- 3. Script para la lógica dinámica de Estados/Ciudades -->
+@push('scripts')
 <script>
     $(document).ready(function() {
 
@@ -191,10 +175,11 @@
         const inputNuevaCiudad = $('#nueva_nombre_ciudad');
         const btnGuardarCiudad = $('#btnGuardarCiudad');
 
-        // FUNCIÓN CENTRALIZADA PARA CARGAR CIUDADES
         function cargarCiudades(id_estado, id_ciudad_seleccionada = null) {
             if (!id_estado) {
                 ciudadSelect.prop('disabled', true).empty().append('<option value="">Seleccione primero un estado...</option>');
+                if (ciudadSelect.data('select2')) { ciudadSelect.trigger('change'); }
+                
                 btnToggleCiudad.prop('disabled', true);
                 collapseElement.collapse('hide');
                 return;
@@ -211,24 +196,23 @@
                     let selected = (id_ciudad_seleccionada && ciudad.id_ciudad == id_ciudad_seleccionada) ? 'selected' : '';
                     ciudadSelect.append('<option value="' + ciudad.id_ciudad + '" ' + selected + '>' + ciudad.nombre_ciudad + '</option>');
                 });
+
+                if (ciudadSelect.data('select2')) { ciudadSelect.trigger('change'); }
             }).fail(function() {
                 mostrarErrorSwal('Error de carga', 'Ocurrió un error al cargar las ciudades.');
             });
         }
 
-        // 1. EVENTO CHANGE: Llamamos a la función centralizada
         estadoSelect.on('change', function() {
             cargarCiudades($(this).val());
         });
 
-        // 2. PERSISTENCIA AL CARGAR (Si hay error de validación)
         let oldEstado = "{{ old('id_estado') }}";
         let oldCiudad = "{{ old('id_ciudad') }}";
         if (oldEstado) {
             cargarCiudades(oldEstado, oldCiudad);
         }
 
-           // 3. Guardar Ciudad por AJAX
         btnGuardarCiudad.on('click', function() {
             let id_estado = estadoSelect.val();
             let nombre_ciudad = inputNuevaCiudad.val().trim();
@@ -251,6 +235,9 @@
                 },
                 success: function(response) {
                     ciudadSelect.append('<option value="' + response.ciudad.id_ciudad + '" selected>' + response.ciudad.nombre_ciudad + '</option>');
+                    
+                    if (ciudadSelect.data('select2')) { ciudadSelect.trigger('change'); }
+                    
                     inputNuevaCiudad.val('');
                     collapseElement.collapse('hide');
                     btnGuardarCiudad.prop('disabled', false).html('<i class="bi bi-save me-1"></i> Guardar y Seleccionar');
@@ -268,4 +255,4 @@
         });
     });
 </script>
-@endsection
+@endpush

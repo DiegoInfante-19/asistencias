@@ -50,16 +50,13 @@ div.dt-buttons .btn-outline-secondary {
 }
 
 /* 4. BOTONES DE REGISTROS (Dentro de la tabla) */
-/* Aumentamos la especificidad usando .card-body y .table para ganarle a AdminLTE */
 .card-body .table tbody .btn-group .btn-outline-secondary {
-    /* Fondo blanco constante sin romper el hover */
     --bs-btn-bg: #ffffff; 
     --bs-btn-hover-bg: var(--bs-secondary);
     --bs-btn-hover-color: #ffffff;
     --bs-btn-active-bg: var(--bs-secondary);
     --bs-btn-active-color: #ffffff;
     
-    /* Limpieza visual */
     box-shadow: none !important;
     background-image: none !important;
     border-color: var(--bs-secondary) !important;
@@ -67,86 +64,63 @@ div.dt-buttons .btn-outline-secondary {
 
 /* 5. BOTONES INDIVIDUALES DE REGISTROS (Ej: Desvincular) */
 .btn-accion-desvinculacion.btn-outline-secondary {
-    /* Fondo blanco constante sin romper el hover */
     --bs-btn-bg: #ffffff; 
     --bs-btn-hover-bg: var(--bs-secondary);
     --bs-btn-hover-color: #ffffff;
     --bs-btn-active-bg: var(--bs-secondary);
     --bs-btn-active-color: #ffffff;
     
-    /* Limpieza visual contra AdminLTE/DataTables */
     box-shadow: none !important;
     background-image: none !important;
     border-color: var(--bs-secondary) !important;
 }
 
+/* ==========================================================================
+   FIX DEFINITIVO: Espaciado y no-solapamiento en Paginación DataTables
+   ========================================================================== */
+.dataTables_wrapper .dataTables_paginate {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    width: 100% !important;
+}
 
-/* 
-div.dataTables_wrapper div.dataTables_filter {
-        text-align: right;
-        margin-bottom: 15px;
-    }
+.dataTables_wrapper .dataTables_paginate ul.pagination {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    padding-left: 0 !important;
+    list-style: none !important;
+    margin: 0 !important;
+}
 
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0 !important;
-    }
+/* Espacio físico real entre cada botón para anular el margen negativo de Bootstrap */
+.dataTables_wrapper .dataTables_paginate ul.pagination .page-item {
+    margin: 0 3px !important; 
+}
 
-    #users-table {
-        width: 100% !important;
-    }
+.dataTables_wrapper .dataTables_paginate ul.pagination .page-item .page-link {
+    position: relative !important;
+    display: block !important;
+    padding: 0.375rem 0.75rem !important;
+    color: var(--bs-secondary) !important;
+    background-color: #fff !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 0.375rem !important;
+    line-height: 1.25 !important;
+    white-space: nowrap !important;
+}
 
-    div.dataTables_wrapper div.dataTables_length {
-        margin-bottom: 0 !important;
-    }
+.dataTables_wrapper .dataTables_paginate ul.pagination .page-item.active .page-link {
+    z-index: 3 !important;
+    color: #fff !important;
+    background-color: var(--bs-secondary) !important;
+    border-color: var(--bs-secondary) !important;
+}
 
-    div.dataTables_wrapper div.dataTables_length label {
-        margin-bottom: 0 !important;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    div.dataTables_wrapper div.dataTables_length select {
-        width: auto;
-        display: inline-block;
-    }
-
-    .btn-tabla {
-        border: 1px solid var(--bs-secondary-color) !important;
-        color: var(--bs-secondary-color) !important;
-    }
-
-    .btn-tabla:hover {
-        background-color: var(--bs-secondary-color) !important;
-        color: #ffffff !important;
-        border: 1px solid var(--bs-secondary-color) !important;
-        box-shadow: none !important;
-        background-image: none !important;
-        border-color: var(--bs-secondary-color) !important;
-    }
-
-
-    .dataTables_wrapper .pagination .page-link {
-        color: var(--bs-secondary-color) !important;
-        border-color: var(--bs-border-color) !important;
-        background-color: #ffffff !important;
-        box-shadow: none !important;
-    }
-
-    .dataTables_wrapper .pagination .page-link:hover {
-        background-color: var(--bs-secondary-color) !important;
-        border-color: var(--bs-secondary-color) !important;
-        color: #ffffff !important;
-    }
-
-    .dataTables_wrapper .pagination .page-item.active .page-link {
-        background-color: var(--bs-secondary-color) !important;
-        border-color: var(--bs-secondary-color) !important;
-        color: #ffffff !important;
-    }
-
-    .dataTables_wrapper .pagination .page-item.disabled .page-link {
-        color: #adb5bd !important;
-        background-color: #f8f9fa !important;
-        border-color: var(--bs-border-color) !important;
-    } */
+.dataTables_wrapper .dataTables_paginate ul.pagination .page-item.disabled .page-link {
+    color: #6c757d !important;
+    pointer-events: none !important;
+    background-color: #fff !important;
+    border-color: #dee2e6 !important;
+    opacity: 0.5 !important;
+}

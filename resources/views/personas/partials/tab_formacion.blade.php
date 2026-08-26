@@ -173,28 +173,21 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const selectBase = document.getElementById('id_titulos');
-        const selectPnf = document.getElementById('id_titulos_pnf');
+        const selectBase = $('#id_titulos');
+        const selectPnf = $('#id_titulos_pnf');
         const tabBaseBtn = document.getElementById('tab-base-btn');
         const tabPnfBtn = document.getElementById('tab-pnf-btn');
 
-        // Función para limpiar y deshabilitar el campo opuesto al cambiar de pestaña
         function actualizarCamposActivos() {
-            if (tabPnfBtn.classList.contains('active')) {
-                // Si estamos en PNF, limpiamos Título Base
-                if (selectBase) {
-                    selectBase.value = '';
-                    if (window.jQuery && $(selectBase).data('select2')) {
-                        $(selectBase).val('').trigger('change');
-                    }
+            if (tabPnfBtn && tabPnfBtn.classList.contains('active')) {
+                if (selectBase.length) {
+                    selectBase.val('');
+                    if (selectBase.data('select2')) { selectBase.trigger('change'); }
                 }
             } else {
-                // Si estamos en Base, limpiamos Título PNF
-                if (selectPnf) {
-                    selectPnf.value = '';
-                    if (window.jQuery && $(selectPnf).data('select2')) {
-                        $(selectPnf).val('').trigger('change');
-                    }
+                if (selectPnf.length) {
+                    selectPnf.val('');
+                    if (selectPnf.data('select2')) { selectPnf.trigger('change'); }
                 }
             }
         }
@@ -204,9 +197,8 @@
             tabPnfBtn.addEventListener('shown.bs.tab', actualizarCamposActivos);
         }
 
-        // Si hay un error de validación previo en PNF, abrir automáticamente esa pestaña al recargar
         @if(old('id_titulos_pnf'))
-            if (tabPnfBtn) {
+            if (tabPnfBtn && typeof bootstrap !== 'undefined') {
                 var pnfTab = new bootstrap.Tab(tabPnfBtn);
                 pnfTab.show();
             }

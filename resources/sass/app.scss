@@ -1,4 +1,6 @@
-/* 1. Declaración de la fuente local Rubik Variable (Cero CDNs) */
+/* ==========================================================================
+   1. Declaración de la fuente local Rubik Variable (Cero CDNs)
+   ========================================================================== */
 @font-face {
     font-family: 'Rubik';
     src: url('/public/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
@@ -7,21 +9,12 @@
     font-display: swap;
 }
 
-// 2. Variables (Carga tu color $primary y tipografía)
+// 2. Variables del sistema
 @import 'variables';
 
-// 3. Importar Bootstrap (Absorberá las variables automáticamente)
+// 3. Importar Bootstrap
 @import 'bootstrap/scss/bootstrap';
 
-// 4. Importar AdminLTE
-@import 'admin-lte/dist/css/adminlte.css';
-
-// 5. Estilos locales de librerías de terceros (Cero CDNs)
-@import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
-@import 'datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css'; // <-- AÑADIDO PARA LOS BOTONES
+// 4. Estilos de Select2 y su tema Bootstrap 5 (Locales vía npm)
 @import 'select2/dist/css/select2.min.css';
-
-// RUTA CORREGIDA DE OVERLAYSCROLLBARS:
-@import 'overlayscrollbars/styles/overlayscrollbars.css';
-
-@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css';

@@ -16,7 +16,6 @@
     </button>
 </div>
 
-<!-- ¡IMPORTANTE!: Agregada la clase 'form-delete' para que SweetAlert lo intercepte -->
 <form id="form-delete-{{ $persona->id_personas }}" action="{{ route('personas.destroy', $persona->id_personas) }}" method="POST" class="d-none form-delete">
     @csrf
     @method('DELETE')

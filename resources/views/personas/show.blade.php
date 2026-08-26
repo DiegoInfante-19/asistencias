@@ -1,11 +1,8 @@
 @extends('layouts.admin')
 
-<!-- LOS STYLES VAN FUERA DEL CONTENT -->
-@section('styles')
-<!-- Select2 CSS y Tema para Bootstrap 5 -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-@endsection
+@push('styles')
+<!-- Select2 y Tema Bootstrap 5 centralizados por Vite (Sin CDNs) -->
+@endpush
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
@@ -37,7 +34,6 @@
                 <!-- Columna de Información -->
                 <div class="col-md-10">
                     <div class="row g-3">
-                        <!-- NOMBRES DE VARIABLES CORREGIDOS -->
                         <div class="col-md-4">
                             <span class="text-muted d-block small fw-bold">Cédula</span>
                             <span class="fs-5">{{ $persona->cedula_personas }}</span>
@@ -67,7 +63,6 @@
                         </div>
                         <div class="col-12">
                             <span class="text-muted d-block small fw-bold">Detalles de Dirección</span>
-                            <!-- Llamamos a detalles_adicionales que es donde realmente guardas esta info -->
                             <span class="fs-6">{{ $persona->lugarNacimiento->detalles_adicionales ?? 'Sin detalles adicionales registrados' }}</span>
                         </div>
                     </div>
@@ -116,27 +111,21 @@
         <!-- Contenido de las pestañas -->
         <div class="card-body bg-light border-top">
             <div class="tab-content" id="expedienteTabsContent">
-                <!-- Pestaña: Teléfonos -->
                 <div class="tab-pane fade show active" id="telefonos" role="tabpanel">
                     @include('personas.partials.tab_telefonos')
                 </div>
-                <!-- Pestaña: Expediente Académico -->
                 <div class="tab-pane fade" id="academico" role="tabpanel">
                     @include('personas.partials.tab_titulacion')
                 </div>
-                <!-- Pestaña: Formación Previa -->
                 <div class="tab-pane fade" id="formacion" role="tabpanel">
                     @include('personas.partials.tab_formacion')
                 </div>
-                <!-- Pestaña: Control de Estudio -->
                 <div class="tab-pane fade" id="inscripciones" role="tabpanel">
                     @include('personas.partials.tab_inscripciones')
                 </div>
-                <!-- Pestaña: Perfil Laboral -->
                 <div class="tab-pane fade" id="laboral" role="tabpanel">
                     @include('personas.partials.tab_empresas')
                 </div>
-                <!-- Pestaña: Observaciones -->
                 <div class="tab-pane fade" id="observaciones" role="tabpanel">
                     @include('personas.partials.tab_observaciones')
                 </div>
@@ -146,39 +135,29 @@
 </div>
 @endsection
 
-@section('scripts')
-<!-- 1. PRIMERO JQUERY -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
-
-<!-- 2. LUEGO SELECT2 -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
+@push('scripts')
 <script>
-    $(document).ready(function() {
-        // Inicializar Select2
-        $('.select2-buscador').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: 'Escriba para buscar...',
-            language: {
-                noResults: function() {
-                    return "No se encontraron resultados";
+    document.addEventListener('DOMContentLoaded', function() {
+        // Asegurarnos de que jQuery y Bootstrap estén listos
+        if (typeof window.$ !== 'undefined') {
+            var activeTab = localStorage.getItem('activeTabPersona');
+            if (activeTab) {
+                var triggerEl = document.querySelector('#expedienteTabs button[data-bs-target="' + activeTab + '"]');
+                if (triggerEl) {
+                    var tabInstance = new bootstrap.Tab(triggerEl);
+                    tabInstance.show();
                 }
             }
-        });
 
-        // Lógica de pestañas unificada
-        var activeTab = localStorage.getItem('activeTabPersona');
-        if (activeTab) {
-            $('#expedienteTabs button[data-bs-target="' + activeTab + '"]').tab('show');
+            document.querySelectorAll('#expedienteTabs button[data-bs-toggle="tab"]').forEach(function(el) {
+                el.addEventListener('shown.bs.tab', function(e) {
+                    localStorage.setItem('activeTabPersona', e.target.getAttribute('data-bs-target'));
+                });
+            });
         }
-
-        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-            localStorage.setItem('activeTabPersona', $(e.target).attr('data-bs-target'));
-        });
     });
 </script>
 
 <script src="{{ asset('js/core-validations.js') }}" defer></script>
 <script src="{{ asset('js/admin-validations.js') }}" defer></script>
-@endsection
+@endpush

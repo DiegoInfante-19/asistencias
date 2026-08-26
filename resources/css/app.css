@@ -4,7 +4,7 @@
 @font-face {
     font-family: 'Rubik';
     src: url('/public/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
-    font-weight: 100 900; /* Rango de peso de la fuente variable */
+    font-weight: 100 900;
     font-style: normal;
     font-display: swap;
 }
@@ -17,7 +17,7 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
-@source '../../node_modules/flowbite/**/*.js'; /* <-- Escáner para la interactividad de Flowbite */
+@source '../../node_modules/flowbite/**/*.js';
 
 /* 3. Definimos nuestros colores corporativos (Paleta 'Primary') */
 @theme {
@@ -33,4 +33,6 @@
     --color-primary-900: #1e3a8a;
     --color-primary-950: #172554;
     
---font-sans: 'Rubik', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';}
+    --font-sans: 'Rubik', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+

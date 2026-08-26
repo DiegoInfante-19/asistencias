@@ -14,7 +14,6 @@ class CohortesDataTable extends BaseDataTable
     {
         return EloquentDataTable::create($query)
             ->addIndexColumn()
-            // Badges sólidos con tamaño de fuente aumentado y legibles
             ->editColumn('estatus_cohorte', function ($cohorte) {
                 $estatus = strtolower(trim($cohorte->estatus_cohorte));
                 
@@ -60,15 +59,7 @@ class CohortesDataTable extends BaseDataTable
 
     public function html(): HtmlBuilder
     {
-        return $this->sharedHtmlBuilder()
-            ->ajax([
-                'url' => route('cohortes.index'),
-                'type' => 'GET',
-                'headers' => [
-                    'X-Requested-With' => 'XMLHttpRequest',
-                    'X-CSRF-TOKEN' => csrf_token()
-                ]
-            ]);
+        return $this->sharedHtmlBuilder();
     }
 
     protected function getColumns(): array

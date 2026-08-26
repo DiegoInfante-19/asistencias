@@ -14,10 +14,9 @@
                     <!-- Selección de Empresa -->
                     <div class="mb-3">
                         <label for="id_empresa" class="form-label fw-bold">Empresa <span class="text-danger">*</span></label>
-                        <select class="form-select @error('id_empresa') is-invalid @enderror" id="id_empresa" name="id_empresa" required>
+                        <select class="form-select select2-buscador @error('id_empresa') is-invalid @enderror" id="id_empresa" name="id_empresa" required>
                             <option value="" selected disabled>Seleccione una empresa...</option>
                             @foreach($empresas as $empresa)
-                            <!-- Asumiendo que la llave primaria de la tabla empresas es 'id_empresa' -->
                             <option value="{{ $empresa->id_empresa }}"
                                 {{ old('id_empresa', $persona->empresaPersona->id_empresa ?? '') == $empresa->id_empresa ? 'selected' : '' }}>
                                 {{ $empresa->nombre_empresa ?? 'Empresa ' . $empresa->id_empresa }}
@@ -32,7 +31,6 @@
                     <!-- Selección de Cargo -->
                     <div class="mb-3">
                         <label for="id_cargo" class="form-label fw-bold">Cargo <span class="text-danger">*</span></label>
-                        <!-- Agregamos la clase 'select2-buscador' -->
                         <select class="form-select select2-buscador @error('id_cargo') is-invalid @enderror" id="id_cargo" name="id_cargo" required>
                             <option value="" selected disabled>Seleccione un cargo...</option>
                             @foreach($cargos as $cargo)

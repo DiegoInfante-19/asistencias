@@ -7,7 +7,6 @@
             </div>
             <div class="card-body bg-light">
 
-                <!-- VALIDACIÓN DE PRERREQUISITOS DE NEGOCIO (HARD LOCK) -->
                 @if(!$persona->titulacionPersona)
                     <div class="text-center py-5">
                         <i class="bi bi-shield-lock-fill text-danger mb-3" style="font-size: 3.5rem;"></i>
@@ -15,7 +14,6 @@
                         <p class="text-muted small px-2">Para poder inscribir a este estudiante, <strong>primero debe asignarle un Programa Nacional de Formación (PNF)</strong> en la pestaña "Exp. Académico".</p>
                     </div>
                 @else
-                    <!-- RETROALIMENTACIÓN VISUAL (CONTEXTO) -->
                     <div class="alert alert-primary py-2 shadow-sm border-0 small mb-3">
                         <i class="bi bi-info-circle-fill me-1"></i>
                         Filtrando secciones exclusivas para:<br>
@@ -26,16 +24,15 @@
                         @csrf
                         <input type="hidden" name="id_personas" value="{{ $persona->id_personas }}">
 
-                        <!-- Select: Sección (Se llenará vía JS según el PNF) -->
+                        <!-- Select: Sección -->
                         <div class="mb-3">
                             <label for="select_seccion" class="form-label fw-bold">Sección Académica <span class="text-danger">*</span></label>
-                            <select id="select_seccion" class="form-select" required>
+                            <select id="select_seccion" class="form-select select2-buscador" required>
                                 <option value="" selected disabled>Seleccione una sección...</option>
                             </select>
                             <small class="text-muted d-block mt-1">Solo se muestran secciones activas del PNF del estudiante.</small>
                         </div>
 
-                        <!-- INPUT OCULTO QUE SE ENVÍA AL CONTROLADOR -->
                         <input type="hidden" name="id_seccion" id="id_seccion_hidden" value="">
                         @error('id_seccion')
                             <div class="text-danger small mt-1">{{ $message }}</div>
@@ -141,7 +138,7 @@
 </div>
 
 @if($persona->titulacionPersona)
-<!-- LÓGICA DE JAVASCRIPT: FILTRADO ESTRICTO POR DOMINIO ACADÉMICO -->
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const seccionesDisponibles = @json($seccionesData ?? []);
@@ -162,24 +159,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // ==========================================
-        // INICIALIZACIÓN DE SELECT2
-        // ==========================================
-        // Usamos jQuery (que AdminLTE ya incluye) para activar el buscador
-        $('#select_seccion').select2({
-            theme: 'bootstrap-5', // Para que coincida con el diseño de tu panel
-            width: '100%',
-            placeholder: 'Seleccione una sección...',
-            language: "es" // Opcional: para que diga "No se encontraron resultados" en español
-        });
-
-        // Evento de Select2 cuando el usuario elige una opción
+        // Ya está inicializado globalmente o vía clase select2-buscador, pero sincronizamos los eventos de Select2
         $('#select_seccion').on('select2:select', function (e) {
             inputSeccionHidden.value = e.params.data.id;
             btnInscribir.disabled = (this.value === '');
         });
 
-        // En caso de que se limpie la selección
         $('#select_seccion').on('select2:unselect', function () {
             inputSeccionHidden.value = '';
             btnInscribir.disabled = true;
@@ -187,4 +172,5 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+@endpush
 @endif

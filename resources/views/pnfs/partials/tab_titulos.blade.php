@@ -17,29 +17,29 @@
         </thead>
         <tbody>
             @forelse($pnf->titulosPnf as $index => $vinculo)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td class="text-start">
-                        <span class="badge bg-secondary me-2">{{ $vinculo->titulo->nivel_academico }}</span>
-                        {{ $vinculo->titulo->nombre_titulo_base }}
-                    </td>
-                    <td class="text-start fw-semibold text-primary">{{ $vinculo->nombre_titulo_pnf }}</td>
-                    <td>
-                        <form action="{{ route('pnfs.titulos.destroy', $vinculo->id_titulos_pnf) }}" method="POST" class="m-0 p-0 form-desvincular-titulo">
-                            @csrf 
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-accion-desvinculacion btn-outline-secondary" title="Retirar Título del PNF">
-                                <i class="bi bi-link-45deg"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td class="text-start">
+                    <span class="badge bg-secondary me-2">{{ $vinculo->titulo->nivel_academico }}</span>
+                    {{ $vinculo->titulo->nombre_titulo_base }}
+                </td>
+                <td class="text-start fw-semibold text-primary">{{ $vinculo->nombre_titulo_pnf }}</td>
+                <td>
+                    <form action="{{ route('pnfs.titulos.destroy', $vinculo->id_titulos_pnf) }}" method="POST" class="m-0 p-0 form-desvincular-titulo">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-accion-desvinculacion btn-outline-secondary" title="Retirar Título del PNF">
+                            <b>Desvincular</b>
+                        </button>
+                    </form>
+                </td>
+            </tr>
             @empty
-                <tr>
-                    <td colspan="4" class="text-muted py-4">
-                        <i class="bi bi-info-circle fs-4 d-block mb-2"></i> No hay títulos universitarios asociados a este programa de formación actualmente.
-                    </td>
-                </tr>
+            <tr>
+                <td colspan="4" class="text-muted py-4">
+                    <i class="bi bi-info-circle fs-4 d-block mb-2"></i> No hay títulos universitarios asociados a este programa de formación actualmente.
+                </td>
+            </tr>
             @endforelse
         </tbody>
     </table>
@@ -57,10 +57,10 @@
                     @csrf
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Seleccione el Título Base <span class="text-danger">*</span></label>
-                        <select class="form-select" name="id_titulo" required>
+                        <select class="form-select select2-buscador" name="id_titulo" required>
                             <option value="" selected disabled>Seleccione...</option>
                             @foreach($catalogoTitulos as $cat)
-                                <option value="{{ $cat->id_titulos }}">[{{ $cat->nivel_academico }}] - {{ $cat->nombre_titulo_base }}</option>
+                            <option value="{{ $cat->id_titulos }}">[{{ $cat->nivel_academico }}] - {{ $cat->nombre_titulo_base }}</option>
                             @endforeach
                         </select>
                     </div>

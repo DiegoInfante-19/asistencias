@@ -17,11 +17,6 @@
                     <div class="mb-3">
                         <label for="observacion_personas" class="form-label fw-bold">Nota de Observación <span class="text-danger">*</span></label>
                         
-                        <!-- 
-                            1. Corregido: 'name' y 'id' ahora son observacion_personas 
-                            2. Corregido: El maxlength se subió a 1000 para coincidir con tu Request
-                            3. Corregido: Se busca el valor real en $persona->observacion->observacion_personas
-                        -->
                         <textarea class="form-control @error('observacion_personas') is-invalid @enderror" 
                                   id="observacion_personas" 
                                   name="observacion_personas" 

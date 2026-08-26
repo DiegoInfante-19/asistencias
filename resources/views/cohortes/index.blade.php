@@ -21,7 +21,8 @@
         <!-- Cuerpo de la tarjeta principal en blanco y sin tarjetas anidadas -->
         <div class="card-body bg-white">
             <div class="table-responsive">
-                {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!} </div>
+                {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!} 
+            </div>
         </div>
 
     </div>
@@ -31,7 +32,7 @@
 @endsection
 
 @push('scripts')
-<!-- 1. Script del Modal: Envuelto en type="module" para que espere a Vite -->
+<!-- 1. Script para el Modal adaptado a módulo estandarizado -->
 <script type="module">
     $(document).ready(function() {
         $('#UpdateCohorteModal').on('show.bs.modal', function(event) {
@@ -47,6 +48,6 @@
 
 <script src="{{ asset('js/admin-validations.js') }}" defer></script>
 
-<!-- 2. Script de Yajra: Pasando atributos como array para resolver el TypeError -->
+<!-- 2. Inicialización modular idéntica al resto de las tablas -->
 {!! $dataTable->scripts(null, ['type' => 'module']) !!}
 @endpush

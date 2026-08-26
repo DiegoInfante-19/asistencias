@@ -70,81 +70,48 @@
     </div>
 </div>
 
-<div class="modal fade" id="UpdatePnfModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5 fw-bold">Modificar PNF</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="UpdatePnfForm" method="POST" action="">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="origen" value="update_pnf_show">
+<!-- Incluimos los modales externos para no duplicar código -->
+@include('pnfs.partials.modals')
 
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-bold small text-muted">Nombre del PNF <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="nombre_pnf" id="edit-nombre-pnf" required autocomplete="off">
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-bold small text-muted">Vigencia <span class="text-danger">*</span></label>
-                        <select class="form-select" name="vigencia_pnf" id="edit-vigencia-pnf" required>
-                            <option value="1">Activo</option>
-                            <option value="0">Inactivo</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-bold small text-muted">Descripción</label>
-                        <textarea class="form-control" name="descripcion_pnf" id="edit-descripcion-pnf" rows="3"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" form="UpdatePnfForm" class="btn btn-warning fw-bold text-dark">Actualizar</button>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 
-@section('scripts')
-<script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
+@push('scripts')
 <script>
-    $(document).ready(function() {
-        // Inicializar datos del modal de edición
-        $('#UpdatePnfModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget);
-            var modal = $(this);
-            modal.find('#UpdatePnfForm').attr('action', button.data('url'));
-            modal.find('#edit-nombre-pnf').val(button.data('nombre'));
-            modal.find('#edit-vigencia-pnf').val(button.data('vigencia'));
-            modal.find('#edit-descripcion-pnf').val(button.data('descripcion'));
-        });
+    // Toda la inicialización de Select2 fue movida a app.js por Vite de forma segura.
+
+    // 1. Lógica para cargar datos dinámicos en el modal de edición de PNF
+    document.addEventListener('DOMContentLoaded', function() {
+        let updateModal = document.getElementById('UpdatePnfModal');
+        if (updateModal) {
+            updateModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var modal = this;
+                
+                // Actualizar la ruta del formulario
+                modal.querySelector('#UpdatePnfForm').setAttribute('action', button.getAttribute('data-url'));
+                
+                // Setear valores de texto
+                modal.querySelector('#edit-nombre-pnf').value = button.getAttribute('data-nombre');
+                modal.querySelector('#edit-descripcion-pnf').value = button.getAttribute('data-descripcion');
+                
+                // Setear el valor del Select y notificar a jQuery/Select2
+                let vigenciaSelect = modal.querySelector('#edit-vigencia-pnf');
+                vigenciaSelect.value = button.getAttribute('data-vigencia');
+                
+                if (typeof window.$ !== 'undefined') {
+                    let $vigenciaSelect = $(vigenciaSelect);
+                    if ($vigenciaSelect.data('select2')) { 
+                        $vigenciaSelect.trigger('change'); 
+                    }
+                }
+            });
+        }
     });
 
-    $(document).ready(function() {
-        // Inicializar datos del modal de edición
-        $('#UpdatePnfModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget);
-            var modal = $(this);
-            modal.find('#UpdatePnfForm').attr('action', button.data('url'));
-            modal.find('#edit-nombre-pnf').val(button.data('nombre'));
-            modal.find('#edit-vigencia-pnf').val(button.data('vigencia'));
-            modal.find('#edit-descripcion-pnf').val(button.data('descripcion'));
-        });
-    });
-
-    // Delegación de eventos para Confirmación de SweetAlert2
+    // 2. Delegación nativa para SweetAlert2 (Eliminaciones de Títulos y Empresas)
     document.addEventListener('submit', function(event) {
-
-        // 1. Interceptar eliminación de Títulos
         if (event.target && event.target.classList.contains('form-desvincular-titulo')) {
-            event.preventDefault(); // Detenemos el envío inmediato
-
+            event.preventDefault();
             Swal.fire({
                 title: '¿Desvincular Título?',
                 text: "¿Está seguro de retirar este título del programa de formación?",
@@ -156,16 +123,12 @@
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true
             }).then((result) => {
-                if (result.isConfirmed) {
-                    event.target.submit(); // Enviamos el formulario
-                }
+                if (result.isConfirmed) { event.target.submit(); }
             });
         }
 
-        // 2. Interceptar eliminación de Empresas
         if (event.target && event.target.classList.contains('form-desvincular-empresa')) {
-            event.preventDefault(); // Detenemos el envío inmediato
-
+            event.preventDefault();
             Swal.fire({
                 title: '¿Revocar Alianza?',
                 text: "¿Está seguro de romper el convenio con esta empresa para este PNF?",
@@ -177,34 +140,30 @@
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true
             }).then((result) => {
-                if (result.isConfirmed) {
-                    event.target.submit(); // Enviamos el formulario
-                }
+                if (result.isConfirmed) { event.target.submit(); }
             });
         }
     });
 
+    // 3. Persistencia de pestañas activas con Bootstrap
     document.addEventListener("DOMContentLoaded", function() {
-        // A) Leer si hay una pestaña guardada previamente en la memoria del navegador
-        let activeTabId = localStorage.getItem('pnf_dashboard_active_tab');
-
-        if (activeTabId) {
-            let tabElement = document.getElementById(activeTabId);
-            if(tabElement) {
-                // Instanciar y mostrar la pestaña usando la API nativa de Bootstrap 5
-                let tab = new bootstrap.Tab(tabElement);
-                tab.show();
+        if (typeof window.bootstrap !== 'undefined') {
+            let activeTabId = localStorage.getItem('pnf_dashboard_active_tab');
+            if (activeTabId) {
+                let tabElement = document.getElementById(activeTabId);
+                if(tabElement) {
+                    let tab = new bootstrap.Tab(tabElement);
+                    tab.show();
+                }
             }
-        }
 
-        // B) Detectar cuando el usuario cambia de pestaña y guardar su ID
-        let tabElements = document.querySelectorAll('button[data-bs-toggle="tab"]');
-        tabElements.forEach(function(tab) {
-            tab.addEventListener('shown.bs.tab', function(event) {
-                // event.target es el botón de la pestaña que acaba de activarse
-                localStorage.setItem('pnf_dashboard_active_tab', event.target.id);
+            let tabElements = document.querySelectorAll('button[data-bs-toggle="tab"]');
+            tabElements.forEach(function(tab) {
+                tab.addEventListener('shown.bs.tab', function(event) {
+                    localStorage.setItem('pnf_dashboard_active_tab', event.target.id);
+                });
             });
-        });
+        }
     });
 </script>
-@endsection
+@endpush

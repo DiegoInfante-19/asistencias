@@ -8,7 +8,6 @@
                 Editar Datos Básicos:
                 <span class="text-primary">{{ $persona->primer_nombre_personas }} {{ $persona->primer_apellido_personas }}</span>
             </h3>
-            <!-- Botón para regresar al expediente principal (show) -->
             <a href="{{ route('personas.show', $persona->id_personas) }}" class="btn btn-outline-secondary ms-auto">
                 <b>Revisar Expediente</b>
             </a>
@@ -17,7 +16,7 @@
         <div class="card-body">
             <form action="{{ route('personas.update', $persona->id_personas) }}" method="POST" id="editPersonaForm">
                 @csrf
-                @method('PUT') <!-- Requerido por Laravel para actualizar -->
+                @method('PUT')
 
                 <div class="row g-3">
                     <!-- Cédula -->
@@ -88,15 +87,12 @@
                             id="email_personas" name="email_personas" value="{{ old('email_personas', $persona->email_personas) }}" autocomplete="off">
                     </div>
 
-                    <!-- ========================================== -->
-                    <!-- SECCIÓN: LUGAR DE NACIMIENTO -->
-                    <!-- ========================================== -->
+                    <!-- LUGAR DE NACIMIENTO -->
                     <div class="col-12 mt-4">
                         <h5 class="fw-bold border-bottom pb-2"><i class="bi bi-geo-alt-fill me-2"></i>Lugar de Nacimiento</h5>
                     </div>
 
                     @php
-                        // CORREGIDO: El estado actual ya no se lee de lugarNacimiento directamente, sino a través de la ciudad
                         $estadoActual = $persona->lugarNacimiento->ciudad->id_estado ?? '';
                         $ciudadActual = $persona->lugarNacimiento->id_ciudad ?? '';
                         $detallesActual = $persona->lugarNacimiento->detalles_adicionales ?? '';
@@ -105,7 +101,7 @@
                     <!-- Estado -->
                     <div class="col-md-4">
                         <label for="id_estado" class="form-label fw-bold">Estado <span class="text-danger">*</span></label>
-                        <select class="form-select @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado" required>
+                        <select class="form-select select2-buscador @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado" required>
                             <option value="">Seleccione...</option>
                             @foreach($estados as $estado)
                             <option value="{{ $estado->id_estado }}" {{ old('id_estado', $estadoActual) == $estado->id_estado ? 'selected' : '' }}>
@@ -116,11 +112,11 @@
                         @error('id_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Ciudad (Con botón Collapse) -->
+                    <!-- Ciudad -->
                     <div class="col-md-4">
                         <label for="id_ciudad" class="form-label fw-bold">Ciudad <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <select class="form-select @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
+                            <select class="form-select select2-buscador @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
                                 <option value="">Seleccione primero un estado...</option>
                             </select>
                             <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNuevaCiudad" aria-expanded="false" aria-controls="collapseNuevaCiudad" id="btnToggleCiudad" disabled>
@@ -136,9 +132,7 @@
                         <input type="text" class="form-control" id="detalles_adicionales" name="detalles_adicionales" value="{{ old('detalles_adicionales', $detallesActual) }}" placeholder="Ej: Hospital Ruiz y Páez">
                     </div>
 
-                    <!-- ========================================== -->
                     <!-- PANEL COLAPSABLE: NUEVA CIUDAD -->
-                    <!-- ========================================== -->
                     <div class="col-5">
                         <div class="collapse" id="collapseNuevaCiudad">
                             <div class="card card-body bg-light border-primary shadow-sm mt-2">
@@ -176,13 +170,7 @@
 </div>
 @endsection
 
-@section('scripts')
-<!-- 1. CARGAMOS JQUERY PRIMERO -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
-
-<script src="{{ asset('js/core-validations.js') }}" defer></script>
-<script src="{{ asset('js/admin-validations.js') }}" defer></script>
-
+@push('scripts')
 <script>
     $(document).ready(function() {
 
@@ -202,10 +190,11 @@
         const inputNuevaCiudad = $('#nueva_nombre_ciudad');
         const btnGuardarCiudad = $('#btnGuardarCiudad');
 
-        // FUNCIÓN CENTRALIZADA PARA CARGAR CIUDADES
         function cargarCiudades(id_estado, id_ciudad_seleccionada = null) {
             if (!id_estado) {
                 ciudadSelect.prop('disabled', true).empty().append('<option value="">Seleccione primero un estado...</option>');
+                if (ciudadSelect.data('select2')) { ciudadSelect.trigger('change'); }
+                
                 btnToggleCiudad.prop('disabled', true);
                 collapseElement.collapse('hide');
                 return;
@@ -222,18 +211,17 @@
                     let selected = (id_ciudad_seleccionada && ciudad.id_ciudad == id_ciudad_seleccionada) ? 'selected' : '';
                     ciudadSelect.append('<option value="' + ciudad.id_ciudad + '" ' + selected + '>' + ciudad.nombre_ciudad + '</option>');
                 });
+
+                if (ciudadSelect.data('select2')) { ciudadSelect.trigger('change'); }
             }).fail(function() {
                 mostrarErrorSwal('Error de carga', 'Ocurrió un error al cargar las ciudades.');
             });
         }
 
-        // 1. EVENTO CHANGE
         estadoSelect.on('change', function() {
             cargarCiudades($(this).val());
         });
 
-        // 2. PERSISTENCIA Y CARGA INICIAL (Combina BD y Errores de Validación)
-        // Tomamos el 'old' si hubo error, sino tomamos el valor actual de la BD que inyectamos en Blade
         let oldEstado = "{{ old('id_estado', $estadoActual ?? '') }}";
         let oldCiudad = "{{ old('id_ciudad', $ciudadActual ?? '') }}";
 
@@ -241,7 +229,6 @@
             cargarCiudades(oldEstado, oldCiudad);
         }
 
-        // 3. Guardar Ciudad por AJAX
         btnGuardarCiudad.on('click', function() {
             let id_estado = estadoSelect.val();
             let nombre_ciudad = inputNuevaCiudad.val().trim();
@@ -264,6 +251,9 @@
                 },
                 success: function(response) {
                     ciudadSelect.append('<option value="' + response.ciudad.id_ciudad + '" selected>' + response.ciudad.nombre_ciudad + '</option>');
+                    
+                    if (ciudadSelect.data('select2')) { ciudadSelect.trigger('change'); }
+                    
                     inputNuevaCiudad.val('');
                     collapseElement.collapse('hide');
                     btnGuardarCiudad.prop('disabled', false).html('<i class="bi bi-save me-1"></i> Guardar');
@@ -281,4 +271,4 @@
         });
     });
 </script>
-@endsection
+@endpush
