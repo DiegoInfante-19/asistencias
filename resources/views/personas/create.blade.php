@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    <div class="card shadow-sm border-0">
+    <!-- Tarjeta con estilo AdminLTE unificado -->
+    <div class="card shadow-sm">
         <div class="card-header bg-white py-3 d-flex align-items-center">
             <h3 class="card-title fw-bold text-dark mb-0">Registrar Nuevo Estudiante</h3>
             <a href="{{ route('personas.index') }}" class="btn btn-outline-secondary ms-auto">
@@ -10,14 +11,14 @@
             </a>
         </div>
 
-        <div class="card-body">
+        <div class="card-body bg-white py-4">
             <form action="{{ route('personas.store') }}" method="POST" id="createPersonaForm">
                 @csrf
 
                 <div class="row g-3">
                     <!-- Cédula -->
                     <div class="col-md-4">
-                        <label for="cedula_personas" class="form-label fw-bold">Cédula <span class="text-danger">*</span></label>
+                        <label for="cedula_personas" class="form-label fw-bold small text-muted">Cédula <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('cedula_personas') is-invalid @enderror"
                             id="cedula_personas" name="cedula_personas" value="{{ old('cedula_personas') }}"
                             autocomplete="off" required>
@@ -28,7 +29,7 @@
 
                     <!-- Nombres -->
                     <div class="col-md-4">
-                        <label for="primer_nombre_personas" class="form-label fw-bold">Primer Nombre <span class="text-danger">*</span></label>
+                        <label for="primer_nombre_personas" class="form-label fw-bold small text-muted">Primer Nombre <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('primer_nombre_personas') is-invalid @enderror"
                             id="primer_nombre_personas" name="primer_nombre_personas" value="{{ old('primer_nombre_personas') }}"
                             autocomplete="off" required>
@@ -38,7 +39,7 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label for="segundo_nombre_personas" class="form-label fw-bold">Segundo Nombre</label>
+                        <label for="segundo_nombre_personas" class="form-label fw-bold small text-muted">Segundo Nombre</label>
                         <input type="text" class="form-control @error('segundo_nombre_personas') is-invalid @enderror"
                             id="segundo_nombre_personas" name="segundo_nombre_personas" value="{{ old('segundo_nombre_personas') }}"
                             autocomplete="off">
@@ -46,14 +47,14 @@
 
                     <!-- Apellidos -->
                     <div class="col-md-4">
-                        <label for="primer_apellido_personas" class="form-label fw-bold">Primer Apellido <span class="text-danger">*</span></label>
+                        <label for="primer_apellido_personas" class="form-label fw-bold small text-muted">Primer Apellido <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('primer_apellido_personas') is-invalid @enderror"
                             id="primer_apellido_personas" name="primer_apellido_personas" value="{{ old('primer_apellido_personas') }}"
                             autocomplete="off" required>
                     </div>
 
                     <div class="col-md-4">
-                        <label for="segundo_apellido_personas" class="form-label fw-bold">Segundo Apellido</label>
+                        <label for="segundo_apellido_personas" class="form-label fw-bold small text-muted">Segundo Apellido</label>
                         <input type="text" class="form-control @error('segundo_apellido_personas') is-invalid @enderror"
                             id="segundo_apellido_personas" name="segundo_apellido_personas" value="{{ old('segundo_apellido_personas') }}"
                             autocomplete="off">
@@ -61,7 +62,7 @@
 
                     <!-- Sexo -->
                     <div class="col-md-4">
-                        <label for="sexo_personas" class="form-label fw-bold">Sexo <span class="text-danger">*</span></label>
+                        <label for="sexo_personas" class="form-label fw-bold small text-muted">Sexo <span class="text-danger">*</span></label>
                         <select class="form-select @error('sexo_personas') is-invalid @enderror" id="sexo_personas" name="sexo_personas" required>
                             <option value="">Seleccione...</option>
                             <option value="M" {{ old('sexo_personas') == 'M' ? 'selected' : '' }}>Masculino</option>
@@ -71,26 +72,40 @@
 
                     <!-- Fecha de Nacimiento -->
                     <div class="col-md-4">
-                        <label for="fecha_nacimiento_personas" class="form-label fw-bold">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                        <label for="fecha_nacimiento_personas" class="form-label fw-bold small text-muted">Fecha de Nacimiento <span class="text-danger">*</span></label>
                         <input type="date" class="form-control @error('fecha_nacimiento_personas') is-invalid @enderror"
                             id="fecha_nacimiento_personas" name="fecha_nacimiento_personas" value="{{ old('fecha_nacimiento_personas') }}" autocomplete="off" required>
                     </div>
 
                     <!-- Correo -->
                     <div class="col-md-4">
-                        <label for="email_personas" class="form-label fw-bold">Correo Electrónico </label>
+                        <label for="email_personas" class="form-label fw-bold small text-muted">Correo Electrónico</label>
                         <input type="email" class="form-control @error('email_personas') is-invalid @enderror"
                             id="email_personas" name="email_personas" value="{{ old('email_personas') }}" autocomplete="off">
                     </div>
 
+                    <!-- COHORTE DE INGRESO -->
+                    <div class="col-md-4">
+                        <label for="id_cohortes" class="form-label fw-bold small text-muted">Cohorte de Ingreso <span class="text-danger">*</span></label>
+                        <select class="form-select select2-buscador @error('id_cohortes') is-invalid @enderror" id="id_cohortes" name="id_cohortes" required>
+                            <option value="">Seleccione...</option>
+                            @foreach($cohortes as $cohorte)
+                                <option value="{{ $cohorte->id_cohortes }}" {{ old('id_cohortes') == $cohorte->id_cohortes ? 'selected' : '' }}>
+                                    {{ $cohorte->numero_cohorte }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('id_cohortes') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                    </div>
+
                     <!-- LUGAR DE NACIMIENTO -->
                     <div class="col-12 mt-4">
-                        <h5 class="fw-bold border-bottom pb-2"><i class="bi bi-geo-alt-fill me-2"></i>Lugar de Nacimiento</h5>
+                        <h5 class="fw-bold border-bottom pb-2 text-dark"><i class="bi bi-geo-alt-fill me-2 text-primary"></i>Lugar de Nacimiento</h5>
                     </div>
 
                     <!-- Estado -->
                     <div class="col-md-4">
-                        <label for="id_estado" class="form-label fw-bold">Estado <span class="text-danger">*</span></label>
+                        <label for="id_estado" class="form-label fw-bold small text-muted">Estado <span class="text-danger">*</span></label>
                         <select class="form-select select2-buscador @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado" required>
                             <option value="">Seleccione...</option>
                             @foreach($estados as $estado)
@@ -102,28 +117,30 @@
                         @error('id_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Ciudad -->
+                    <!-- Ciudad corregida con distribución limpia -->
                     <div class="col-md-4">
-                        <label for="id_ciudad" class="form-label fw-bold">Ciudad <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <select class="form-select select2-buscador @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
-                                <option value="">Seleccione primero un estado...</option>
-                            </select>
-                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNuevaCiudad" aria-expanded="false" aria-controls="collapseNuevaCiudad" id="btnToggleCiudad" disabled>
+                        <label for="id_ciudad" class="form-label fw-bold small text-muted">Ciudad <span class="text-danger">*</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="flex-grow-1">
+                                <select class="form-select select2-buscador @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
+                                    <option value="">Seleccione primero un estado...</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-outline-primary text-nowrap" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNuevaCiudad" aria-expanded="false" aria-controls="collapseNuevaCiudad" id="btnToggleCiudad" disabled>
                                 <i class="bi bi-plus-lg"></i> Nueva
                             </button>
                         </div>
-                        @error('id_ciudad') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        @error('id_ciudad') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                     </div>
 
                     <!-- Detalles Adicionales -->
                     <div class="col-md-4">
-                        <label for="detalles_adicionales" class="form-label fw-bold">Detalles (Opcional)</label>
+                        <label for="detalles_adicionales" class="form-label fw-bold small text-muted">Detalles (Opcional)</label>
                         <input type="text" class="form-control" id="detalles_adicionales" name="detalles_adicionales" value="{{ old('detalles_adicionales') }}" placeholder="Ej: Hospital Ruiz y Páez">
                     </div>
 
                     <!-- PANEL COLAPSABLE: NUEVA CIUDAD -->
-                    <div class="col-5">
+                    <div class="col-12">
                         <div class="collapse" id="collapseNuevaCiudad">
                             <div class="card card-body bg-light border-primary shadow-sm mt-2">
                                 <h6 class="fw-bold text-primary mb-3"><i class="bi bi-building-add me-2"></i>Registrar Nueva Ciudad</h6>
@@ -144,20 +161,52 @@
                     </div>
 
                 </div>
-
-                <hr class="my-4">
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-save-fill me-1"></i> Guardar Estudiante</button>
-                </div>
             </form>
+        </div>
+
+        <!-- FOOTER DE LA TARJETA -->
+        <div class="card-footer bg-white py-3 d-flex justify-content-end">
+            <button type="submit" form="createPersonaForm" class="btn btn-primary">
+                <i class="bi bi-save-fill me-1"></i> Guardar Estudiante
+            </button>
         </div>
     </div>
 </div>
 @endsection
 
+@section('styles')
+<style>
+    /* Estética unificada para inputs y selects en tarjetas blancas */
+    .card-body.bg-white .form-control,
+    .card-body.bg-white .form-select {
+        background-color: #f8f9fa !important;
+        border-color: #dee2e6 !important;
+    }
+
+    .card-body.bg-white .select2-container--bootstrap-5 .select2-selection {
+        background-color: #f8f9fa !important;
+        border-color: #dee2e6 !important;
+    }
+
+    /* Efecto al hacer Focus */
+    .card-body.bg-white .form-control:focus,
+    .card-body.bg-white .form-select:focus,
+    .card-body.bg-white .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        background-color: #ffffff !important;
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+@endsection
+
 @push('scripts')
-<script>
+<script type="module">
     $(document).ready(function() {
+        // Inicializar Select2 en los campos correspondientes
+        $('.select2-buscador').select2({
+            theme: 'bootstrap-5',
+            width: '100%'
+        });
 
         function mostrarErrorSwal(titulo, mensaje) {
             Swal.fire({
@@ -178,7 +227,7 @@
         function cargarCiudades(id_estado, id_ciudad_seleccionada = null) {
             if (!id_estado) {
                 ciudadSelect.prop('disabled', true).empty().append('<option value="">Seleccione primero un estado...</option>');
-                if (ciudadSelect.data('select2')) { ciudadSelect.trigger('change'); }
+                ciudadSelect.trigger('change.select2');
                 
                 btnToggleCiudad.prop('disabled', true);
                 collapseElement.collapse('hide');
@@ -197,7 +246,7 @@
                     ciudadSelect.append('<option value="' + ciudad.id_ciudad + '" ' + selected + '>' + ciudad.nombre_ciudad + '</option>');
                 });
 
-                if (ciudadSelect.data('select2')) { ciudadSelect.trigger('change'); }
+                ciudadSelect.trigger('change.select2');
             }).fail(function() {
                 mostrarErrorSwal('Error de carga', 'Ocurrió un error al cargar las ciudades.');
             });
@@ -235,8 +284,7 @@
                 },
                 success: function(response) {
                     ciudadSelect.append('<option value="' + response.ciudad.id_ciudad + '" selected>' + response.ciudad.nombre_ciudad + '</option>');
-                    
-                    if (ciudadSelect.data('select2')) { ciudadSelect.trigger('change'); }
+                    ciudadSelect.trigger('change.select2');
                     
                     inputNuevaCiudad.val('');
                     collapseElement.collapse('hide');

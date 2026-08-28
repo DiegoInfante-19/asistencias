@@ -1,19 +1,19 @@
 <div class="row g-4 mt-2">
     <!-- COLUMNA IZQUIERDA: FORMULARIO DE REGISTRO LABORAL -->
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-briefcase-fill me-1"></i>
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-briefcase-fill me-1 text-primary"></i>
                 {{ $persona->empresaPersona ? 'Actualizar' : 'Añadir' }} Experiencia Laboral
             </div>
-            <div class="card-body bg-light">
+            <div class="card-body bg-white py-4">
 
                 <form action="{{ route('personas.empresas.store', $persona->id_personas) }}" method="POST">
                     @csrf
 
                     <!-- Selección de Empresa -->
                     <div class="mb-3">
-                        <label for="id_empresa" class="form-label fw-bold">Empresa <span class="text-danger">*</span></label>
+                        <label for="id_empresa" class="form-label fw-bold small text-muted">Empresa <span class="text-danger">*</span></label>
                         <select class="form-select select2-buscador @error('id_empresa') is-invalid @enderror" id="id_empresa" name="id_empresa" required>
                             <option value="" selected disabled>Seleccione una empresa...</option>
                             @foreach($empresas as $empresa)
@@ -30,7 +30,7 @@
 
                     <!-- Selección de Cargo -->
                     <div class="mb-3">
-                        <label for="id_cargo" class="form-label fw-bold">Cargo <span class="text-danger">*</span></label>
+                        <label for="id_cargo" class="form-label fw-bold small text-muted">Cargo <span class="text-danger">*</span></label>
                         <select class="form-select select2-buscador @error('id_cargo') is-invalid @enderror" id="id_cargo" name="id_cargo" required>
                             <option value="" selected disabled>Seleccione un cargo...</option>
                             @foreach($cargos as $cargo)
@@ -41,27 +41,30 @@
                             @endforeach
                         </select>
                         @error('id_cargo')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-sm">
+                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
                             <i class="bi bi-save me-1"></i> {{ $persona->empresaPersona ? 'Actualizar' : 'Guardar' }} Perfil Laboral
                         </button>
                     </div>
                 </form>
+            </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Registro de vinculación laboral.
             </div>
         </div>
     </div>
 
     <!-- COLUMNA DERECHA: PERFIL LABORAL ACTUAL -->
     <div class="col-md-8">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-person-workspace me-1"></i> Empleo Actual
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-person-workspace me-1 text-primary"></i> Empleo Actual
             </div>
-            <div class="card-body d-flex flex-column justify-content-center">
+            <div class="card-body bg-white d-flex flex-column justify-content-center py-4">
                 @if ($persona->empresaPersona)
                 <div class="p-4 border-start border-4 border-primary bg-light rounded shadow-sm">
                     <div class="row align-items-center">
@@ -93,7 +96,7 @@
                             <form action="{{ route('personas.empresas.destroy', ['persona' => $persona->id_personas, 'empresa' => $persona->empresaPersona->id_empresa_personas]) }}" method="POST" class="form-delete">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger w-50" title="Eliminar registro laboral">
+                                <button type="submit" class="btn btn-outline-danger w-75" title="Eliminar registro laboral">
                                     <i class="bi bi-trash3-fill me-1"></i> Eliminar
                                 </button>
                             </form>
@@ -108,6 +111,9 @@
                     <p class="small">El estudiante no tiene asignada ninguna empresa o cargo actualmente.</p>
                 </div>
                 @endif
+            </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Estado laboral del estudiante.
             </div>
         </div>
     </div>

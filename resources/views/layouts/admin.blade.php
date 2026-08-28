@@ -23,19 +23,16 @@
 
   <link rel="icon" type="image/png" href="{{ asset('images/upt_logo-modified.png') }}">
 
-  <!-- Preload de AdminLTE CSS -->
+  <!-- 1. Cargar PRIMERO el framework base (AdminLTE) -->
   <link rel="preload" href="{{ asset('dist/css/adminlte.css') }}" as="style" />
-
-
-  <!-- Estilos principales de AdminLTE -->
   <link rel="stylesheet" href="{{ asset('dist/css/adminlte.css') }}" />
 
-
-  @yield('styles')
+  <!-- 2. Custom CSS -->
   <link href="{{ asset('css/custom-datatables.css') }}?v={{ time() }}" rel="stylesheet">
+  @yield('styles')
 
-  <!-- INYECCIÓN DE VITE (Maneja CSS/JS centralizado: jQuery, Bootstrap, OverlayScrollbars, Select2, DataTables) -->
-  @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+  <!-- 3. Cargar DESPUÉS Vite (Nuestras sobreescrituras en app.css ganarán por cascada) -->
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <!--end::Head-->
 
@@ -43,7 +40,7 @@
 
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
   <div class="app-wrapper">
-    <nav class="app-header navbar navbar-expand bg-body">
+    <nav class="app-header navbar navbar-expand bg-white border-bottom">
       <div class="container-fluid">
         <ul class="navbar-nav">
           <li class="nav-item">
@@ -386,7 +383,7 @@
   @endif
 
   <!-- CAMPOS DE COMPATIBILIDAD CRÍTICOS PARA SELECT2 Y SCRIPTS -->
-  
+
 
   @yield('scripts')
   @stack('scripts')

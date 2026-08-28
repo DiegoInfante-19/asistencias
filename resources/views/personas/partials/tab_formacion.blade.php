@@ -1,11 +1,11 @@
 <div class="row g-4 mt-2">
     <!-- COLUMNA IZQUIERDA: FORMULARIO DE REGISTRO -->
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-plus-circle me-1"></i> Agregar Formación Previa
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-plus-circle me-1 text-primary"></i> Agregar Formación Previa
             </div>
-            <div class="card-body bg-light">
+            <div class="card-body bg-white py-4">
 
                 <div class="alert alert-info py-2 shadow-sm border-0 small mb-3">
                     <i class="bi bi-info-circle-fill me-1"></i>
@@ -15,7 +15,10 @@
                 <form action="{{ route('personas.formacion.store', $persona->id_personas) }}" method="POST" id="form-formacion">
                     @csrf
 
-                    <!-- PESTAÑAS DE SELECCIÓN (TIPO DE TÍTULO) -->
+                    <!-- CAMPO OCULTO: ORIGEN DE LA FORMACIÓN -->
+                    <input type="hidden" name="origen_formacion" id="origen_formacion" value="{{ old('origen_formacion', 'Externo') }}">
+
+                    <!-- PESTAÑAS DE SELECCIÓN -->
                     <ul class="nav nav-pills nav-fill mb-3" id="pills-tipo-titulo" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-bold py-2" id="tab-base-btn" data-bs-toggle="pill" data-bs-target="#pane-base" type="button" role="tab" aria-controls="pane-base" aria-selected="true">
@@ -31,11 +34,11 @@
 
                     <!-- CONTENIDO DE LAS PESTAÑAS -->
                     <div class="tab-content" id="pills-tabContent">
-                        
+
                         <!-- PESTAÑA 1: TÍTULO BASE -->
                         <div class="tab-pane fade show active" id="pane-base" role="tabpanel" aria-labelledby="tab-base-btn">
                             <div class="mb-3">
-                                <label for="id_titulos" class="form-label fw-semibold text-secondary small">Seleccionar Título Base Externo/General</label>
+                                <label for="id_titulos" class="form-label fw-bold small text-muted">Seleccionar Título Base Externo/General</label>
                                 <select class="form-select select2-buscador @error('id_titulos') is-invalid @enderror" id="id_titulos" name="id_titulos">
                                     <option value="" selected>Seleccione...</option>
                                     @foreach($titulos as $titulo)
@@ -53,7 +56,7 @@
                         <!-- PESTAÑA 2: TÍTULO PNF -->
                         <div class="tab-pane fade" id="pane-pnf" role="tabpanel" aria-labelledby="tab-pnf-btn">
                             <div class="mb-3">
-                                <label for="id_titulos_pnf" class="form-label fw-semibold text-secondary small">Seleccionar Título PNF Universitario</label>
+                                <label for="id_titulos_pnf" class="form-label fw-bold small text-muted">Seleccionar Título PNF Universitario</label>
                                 <select class="form-select select2-buscador @error('id_titulos_pnf') is-invalid @enderror" id="id_titulos_pnf" name="id_titulos_pnf">
                                     <option value="" selected>Seleccione...</option>
                                     @foreach($titulos_pnf as $tituloPnf)
@@ -70,9 +73,13 @@
 
                     </div>
 
+                    @error('origen_formacion')
+                    <div class="alert alert-danger py-1 small mb-3">{{ $message }}</div>
+                    @enderror
+
                     <!-- Observación -->
                     <div class="mb-3 mt-2">
-                        <label for="observacion_formacion_academica" class="form-label fw-bold">Observación</label>
+                        <label for="observacion_formacion_academica" class="form-label fw-bold small text-muted">Observación</label>
                         <textarea class="form-control @error('observacion_formacion_academica') is-invalid @enderror"
                             id="observacion_formacion_academica" name="observacion_formacion_academica"
                             rows="3" placeholder="Detalles adicionales (opcional)...">{{ old('observacion_formacion_academica') }}</textarea>
@@ -82,22 +89,25 @@
                     </div>
 
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-sm">
+                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
                             <i class="bi bi-save me-1"></i> Guardar Formación
                         </button>
                     </div>
                 </form>
+            </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Registro de títulos previos.
             </div>
         </div>
     </div>
 
     <!-- COLUMNA DERECHA: TABLA DE FORMACIÓN REGISTRADA -->
     <div class="col-md-8">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white fw-bold"><i class="bi bi-award-fill me-1"></i> Grado de Instrucción del Estudiante</div>
-            <div class="card-body p-0">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark"><i class="bi bi-award-fill me-1 text-primary"></i> Grado de Instrucción del Estudiante</div>
+            <div class="card-body bg-white p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle shadow-sm border">
+                    <table class="table table-hover mb-0 align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 18%;">Categoría</th>
@@ -110,19 +120,13 @@
                             @forelse ($persona->formacionAcademica as $formacion)
                             <tr>
                                 <td>
-                                    @if($formacion->id_titulos)
-                                    <div class="d-flex align-items-center text-success fw-bold">
-                                        <span>Título Base</span>
+                                    <div class="d-flex flex-column">
+                                        @if($formacion->origen_formacion === 'Interno')
+                                        <span class="fw-bold text-primary mb-1">Interno</span>
+                                        @else
+                                        <span class="fw-bold text-success mb-1">Externo</span>
+                                        @endif
                                     </div>
-                                    @elseif($formacion->id_titulos_pnf)
-                                    <div class="d-flex align-items-center text-primary fw-bold">
-                                        <span>Título PNF</span>
-                                    </div>
-                                    @else
-                                    <div class="d-flex align-items-center text-muted fw-bold">
-                                        <span>Desconocido</span>
-                                    </div>
-                                    @endif
                                 </td>
 
                                 <td class="fw-bold text-dark">
@@ -133,8 +137,7 @@
                                     {{ $formacion->tituloPnf->nombre_titulo_pnf }}
                                     @else
                                     <span class="text-danger small">
-                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                                        Error de registro (Revisar BD).
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Error de registro.
                                     </span>
                                     @endif
                                 </td>
@@ -166,6 +169,9 @@
                     </table>
                 </div>
             </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Historial de instrucción académica.
+            </div>
         </div>
     </div>
 </div>
@@ -177,31 +183,39 @@
         const selectPnf = $('#id_titulos_pnf');
         const tabBaseBtn = document.getElementById('tab-base-btn');
         const tabPnfBtn = document.getElementById('tab-pnf-btn');
+        const inputOrigen = document.getElementById('origen_formacion');
 
-        function actualizarCamposActivos() {
+        function actualizarCamposYOrigen() {
             if (tabPnfBtn && tabPnfBtn.classList.contains('active')) {
+                inputOrigen.value = 'Interno';
                 if (selectBase.length) {
                     selectBase.val('');
-                    if (selectBase.data('select2')) { selectBase.trigger('change'); }
+                    if (selectBase.data('select2')) {
+                        selectBase.trigger('change');
+                    }
                 }
             } else {
+                inputOrigen.value = 'Externo';
                 if (selectPnf.length) {
                     selectPnf.val('');
-                    if (selectPnf.data('select2')) { selectPnf.trigger('change'); }
+                    if (selectPnf.data('select2')) {
+                        selectPnf.trigger('change');
+                    }
                 }
             }
         }
 
         if (tabBaseBtn && tabPnfBtn) {
-            tabBaseBtn.addEventListener('shown.bs.tab', actualizarCamposActivos);
-            tabPnfBtn.addEventListener('shown.bs.tab', actualizarCamposActivos);
+            tabBaseBtn.addEventListener('shown.bs.tab', actualizarCamposYOrigen);
+            tabPnfBtn.addEventListener('shown.bs.tab', actualizarCamposYOrigen);
         }
 
-        @if(old('id_titulos_pnf'))
-            if (tabPnfBtn && typeof bootstrap !== 'undefined') {
-                var pnfTab = new bootstrap.Tab(tabPnfBtn);
-                pnfTab.show();
-            }
+        @if(old('id_titulos_pnf') || old('origen_formacion') === 'Interno')
+        if (tabPnfBtn && typeof bootstrap !== 'undefined') {
+            var pnfTab = new bootstrap.Tab(tabPnfBtn);
+            pnfTab.show();
+            inputOrigen.value = 'Interno';
+        }
         @endif
     });
 </script>

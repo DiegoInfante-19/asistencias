@@ -12,20 +12,12 @@
                         <label class="form-label fw-bold small text-muted">Número de Cohorte</label>
                         <input type="text" class="form-control text-uppercase" name="numero_cohorte" required autocomplete="off" oninput="this.value = this.value.toUpperCase()">
                     </div>
-                    <div class="row">
-                        <div class="col-6 form-group mb-3">
-                            <label class="form-label fw-bold small text-muted">Fecha Inicio</label>
-                            <input type="date" class="form-control" name="fecha_inicio_cohorte" required>
-                        </div>
-                        <div class="col-6 form-group mb-3">
-                            <label class="form-label fw-bold small text-muted">Fecha Fin</label>
-                            <input type="date" class="form-control" name="fecha_fin_cohorte" required>
-                        </div>
-                    </div>
+                    
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Descripción</label>
                         <textarea class="form-control" name="descripcion_cohorte" rows="2"></textarea>
                     </div>
+                    
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Estatus</label>
                         <select class="form-select" name="estatus_cohorte" required>
@@ -54,24 +46,17 @@
             <div class="modal-body p-4">
                 <form id="UpdateCohorteForm" method="POST" action="">
                     @csrf @method('PUT')
+                    
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Número de Cohorte</label>
                         <input type="text" class="form-control text-uppercase" name="numero_cohorte" id="edit-numero-cohorte" required>
                     </div>
-                    <div class="row">
-                        <div class="col-6 form-group mb-3">
-                            <label class="form-label fw-bold small text-muted">Fecha Inicio</label>
-                            <input type="date" class="form-control" name="fecha_inicio_cohorte" id="edit-fecha-inicio" required>
-                        </div>
-                        <div class="col-6 form-group mb-3">
-                            <label class="form-label fw-bold small text-muted">Fecha Fin</label>
-                            <input type="date" class="form-control" name="fecha_fin_cohorte" id="edit-fecha-fin" required>
-                        </div>
-                    </div>
+                    
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Descripción</label>
                         <textarea class="form-control" name="descripcion_cohorte" id="edit-descripcion" rows="2"></textarea>
                     </div>
+                    
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Estatus</label>
                         <select class="form-select" name="estatus_cohorte" id="edit-estatus" required>

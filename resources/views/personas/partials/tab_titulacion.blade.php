@@ -1,12 +1,12 @@
 <div class="row g-4 mt-2">
     <!-- COLUMNA IZQUIERDA: FORMULARIO DE ASIGNACIÓN -->
     <div class="col-md-5">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-mortarboard-fill me-1"></i>
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-mortarboard-fill me-1 text-primary"></i>
                 {{ $persona->titulacionPersona ? 'Actualizar' : 'Asignar' }} Expediente Académico
             </div>
-            <div class="card-body bg-light">
+            <div class="card-body bg-white py-4">
 
                 <div class="alert alert-warning py-2 shadow-sm border-0 small mb-3">
                     <i class="bi bi-exclamation-triangle-fill me-1"></i>
@@ -18,7 +18,7 @@
 
                     <!-- 1. Selección del PNF -->
                     <div class="mb-3">
-                        <label for="id_pnf" class="form-label fw-bold">Programa Nacional de Formación (PNF) <span class="text-danger">*</span></label>
+                        <label for="id_pnf" class="form-label fw-bold small text-muted">Programa Nacional de Formación (PNF) <span class="text-danger">*</span></label>
                         <select class="form-select select2-buscador @error('id_pnf') is-invalid @enderror" id="id_pnf" name="id_pnf" required>
                             <option value="" selected disabled>Seleccione el PNF a cursar...</option>
                             @foreach($pnfs as $pnf)
@@ -37,7 +37,7 @@
                     <div class="row g-3 mb-3">
                         <!-- Selección del Título (Se llena vía AJAX) -->
                         <div class="col-md-6">
-                            <label for="id_titulacion" class="form-label fw-bold">Título a Optar <span class="text-danger">*</span></label>
+                            <label for="id_titulacion" class="form-label fw-bold small text-muted">Título a Optar <span class="text-danger">*</span></label>
                             <select class="form-select select2-buscador @error('id_titulacion') is-invalid @enderror" id="id_titulacion" name="id_titulacion" required>
                                 <option value="">Seleccione primero un PNF...</option>
                             </select>
@@ -48,7 +48,7 @@
 
                         <!-- Selección del Estatus -->
                         <div class="col-md-6">
-                            <label for="id_estatus_expediente" class="form-label fw-bold">Estatus <span class="text-danger">*</span></label>
+                            <label for="id_estatus_expediente" class="form-label fw-bold small text-muted">Estatus <span class="text-danger">*</span></label>
                             <select class="form-select select2-buscador @error('id_estatus_expediente') is-invalid @enderror" id="id_estatus_expediente" name="id_estatus_expediente" required>
                                 <option value="" selected disabled>Seleccione...</option>
                                 @foreach($estatusExpedientes as $estatus)
@@ -65,7 +65,7 @@
                     </div>
 
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-sm">
+                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
                             <i class="bi bi-save-fill me-1"></i>
                             {{ $persona->titulacionPersona ? 'Actualizar Expediente' : 'Guardar Expediente' }}
                         </button>
@@ -73,16 +73,19 @@
                 </form>
 
             </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Formulario de asignación académica.
+            </div>
         </div>
     </div>
 
     <!-- COLUMNA DERECHA: EXPEDIENTE ACTUAL REGISTRADO -->
     <div class="col-md-7">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-folder-check me-1"></i> Estado del Expediente Académico
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-folder-check me-1 text-primary"></i> Estado del Expediente Académico
             </div>
-            <div class="card-body d-flex flex-column justify-content-center">
+            <div class="card-body bg-white d-flex flex-column justify-content-center py-4">
                 @if ($persona->titulacionPersona)
                 <div class="p-4 border-start border-4 border-primary bg-light rounded shadow-sm">
 
@@ -127,6 +130,9 @@
                     <p class="small">El estudiante aún no tiene asignado un PNF ni un estatus académico.</p>
                 </div>
                 @endif
+            </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Resumen del estado académico actual.
             </div>
         </div>
     </div>

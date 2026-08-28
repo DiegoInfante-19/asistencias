@@ -1,10 +1,10 @@
-<div class="row mt-4">
+<div class="row mt-2">
     <div class="col-md-8 offset-md-2">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-journal-text me-1"></i> Observaciones Especiales (Salud / Generales)
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-journal-text me-1 text-primary"></i> Observaciones Especiales (Salud / Generales)
             </div>
-            <div class="card-body bg-light">
+            <div class="card-body bg-white py-4">
                 
                 <div class="alert alert-info py-2 shadow-sm border-0 small">
                     <i class="bi bi-info-circle-fill me-2"></i>
@@ -15,7 +15,7 @@
                     @csrf
                     
                     <div class="mb-3">
-                        <label for="observacion_personas" class="form-label fw-bold">Nota de Observación <span class="text-danger">*</span></label>
+                        <label for="observacion_personas" class="form-label fw-bold small text-muted">Nota de Observación <span class="text-danger">*</span></label>
                         
                         <textarea class="form-control @error('observacion_personas') is-invalid @enderror" 
                                   id="observacion_personas" 
@@ -41,13 +41,16 @@
                     </div>
 
                     <div class="d-flex justify-content-end mt-4">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary fw-bold">
                             <i class="bi bi-save-fill me-1"></i> 
                             {{ $persona->observacion ? 'Actualizar Observación' : 'Guardar Observación' }}
                         </button>
                     </div>
                 </form>
 
+            </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Notas y condiciones del perfil estudiantil.
             </div>
         </div>
     </div>

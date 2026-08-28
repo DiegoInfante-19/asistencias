@@ -26,7 +26,8 @@ class Persona extends Model
         'sexo_personas',
         'fecha_nacimiento_personas',
         'id_lugar_nacimiento',
-        'email_personas'
+        'email_personas',
+        'id_cohortes' // <-- NUEVO
     ];
 
     /**
@@ -39,6 +40,12 @@ class Persona extends Model
     public function lugarNacimiento(): BelongsTo
     {
         return $this->belongsTo(LugarNacimientoPersona::class, 'id_lugar_nacimiento', 'id_lugar_nacimiento');
+    }
+
+    // NUEVO: Pertenece a una cohorte (Sello de ingreso estático)
+    public function cohorte(): BelongsTo
+    {
+        return $this->belongsTo(Cohorte::class, 'id_cohortes', 'id_cohortes');
     }
 
     // Una persona tiene muchos teléfonos (1 a Muchos)

@@ -24,7 +24,9 @@ class PersonaController extends Controller{
 
     public function create(){
         $estados = \App\Models\Estado::all();
-        return view('personas.create', compact('estados'));
+        $cohortes = Cohorte::all(); // --- NUEVO: Traer cohortes ---
+        
+        return view('personas.create', compact('estados', 'cohortes'));
     }
 
     public function store(StorePersonaRequest $request){
@@ -38,8 +40,11 @@ class PersonaController extends Controller{
                 'detalles_adicionales' => $data['detalles_adicionales'] ?? null
             ]);
 
+            // Se elimina estado, ciudad y detalles para guardar en persona
             $personaData = array_diff_key($data, array_flip(['id_estado', 'id_ciudad', 'detalles_adicionales']));
             $personaData['id_lugar_nacimiento'] = $lugar->id_lugar_nacimiento;
+
+            // La llave 'id_cohortes' ya viene en $personaData porque fue validada en el Request
 
             \App\Models\Persona::create($personaData);
 
@@ -55,6 +60,7 @@ class PersonaController extends Controller{
     {
         $persona = Persona::with([
             'lugarNacimiento.ciudad.estado', 
+            'cohorte', // --- NUEVO: Cargar la cohorte directamente desde la persona ---
             'telefonos',
             'observacion',
             'empresaPersona.empresa',
@@ -62,7 +68,7 @@ class PersonaController extends Controller{
             'titulacionPersona',
             'formacionAcademica.titulo',
             'formacionAcademica.tituloPnf',
-            'inscripcionesSecciones.seccion.periodoAcademico.cohorte',
+            'inscripcionesSecciones.seccion.periodoAcademico', // (Ajustado, se quitó cohorte de aquí)
             'inscripcionesSecciones.seccion.pnf'                        
         ])->findOrFail($id);
 
@@ -74,7 +80,8 @@ class PersonaController extends Controller{
         $empresas             = \App\Models\Empresa::all();
         $cargos               = \App\Models\Cargo::all();
 
-        $seccionesData = \App\Models\Seccion::with(['pnf', 'periodoAcademico.cohorte'])
+        // Modificamos para no pedir 'periodoAcademico.cohorte' ya que cohorte ya no está ahí
+        $seccionesData = \App\Models\Seccion::with(['pnf', 'periodoAcademico'])
             ->whereHas('periodoAcademico', function($q) { 
                 $q->where('estatus_periodo', 'Activo'); 
             })
@@ -107,8 +114,9 @@ class PersonaController extends Controller{
     {
         $persona = \App\Models\Persona::with('lugarNacimiento.ciudad')->findOrFail($id);
         $estados = \App\Models\Estado::all();
+        $cohortes = Cohorte::all(); // --- NUEVO: Traer cohortes ---
 
-        return view('personas.edit', compact('persona', 'estados'));
+        return view('personas.edit', compact('persona', 'estados', 'cohortes'));
     }
 
     public function update(UpdatePersonaRequest $request, Persona $persona)

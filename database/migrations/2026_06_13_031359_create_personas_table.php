@@ -22,6 +22,9 @@ return new class extends Migration
             $table->foreignId('id_lugar_nacimiento')->constrained('lugar_nacimiento_personas', 'id_lugar_nacimiento')->onDelete('restrict');
             
             $table->string('email_personas')->unique();
+
+            // --- NUEVO: Sello de ingreso de Cohorte ---
+            $table->foreignId('id_cohortes')->constrained('cohortes', 'id_cohortes')->onDelete('restrict');
             
             // Auditoría y Seguridad
             $table->softDeletes(); // Columna deleted_at

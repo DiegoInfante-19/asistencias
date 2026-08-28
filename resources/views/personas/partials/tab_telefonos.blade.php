@@ -1,11 +1,11 @@
 <div class="row g-4 mt-2">
     <!-- COLUMNA IZQUIERDA: FORMULARIO DE REGISTRO -->
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-plus-circle me-1"></i> Agregar Teléfono
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-plus-circle me-1 text-primary"></i> Agregar Teléfono
             </div>
-            <div class="card-body bg-light">
+            <div class="card-body bg-white py-4">
 
                 <div class="alert alert-info py-2 shadow-sm border-0 small mb-3">
                     <i class="bi bi-info-circle-fill me-1"></i>
@@ -16,7 +16,7 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label for="numero_telefono_personas" class="form-label fw-bold">Número <span class="text-danger">*</span></label>
+                        <label for="numero_telefono_personas" class="form-label fw-bold small text-muted">Número <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('numero_telefono_personas') is-invalid @enderror"
                             id="numero_telefono_personas" name="numero_telefono_personas"
                             value="{{ old('numero_telefono_personas') }}" placeholder="Ej: 04141234567" required>
@@ -26,7 +26,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="tipo_telefono" class="form-label fw-bold">Tipo <span class="text-danger">*</span></label>
+                        <label for="tipo_telefono" class="form-label fw-bold small text-muted">Tipo <span class="text-danger">*</span></label>
                         <select class="form-select @error('tipo_telefono') is-invalid @enderror" id="tipo_telefono" name="tipo_telefono" required>
                             <option value="" selected disabled>Seleccione un tipo...</option>
                             <option value="Móvil" {{ old('tipo_telefono') == 'Móvil' ? 'selected' : '' }}>Móvil</option>
@@ -40,24 +40,27 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-sm">
+                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
                             <i class="bi bi-save-fill me-1"></i> Guardar Teléfono
                         </button>
                     </div>
                 </form>
+            </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Gestión de contactos telefónicos.
             </div>
         </div>
     </div>
 
     <!-- COLUMNA DERECHA: TABLA DE TELÉFONOS REGISTRADOS -->
     <div class="col-md-8">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-list-check me-1"></i> Teléfonos Registrados
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-list-check me-1 text-primary"></i> Teléfonos Registrados
             </div>
-            <div class="card-body p-0">
+            <div class="card-body bg-white p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped mb-0 align-middle shadow-sm border">
+                    <table class="table table-hover table-striped mb-0 align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 10%;" class="text-center">#</th>
@@ -116,6 +119,9 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Listado general de números activos.
             </div>
         </div>
     </div>

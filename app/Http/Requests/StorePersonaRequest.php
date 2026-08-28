@@ -40,7 +40,7 @@ class StorePersonaRequest extends FormRequest
                 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
             ],
             
-            // --- LÓGICA DE LUGAR DE NACIMIENTO 3NF (AGREGADO) ---
+            // --- LÓGICA DE LUGAR DE NACIMIENTO 3NF ---
             'id_lugar_nacimiento' => [
                 'nullable', 'integer', 'exists:lugar_nacimiento_personas,id_lugar_nacimiento'
             ],
@@ -52,6 +52,11 @@ class StorePersonaRequest extends FormRequest
             ],
             'detalles_adicionales' => [
                 'nullable', 'string', 'max:255'
+            ],
+
+            // --- LÓGICA DE COHORTE ---
+            'id_cohortes' => [
+                'required', 'integer', 'exists:cohortes,id_cohortes'
             ],
         ];
     }
@@ -68,6 +73,9 @@ class StorePersonaRequest extends FormRequest
             'id_ciudad.required' => 'Debe seleccionar una ciudad.',
             'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
             'id_lugar_nacimiento.exists' => 'El lugar de nacimiento seleccionado no es válido.',
+
+            'id_cohortes.required' => 'Debe asignar una cohorte de ingreso al estudiante.',
+            'id_cohortes.exists' => 'La cohorte seleccionada no es válida.',
 
             'cedula_personas.regex'            => 'La cédula debe tener entre 6 y 8 números exactos. Sin espacios ni puntos.',
             'primer_nombre_personas.regex'     => 'Solo se permiten letras y espacios.',

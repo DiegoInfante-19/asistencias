@@ -1,11 +1,11 @@
 <div class="row g-4 mt-2">
     <!-- COLUMNA IZQUIERDA: FORMULARIO DE INSCRIPCIÓN -->
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-calendar-plus me-1"></i> Inscribir en Sección Académica
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-calendar-plus me-1 text-primary"></i> Inscribir en Sección Académica
             </div>
-            <div class="card-body bg-light">
+            <div class="card-body bg-white py-4">
 
                 @if(!$persona->titulacionPersona)
                     <div class="text-center py-5">
@@ -26,7 +26,7 @@
 
                         <!-- Select: Sección -->
                         <div class="mb-3">
-                            <label for="select_seccion" class="form-label fw-bold">Sección Académica <span class="text-danger">*</span></label>
+                            <label for="select_seccion" class="form-label fw-bold small text-muted">Sección Académica <span class="text-danger">*</span></label>
                             <select id="select_seccion" class="form-select select2-buscador" required>
                                 <option value="" selected disabled>Seleccione una sección...</option>
                             </select>
@@ -40,7 +40,7 @@
 
                         <!-- Fecha de Inscripción -->
                         <div class="mb-3 mt-3">
-                            <label for="fecha_inscripcion" class="form-label fw-bold">Fecha de Inscripción <span class="text-danger">*</span></label>
+                            <label for="fecha_inscripcion" class="form-label fw-bold small text-muted">Fecha de Inscripción <span class="text-danger">*</span></label>
                             <input type="date" class="form-control @error('fecha_inscripcion') is-invalid @enderror" 
                                    id="fecha_inscripcion" name="fecha_inscripcion" value="{{ old('fecha_inscripcion', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
                             @error('fecha_inscripcion')
@@ -50,7 +50,7 @@
 
                         <!-- Estatus Inicial -->
                         <div class="mb-4">
-                            <label for="estatus_inscripcion" class="form-label fw-bold">Estatus Inicial <span class="text-danger">*</span></label>
+                            <label for="estatus_inscripcion" class="form-label fw-bold small text-muted">Estatus Inicial <span class="text-danger">*</span></label>
                             <select class="form-select @error('estatus_inscripcion') is-invalid @enderror" id="estatus_inscripcion" name="estatus_inscripcion" required>
                                 <option value="Activo" selected>Activo</option>
                                 <option value="Retirado">Retirado</option>
@@ -61,23 +61,26 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" id="btn_inscribir" class="btn btn-primary btn-sm" disabled>
+                            <button type="submit" id="btn_inscribir" class="btn btn-primary btn-sm fw-bold" disabled>
                                 <i class="bi bi-save me-1"></i> Registrar Inscripción
                             </button>
                         </div>
                     </form>
                 @endif
             </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Módulo de matriculación en secciones.
+            </div>
         </div>
     </div>
 
     <!-- COLUMNA DERECHA: HISTORIAL DE INSCRIPCIONES -->
     <div class="col-md-8">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white fw-bold">
-                <i class="bi bi-calendar-check-fill me-1"></i> Historial Académico del Estudiante
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3 fw-bold text-dark">
+                <i class="bi bi-calendar-check-fill me-1 text-primary"></i> Historial Académico del Estudiante
             </div>
-            <div class="card-body p-0">
+            <div class="card-body bg-white p-0">
                 <div class="table-responsive">
                     <table class="table table-hover table-striped mb-0 align-middle">
                         <thead class="table-light">
@@ -133,6 +136,9 @@
                     </table>
                 </div>
             </div>
+            <div class="card-footer bg-light py-2 text-muted small">
+                Registro histórico de secciones cursadas.
+            </div>
         </div>
     </div>
 </div>
@@ -159,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // Ya está inicializado globalmente o vía clase select2-buscador, pero sincronizamos los eventos de Select2
         $('#select_seccion').on('select2:select', function (e) {
             inputSeccionHidden.value = e.params.data.id;
             btnInscribir.disabled = (this.value === '');
