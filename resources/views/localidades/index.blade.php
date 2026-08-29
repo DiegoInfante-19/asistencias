@@ -1,32 +1,42 @@
 @extends('layouts.admin')
 
-@section('header')
-    <x-page-header title="Gestión de Localidades">
-        <li class="breadcrumb-item active" aria-current="page" style="font-weight: 500;">Localidades</li>
-    </x-page-header>
-@endsection
-
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
     <div class="card border-0 shadow-sm">
-        <div class="card-body bg-white">
-            <!-- Pestañas de Navegación -->
-            <ul class="nav nav-tabs mb-4" id="localidadTab" role="tablist">
+        
+        <!-- Cabecera Principal -->
+        <div class="card-header bg-white py-3 d-flex align-items-center">
+            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
+                Registro de Localidades
+            </h5>
+        </div>
+
+        <!-- Navegación de Pestañas con estilo unificado -->
+        <div class="card-header bg-light pt-2 pb-0 border-top border-bottom">
+            <ul class="nav nav-tabs card-header-tabs" id="localidadTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#tab-estados" type="button" role="tab">Estados</button>
+                    <button class="nav-link active text-dark" data-bs-toggle="tab" data-bs-target="#tab-estados" type="button" role="tab" style="font-weight: 500;">
+                        Estados
+                    </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#tab-ciudades" type="button" role="tab">Ciudades</button>
+                    <button class="nav-link text-dark" data-bs-toggle="tab" data-bs-target="#tab-ciudades" type="button" role="tab" style="font-weight: 500;">
+                        Ciudades
+                    </button>
                 </li>
             </ul>
+        </div>
 
-            <div class="tab-content pt-2">
+        <!-- Cuerpo con fondo blanco puro -->
+        <div class="card-body bg-white py-4">
+            <div class="tab-content" id="localidadTabContent">
+                
                 <!-- TAB ESTADOS -->
                 <div class="tab-pane fade show active" id="tab-estados" role="tabpanel">
-                    <div class="d-flex align-items-center mb-3">
-                        <h4 class="card-title text-dark mb-0" style="font-weight: 500;">Gestión de Estados</h4>
-                        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#createEstateModal">
-                            <i class="bi bi-plus-lg me-1" style="font-weight: 500;"></i> Añadir Estado
+                    <div class="d-flex justify-content-between align-items-center mb-4" >
+                        <h6 class="text-secondary mb-0 " style="font-weight: 500;">Directorio de Estados</h6>
+                        <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#createEstateModal">
+                            <i class="bi bi-plus-circle me-1"></i> Añadir Estado
                         </button>
                     </div>
 
@@ -37,10 +47,10 @@
 
                 <!-- TAB CIUDADES -->
                 <div class="tab-pane fade" id="tab-ciudades" role="tabpanel">
-                    <div class="d-flex align-items-center mb-3">
-                        <h4 class="card-title text-dark mb-0" style="font-weight: 500;">Gestión de Ciudades</h4>
-                        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#createCiudadModal">
-                            <i class="bi bi-plus-lg me-1" style="font-weight: 500;"></i> Añadir Ciudad
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="text-secondary mb-0 " style="font-weight: 500;">Directorio de Ciudades</h6>
+                        <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#createCiudadModal">
+                            <i class="bi bi-plus-circle me-1"></i> Añadir Ciudad
                         </button>
                     </div>
 
@@ -48,12 +58,40 @@
                         {!! $ciudadesTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
 @include('localidades.partials.modals')
+@endsection
+
+@section('styles')
+<style>
+    /* Estética limpia para las pestañas y corrección del solapamiento */
+    .card-header-tabs {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        margin-bottom: -1px !important;
+    }
+    .card-header-tabs .nav-link {
+        border-top-left-radius: 0.375rem;
+        border-top-right-radius: 0.375rem;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: 0.5rem 1rem;
+    }
+    .card-header-tabs .nav-link:hover {
+        border-color: #e9ecef #e9ecef #dee2e6;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+    .card-header-tabs .nav-link.active {
+        color: #0d6efd !important;
+        background-color: #ffffff !important;
+        border-color: #dee2e6 #dee2e6 #ffffff !important;
+    }
+</style>
 @endsection
 
 @push('scripts')

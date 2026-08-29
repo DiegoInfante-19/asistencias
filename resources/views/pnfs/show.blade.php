@@ -10,8 +10,9 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
 
+    <!-- TARJETA DE CABECERA DEL PNF -->
     <div class="card mb-4 border-0 shadow-sm">
-        <div class="card-body p-4">
+        <div class="card-body p-4 bg-white rounded">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
 
                 <div class="flex-grow-1">
@@ -26,14 +27,14 @@
                     <a href="{{ route('pnfs.index') }}" class="btn btn-outline-secondary fw-semibold">
                         <i class="bi bi-arrow-left me-1"></i> Volver al Catálogo
                     </a>
-                    <button type="button" class="btn btn-warning fw-bold text-dark"
+                    <button type="button" class="btn btn-warning fw-bold text-dark shadow-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#UpdatePnfModal"
                         data-url="{{ route('pnfs.update', $pnf->id_pnf) }}"
                         data-nombre="{{ $pnf->nombre_pnf }}"
                         data-vigencia="{{ $pnf->vigencia_pnf ? 1 : 0 }}"
                         data-descripcion="{{ $pnf->descripcion_pnf }}">
-                        <i class="bi bi-pencil me-1"></i> Editar Datos
+                        <i class="bi bi-pencil-square me-1"></i> Editar Datos
                     </button>
                 </div>
 
@@ -41,22 +42,23 @@
         </div>
     </div>
 
+    <!-- TARJETA CONTENEDORA DE PESTAÑAS (TÍTULOS Y EMPRESAS) -->
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-0 pt-3">
             <ul class="nav nav-tabs nav-fill card-header-tabs" id="pnfDashboardTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fw-bold py-3 text-secondary" id="titulos-tab" data-bs-toggle="tab" data-bs-target="#titulos-pane" type="button" role="tab" aria-controls="titulos-pane" aria-selected="true">
-                        <i class="bi bi-mortarboard fs-5 me-2"></i> Títulos Ofertados ({{ $pnf->titulosPnf->count() }})
+                        <i class="bi bi-mortarboard fs-5 me-2 text-primary"></i> Títulos Ofertados ({{ $pnf->titulosPnf->count() }})
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link fw-bold py-3 text-secondary" id="empresas-tab" data-bs-toggle="tab" data-bs-target="#empresas-pane" type="button" role="tab" aria-controls="empresas-pane" aria-selected="false">
-                        <i class="bi bi-building fs-5 me-2"></i> Empresas Aliadas / Convenios ({{ $pnf->empresasPnf->count() }})
+                        <i class="bi bi-building fs-5 me-2 text-primary"></i> Empresas Aliadas / Convenios ({{ $pnf->empresasPnf->count() }})
                     </button>
                 </li>
             </ul>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body bg-white p-4">
             <div class="tab-content" id="pnfDashboardTabsContent">
                 <div class="tab-pane fade show active" id="titulos-pane" role="tabpanel" aria-labelledby="titulos-tab" tabindex="0">
                     @include('pnfs.partials.tab_titulos')
@@ -66,6 +68,9 @@
                     @include('pnfs.partials.tab_empresas')
                 </div>
             </div>
+        </div>
+        <div class="card-footer bg-light py-2 text-muted small">
+            Secciones operativas del expediente del PNF.
         </div>
     </div>
 </div>
@@ -77,9 +82,6 @@
 
 @push('scripts')
 <script>
-    // Toda la inicialización de Select2 fue movida a app.js por Vite de forma segura.
-
-    // 1. Lógica para cargar datos dinámicos en el modal de edición de PNF
     document.addEventListener('DOMContentLoaded', function() {
         let updateModal = document.getElementById('UpdatePnfModal');
         if (updateModal) {
@@ -87,14 +89,10 @@
                 var button = event.relatedTarget;
                 var modal = this;
                 
-                // Actualizar la ruta del formulario
                 modal.querySelector('#UpdatePnfForm').setAttribute('action', button.getAttribute('data-url'));
-                
-                // Setear valores de texto
                 modal.querySelector('#edit-nombre-pnf').value = button.getAttribute('data-nombre');
                 modal.querySelector('#edit-descripcion-pnf').value = button.getAttribute('data-descripcion');
                 
-                // Setear el valor del Select y notificar a jQuery/Select2
                 let vigenciaSelect = modal.querySelector('#edit-vigencia-pnf');
                 vigenciaSelect.value = button.getAttribute('data-vigencia');
                 
@@ -108,7 +106,6 @@
         }
     });
 
-    // 2. Delegación nativa para SweetAlert2 (Eliminaciones de Títulos y Empresas)
     document.addEventListener('submit', function(event) {
         if (event.target && event.target.classList.contains('form-desvincular-titulo')) {
             event.preventDefault();
@@ -145,7 +142,6 @@
         }
     });
 
-    // 3. Persistencia de pestañas activas con Bootstrap
     document.addEventListener("DOMContentLoaded", function() {
         if (typeof window.bootstrap !== 'undefined') {
             let activeTabId = localStorage.getItem('pnf_dashboard_active_tab');
@@ -166,4 +162,7 @@
         }
     });
 </script>
+
+<script src="{{ asset('js/core-validations.js') }}" defer></script>
+<script src="{{ asset('js/admin-validations.js') }}" defer></script>
 @endpush

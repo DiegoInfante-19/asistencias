@@ -1,25 +1,22 @@
 @extends('layouts.admin')
 
-@section('header')
-    <x-page-header title="Catálogo: Estatus de Expedientes">
-        <li class="breadcrumb-item active" aria-current="page" style="font-weight: 500;">Estatus de Expedientes</li>
-    </x-page-header>
-@endsection
-
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
     <!-- Tarjeta Principal con diseño limpio -->
     <div class="card border-0 shadow-sm">
 
+        <!-- Cabecera de la tarjeta principal -->
         <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">Catálogo: Estatus de Expedientes</h4>
-            <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#createEstatusModal">
-                <i class="bi bi-folder-plus me-1" style="font-weight: 500;"></i> Añadir Estatus
+            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
+                Registro de Estatus de Expedientes
+            </h5>
+            <button type="button" class="btn btn-primary fw-bold ms-auto" data-bs-toggle="modal" data-bs-target="#createEstatusModal">
+                <i class="bi bi-folder-plus me-1"></i> Añadir Estatus
             </button>
         </div>
         
-        <!-- Cuerpo con fondo blanco -->
-        <div class="card-body bg-white">
+        <!-- Cuerpo con fondo blanco puro -->
+        <div class="card-body bg-white py-4">
             <div class="table-responsive">
                 {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
             </div>

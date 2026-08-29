@@ -1,11 +1,5 @@
 @extends('layouts.admin')
 
-@section('header')
-    <x-page-header title="Personal y Profesores">
-        <li class="breadcrumb-item active" aria-current="page" style="font-weight: 500;">Profesores</li>
-    </x-page-header>
-@endsection
-
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
     <!-- Tarjeta Principal con diseño limpio -->

@@ -24,7 +24,7 @@
                     <i class="bi bi-building me-2 text-muted"></i>{{ $vinculo->empresa->nombre_empresa }}
                 </td>
                 <td>
-                    <span class=" text-dark">
+                    <span class="text-dark">
                         "{{ $vinculo->tipo_relacion }}"
                     </span>
                 </td>
@@ -35,6 +35,7 @@
                     <form action="{{ route('pnfs.empresas.destroy', $vinculo->id_empresa_pnf) }}" method="POST" class="m-0 p-0 form-desvincular-empresa">
                         @csrf
                         @method('DELETE')
+                        <!-- Botón Original Restaurado -->
                         <button type="submit" class="btn-accion-desvinculacion btn btn-outline-secondary" title="Romper Convenio con Empresa">
                             Desvincular
                         </button>
@@ -54,17 +55,19 @@
 
 <div class="modal fade" id="vincularEmpresaModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold text-dark">Establecer Convenio Empresarial</h5>
+        <div class="modal-content shadow">
+            <div class="modal-header bg-white border-bottom">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="bi bi-building text-primary me-2"></i>Establecer Convenio Empresarial
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body bg-white p-4">
                 <form id="vincularEmpresaForm" method="POST" action="{{ route('pnfs.empresas.store', $pnf->id_pnf) }}">
                     @csrf
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Seleccione la Empresa Aliada <span class="text-danger">*</span></label>
-                        <select class="form-select select2-buscador" name="id_empresa" required>
+                        <select class="form-select bg-light border-secondary-subtle shadow-sm select2-buscador" name="id_empresa" required>
                             <option value="" selected disabled>Seleccione...</option>
                             @foreach($catalogoEmpresas as $emp)
                             <option value="{{ $emp->id_empresa }}">{{ $emp->nombre_empresa }}</option>
@@ -73,17 +76,21 @@
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Tipo de Relación o Convenio <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="tipo_relacion" placeholder="Ej: Pasantías, Proyecto Socio-Integrador" required autocomplete="off">
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" name="tipo_relacion" placeholder="Ej: Pasantías, Proyecto Socio-Integrador" required autocomplete="off">
                     </div>
                     <div class="form-group mb-0">
                         <label class="form-label fw-bold small text-muted">Observaciones Adicionales (Opcional)</label>
-                        <textarea class="form-control" name="observacion_empresa_pnf" rows="3" placeholder="Detalles de convenios, cantidad de vacantes permitidas, etc."></textarea>
+                        <textarea class="form-control bg-light border-secondary-subtle shadow-sm" name="observacion_empresa_pnf" rows="3" placeholder="Detalles de convenios, cantidad de vacantes permitidas, etc."></textarea>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" form="vincularEmpresaForm" class="btn btn-primary fw-bold">Registrar Alianza</button>
+            <div class="modal-footer bg-white border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Cancelar
+                </button>
+                <button type="submit" form="vincularEmpresaForm" class="btn btn-primary fw-bold">
+                    <i class="bi bi-save-fill me-1"></i> Registrar Alianza
+                </button>
             </div>
         </div>
     </div>

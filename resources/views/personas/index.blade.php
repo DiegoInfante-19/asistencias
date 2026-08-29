@@ -43,20 +43,14 @@
 </style>
 @endsection
 
-@section('header')
-    <x-page-header title="Personal y Profesores">
-        <li class="breadcrumb-item active" aria-current="page" style="font-weight: 500;">Estudiantes</li>
-    </x-page-header>
-@endsection
-
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
     
     <!-- PANEL DE FILTROS AVANZADOS -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white py-3">
-            <h5 class="card-title text-dark mb-0 fw-bold fs-6">
-                <i class="bi bi-funnel-fill text-primary me-1"></i> Filtros de Búsqueda Avanzada
+            <h5 class="card-title text-dark mb-0fs-6" style="font-weight: 500;">
+                Filtros de Búsqueda
             </h5>
         </div>
         <div class="card-body bg-white py-4">
@@ -148,7 +142,7 @@
     <!-- Tarjeta Principal con la Tabla -->
     <div class="card shadow-sm">
         <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">Directorio de Estudiantes</h4>
+            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">Registro de Estudiantes</h4>
             <a href="{{ route('personas.create') }}" class="btn btn-primary ms-auto">
                 <i class="bi bi-person-plus-fill me-1" style="font-weight: 500;"></i> Añadir Estudiante
             </a>

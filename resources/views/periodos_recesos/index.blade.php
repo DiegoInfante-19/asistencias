@@ -1,12 +1,6 @@
 @extends('layouts.admin')
 
-{{-- ELIMINAMOS @section('styles') PORQUE YA CARGAMOS TODO LOCALMENTE CON VITE --}}
 
-@section('header')
-<x-page-header title="Periodos de Recesos y Eventos">
-    <li class="breadcrumb-item active" aria-current="page" style="font-weight: 500;">Periodos de Receso</li>
-</x-page-header>
-@endsection
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
@@ -14,16 +8,17 @@
     <div class="card border-0 shadow-sm">
 
         <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">Catálogo de Periodos y Eventos</h4>
-            <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#createPeriodoModal">
-                <i class="bi bi-calendar-plus me-1" style="font-weight: 500;"></i> Añadir Periodo
+            <h5 class="card-title text-dark mb-0  fs-5" style="font-weight: 500;">
+                Registro de Eventos y Periodos 
+            </h5>
+            <button type="button" class="btn btn-primary  ms-auto" data-bs-toggle="modal" data-bs-target="#createPeriodoModal">
+                <i class="bi bi-calendar-plus me-1"></i> Añadir Periodo
             </button>
         </div>
 
         <!-- Cuerpo con fondo blanco -->
-        <div class="card-body bg-white">
+        <div class="card-body bg-white py-4">
             <div class="table-responsive">
-                <!-- Inyectamos las clases de Bootstrap limpias para DataTables -->
                 {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
             </div>
         </div>
@@ -34,8 +29,6 @@
 @endsection
 
 @push('scripts')
-{{-- ELIMINAMOS LOS CDNS DE JQUERY Y DATATABLES PORQUE VITE SE ENCARGA DE ESO --}}
-
 <!-- 1. Script del Modal: Envuelto en type="module" -->
 <script type="module">
     $(document).ready(function() {
@@ -50,6 +43,7 @@
             modal.find('#edit-fin-periodo').val(button.data('fin'));
             modal.find('#edit-descripcion-periodo').val(button.data('descripcion'));
             modal.find('#edit-nivel-periodo').val(button.data('nivel'));
+            modal.find('#edit-tipo-receso').val(button.data('tipo'));
 
             if (button.data('suspension') == 1) {
                 modal.find('#edit-suspension-periodo').prop('checked', true);
@@ -87,6 +81,6 @@
 
 <script src="{{ asset('js/admin-validations.js') }}" defer></script>
 
-<!-- 2. Script de Yajra: Solucionamos el error pasándole el type module -->
+<!-- 2. Script de Yajra modular -->
 {!! $dataTable->scripts(null, ['type' => 'module']) !!}
 @endpush

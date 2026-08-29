@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header">
-                <h1 class="modal-title fs-5 fw-bold" id="viewUserModalLabel">
+                <h1 class="modal-title fs-5 fw-bold" id="viewUserModalLabel" style="font-weight: 500;">
                     Ficha del Profesor
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -64,7 +64,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header border-bottom text-dark">
-                <h1 class="modal-title fs-5 fw-bold" id="editUserModalLabel"> Modificar Datos del Profesor </h1>
+                <h1 class="modal-title fs-5 " id="editUserModalLabel" style="font-weight: 500;"> Modificar Datos del Profesor </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
@@ -149,7 +149,7 @@
         <div class="modal-content border-0 shadow">
 
             <div class="modal-header border-bottom">
-                <h1 class="modal-title fs-5 fw-bold" id="createUserModalLabel">
+                <h1 class="modal-title fs-5" id="createUserModalLabel" style="font-weight: 500;">
                     Registrar Profesor
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

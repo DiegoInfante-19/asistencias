@@ -10,8 +10,8 @@
         <thead class="table-light">
             <tr>
                 <th style="width: 60px;">#</th>
-                <th>Título Base (Catálogo)</th>
-                <th>Nombre de Certificación Específica del PNF</th>
+                <th class="text-start">Título Base (Catálogo)</th>
+                <th class="text-start">Nombre de Certificación Específica del PNF</th>
                 <th style="width: 100px;">Acción</th>
             </tr>
         </thead>
@@ -28,6 +28,7 @@
                     <form action="{{ route('pnfs.titulos.destroy', $vinculo->id_titulos_pnf) }}" method="POST" class="m-0 p-0 form-desvincular-titulo">
                         @csrf
                         @method('DELETE')
+                        <!-- Botón Original Restaurado -->
                         <button type="submit" class="btn btn-accion-desvinculacion btn-outline-secondary" title="Retirar Título del PNF">
                             <b>Desvincular</b>
                         </button>
@@ -47,17 +48,19 @@
 
 <div class="modal fade" id="vincularTituloModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold text-dark">Vincular Título Base</h5>
+        <div class="modal-content shadow">
+            <div class="modal-header bg-white border-bottom">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="bi bi-mortarboard text-primary me-2"></i>Vincular Título Base
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body bg-white p-4">
                 <form id="vincularTituloForm" method="POST" action="{{ route('pnfs.titulos.store', $pnf->id_pnf) }}">
                     @csrf
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Seleccione el Título Base <span class="text-danger">*</span></label>
-                        <select class="form-select select2-buscador" name="id_titulo" required>
+                        <select class="form-select bg-light border-secondary-subtle shadow-sm select2-buscador" name="id_titulo" required>
                             <option value="" selected disabled>Seleccione...</option>
                             @foreach($catalogoTitulos as $cat)
                             <option value="{{ $cat->id_titulos }}">[{{ $cat->nivel_academico }}] - {{ $cat->nombre_titulo_base }}</option>
@@ -67,14 +70,18 @@
 
                     <div class="form-group mb-0">
                         <label class="form-label fw-bold small text-muted">Nombre Específico del Título Impreso <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="nombre_titulo_pnf" placeholder="Ej: Ingeniero en Informática" required autocomplete="off">
-                        <div class="form-text">Asigne el nombre literal que tendrá el egresado en su expediente académico.</div>
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" name="nombre_titulo_pnf" placeholder="Ej: Ingeniero en Informática" required autocomplete="off">
+                        <div class="form-text small text-muted mt-1">Asigne el nombre literal que tendrá el egresado en su expediente académico.</div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" form="vincularTituloForm" class="btn btn-primary fw-bold">Asociar Título</button>
+            <div class="modal-footer bg-white border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Cancelar
+                </button>
+                <button type="submit" form="vincularTituloForm" class="btn btn-primary fw-bold">
+                    <i class="bi bi-save-fill me-1"></i> Asociar Título
+                </button>
             </div>
         </div>
     </div>

@@ -1,25 +1,21 @@
 @extends('layouts.admin')
 
-@section('header')
-<x-page-header title="Cohortes Académicos">
-    <li class="breadcrumb-item active" aria-current="page" style="font-weight: 500;">Cohortes</li>
-</x-page-header>
-@endsection
-
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    <div class="card border-0 shadow-sm">
+    <div class="card shadow-sm border-0">
 
         <!-- Cabecera de la tarjeta principal -->
         <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">Registro de Cohortes</h4>
-            <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#createCohorteModal">
-                <i class="bi bi-calendar-plus me-1" style="font-weight: 500;"></i> Añadir Cohorte
+            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
+                Registro de Cohortes
+            </h5>
+            <button type="button" class="btn btn-primary fw-bold ms-auto" data-bs-toggle="modal" data-bs-target="#createCohorteModal">
+                <i class="bi bi-calendar-plus me-1"></i> Añadir Cohorte
             </button>
         </div>
 
-        <!-- Cuerpo de la tarjeta principal en blanco y sin tarjetas anidadas -->
-        <div class="card-body bg-white">
+        <!-- Cuerpo de la tarjeta principal -->
+        <div class="card-body bg-white py-4">
             <div class="table-responsive">
                 {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!} 
             </div>
