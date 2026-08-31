@@ -12,8 +12,8 @@ use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PnfController;
 use App\Http\Controllers\CohorteController;
-use App\Http\Controllers\PeriodoAcademicoController; // NUEVO
-use App\Http\Controllers\SeccionController;          // NUEVO
+use App\Http\Controllers\PeriodoAcademicoController; 
+use App\Http\Controllers\SeccionController;                
 use App\Http\Controllers\TituloController;
 use App\Http\Controllers\EstatusExpedienteController;
 use App\Http\Controllers\PeriodoRecesoController;
@@ -66,11 +66,11 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
     // ---------------------------------------------------------------------
     Route::middleware(['role:Administrador,Coordinador'])->group(function () {
         
-        // Gestión de Usuarios y Profesores (Actualizado a relaciones N:M de secciones)
+        // Gestión de Usuarios y Profesores
         Route::resource('usuarios', UserController::class);
         Route::post('/usuarios/{usuario}/asignar-pnf', [UserController::class, 'asignarPnf'])->name('usuarios.asignar_pnf');
-        Route::post('/usuarios/{usuario}/asignar-seccion', [UserController::class, 'asignarSeccion'])->name('usuarios.asignar_seccion'); // Reemplaza a grupo
-        Route::delete('/usuarios/{id_usuario}/remover-seccion/{id_seccion}', [UserController::class, 'removerSeccion'])->name('usuarios.remover_seccion'); // Reemplaza a grupo
+        Route::post('/usuarios/{usuario}/asignar-seccion', [UserController::class, 'asignarSeccion'])->name('usuarios.asignar_seccion');
+        Route::delete('/usuarios/{id_usuario}/remover-seccion/{id_seccion}', [UserController::class, 'removerSeccion'])->name('usuarios.remover_seccion');
         Route::get('/profesores', [UserController::class, 'index'])->name('profesores.index');
 
         // Catálogos del Sistema
@@ -118,13 +118,15 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             Route::delete('/cohortes/{cohorte}', 'destroy')->name('cohortes.destroy');
         });
 
-        // NUEVO: Gestión de Períodos Académicos (Temporalidad)
         Route::resource('periodos-academicos', PeriodoAcademicoController::class)->parameters([
             'periodos-academicos' => 'periodo'
         ]);
 
-        // NUEVO: Gestión de Secciones Académicas (Estructura mixta por PNF y Período)
+        // Gestión de Secciones Académicas y Matrícula Interna
         Route::resource('secciones', SeccionController::class);
+        // NUEVO: Rutas para inscribir y retirar estudiantes directamente en la sección
+        Route::post('/secciones/{seccion}/inscribir', [SeccionController::class, 'inscribirEstudiante'])->name('secciones.inscribir');
+        Route::delete('/secciones/{seccion}/retirar/{id_inscripcion}', [SeccionController::class, 'retirarEstudiante'])->name('secciones.retirar');
 
         Route::controller(TituloController::class)->group(function () {
             Route::get('/titulos', 'index')->name('titulos.index');

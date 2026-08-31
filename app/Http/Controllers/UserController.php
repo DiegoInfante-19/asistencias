@@ -93,7 +93,15 @@ class UserController extends Controller
 
     public function show($id)
     {
-        $user = User::with(['rol', 'profesor.pnf', 'profesor.secciones.periodoAcademico.cohorte'])->findOrFail($id);
+        // FASE 3: Cargamos profundamente las secciones del profesor, incluyendo su PNF, período y la lista de estudiantes inscritos
+        $user = User::with([
+            'rol', 
+            'profesor.pnf', 
+            'profesor.secciones.periodoAcademico.cohorte',
+            'profesor.secciones.pnf',
+            'profesor.secciones.inscripciones.persona.cohorte',
+            'profesor.secciones.inscripciones.persona.empresaPersona.empresa'
+        ])->findOrFail($id);
 
         $pnfs = collect();
         $seccionesDisponibles = collect();
@@ -102,6 +110,7 @@ class UserController extends Controller
             $pnfs = Pnf::where('vigencia_pnf', true)->orderBy('nombre_pnf', 'asc')->get();
 
             if ($user->profesor && $user->profesor->id_pnf) {
+                // El administrador puede asignar secciones que coincidan con el PNF del profesor
                 $seccionesDisponibles = \App\Models\Seccion::with(['periodoAcademico.cohorte', 'pnf'])
                     ->where('id_pnf', $user->profesor->id_pnf)
                     ->where('estatus_seccion', 'Activa')
@@ -146,6 +155,7 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Debe configurar el PNF del profesor antes de asignarle secciones.');
         }
 
+        // Usamos syncWithoutDetaching para añadir la sección de forma ágil a su carga múltiple N:M
         $user->profesor->secciones()->syncWithoutDetaching([$request->id_seccion]);
 
         return redirect()->back()->with('success', 'Sección académica asignada exitosamente a la carga del profesor.');

@@ -15,19 +15,19 @@
                 <form action="{{ route('personas.formacion.store', $persona->id_personas) }}" method="POST" id="form-formacion">
                     @csrf
 
-                    <!-- CAMPO OCULTO: ORIGEN DE LA FORMACIÓN -->
+                    <!-- CAMPO OCULTO Y AUTOMÁTICO: ORIGEN DE LA FORMACIÓN -->
                     <input type="hidden" name="origen_formacion" id="origen_formacion" value="{{ old('origen_formacion', 'Externo') }}">
 
                     <!-- PESTAÑAS DE SELECCIÓN -->
                     <ul class="nav nav-pills nav-fill mb-3" id="pills-tipo-titulo" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-bold py-2" id="tab-base-btn" data-bs-toggle="pill" data-bs-target="#pane-base" type="button" role="tab" aria-controls="pane-base" aria-selected="true">
-                                <i class="bi bi-mortarboard me-1"></i> Título Base
+                                <i class="bi bi-building me-1"></i> Título Externo
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold py-2" id="tab-pnf-btn" data-bs-toggle="pill" data-bs-target="#pane-pnf" type="button" role="tab" aria-controls="pane-pnf" aria-selected="false">
-                                <i class="bi bi-building-fill-check me-1"></i> Título PNF
+                                <i class="bi bi-house-door-fill me-1"></i> Título Interno
                             </button>
                         </li>
                     </ul>
@@ -35,7 +35,7 @@
                     <!-- CONTENIDO DE LAS PESTAÑAS -->
                     <div class="tab-content" id="pills-tabContent">
 
-                        <!-- PESTAÑA 1: TÍTULO BASE -->
+                        <!-- PESTAÑA 1: TÍTULO EXTERNO -->
                         <div class="tab-pane fade show active" id="pane-base" role="tabpanel" aria-labelledby="tab-base-btn">
                             <div class="mb-3">
                                 <label for="id_titulos" class="form-label fw-bold small text-muted">Seleccionar Título Base Externo/General</label>
@@ -53,7 +53,7 @@
                             </div>
                         </div>
 
-                        <!-- PESTAÑA 2: TÍTULO PNF -->
+                        <!-- PESTAÑA 2: TÍTULO INTERNO -->
                         <div class="tab-pane fade" id="pane-pnf" role="tabpanel" aria-labelledby="tab-pnf-btn">
                             <div class="mb-3">
                                 <label for="id_titulos_pnf" class="form-label fw-bold small text-muted">Seleccionar Título PNF Universitario</label>
@@ -122,9 +122,9 @@
                                 <td>
                                     <div class="d-flex flex-column">
                                         @if($formacion->origen_formacion === 'Interno')
-                                        <span class="fw-bold text-primary mb-1">Interno</span>
+                                        <span class="badge bg-primary mb-1"><i class="bi bi-house-door-fill me-1"></i> Interno</span>
                                         @else
-                                        <span class="fw-bold text-success mb-1">Externo</span>
+                                        <span class="badge bg-secondary mb-1"><i class="bi bi-building me-1"></i> Externo</span>
                                         @endif
                                     </div>
                                 </td>

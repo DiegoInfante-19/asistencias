@@ -10,7 +10,6 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
 
-    {{-- Comprobación previa de autorización para la vista --}}
     @php
         $puedeEditar = auth()->user()->can('update', $sesion);
     @endphp
@@ -31,11 +30,11 @@
                 <div class="col-md-8">
                     <h4 class="fw-bold text-dark mb-1">
                         <i class="bi bi-easel2-fill me-2 text-primary"></i>
-                        {{ $sesion->grupo->pnf->nombre_pnf }}
+                        Sección: {{ $sesion->seccion->nombre_seccion }}
                     </h4>
                     <p class="text-muted mb-0">
-                        <strong>Cohorte:</strong> {{ $sesion->grupo->cohorte->numero_cohorte }} |
-                        <strong>Nivel:</strong> {{ $sesion->grupo->nivel_academico }} |
+                        <strong>PNF:</strong> {{ $sesion->seccion->pnf->nombre_pnf ?? 'N/D' }} |
+                        <strong>Cohorte Ref.:</strong> {{ $sesion->seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }} |
                         <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($sesion->fecha_sesion)->format('d/m/Y') }}
                     </p>
                     @if($sesion->observacion_sesion)
@@ -65,7 +64,7 @@
             <div class="text-center py-5 text-muted">
                 <i class="bi bi-person-x fs-1 d-block mb-3 opacity-50"></i>
                 <h5 class="fw-bold">No hay estudiantes inscritos</h5>
-                <p>Contacte a Control de Estudios para que asigne estudiantes a este grupo.</p>
+                <p>Matricule estudiantes en esta sección desde el panel administrativo para poder tomar asistencia.</p>
             </div>
             @else
             <form id="formulario-asistencia">
@@ -75,44 +74,48 @@
                             <tr>
                                 <th class="ps-4">Cédula</th>
                                 <th>Apellidos y Nombres</th>
+                                <th>Cohorte (Origen)</th>
                                 <th class="text-center" style="width: 350px;">Estado de Asistencia</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($inscripciones as $inscripcion)
                             @php
-                                $estadoActual = $asistenciasRegistradas[$inscripcion->id_inscripcion_cohortes] ?? 'Presente';
+                                $estadoActual = $asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'Presente';
                             @endphp
 
-                            <tr class="fila-estudiante" data-inscripcion="{{ $inscripcion->id_inscripcion_cohortes }}">
+                            <tr class="fila-estudiante" data-inscripcion="{{ $inscripcion->id_inscripcion_seccion }}">
                                 <td class="ps-4 fw-semibold text-secondary">
                                     V-{{ $inscripcion->persona->cedula_personas ?? 'S/C' }}
                                 </td>
                                 <td class="fw-bold text-dark">
-                                    {{ $inscripcion->persona->primer_apellido_personas ?? '' }} {{ $inscripcion->persona->segundo_apellido_personas ?? '' }} {{ $inscripcion->persona->primer_nombre_personas ?? '' }} {{ $inscripcion->persona->segundo_nombre_personas ?? '' }}
+                                    {{ $inscripcion->persona->nombre_completo ?? 'N/D' }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-info text-dark">Cohorte {{ $inscripcion->persona->cohorte->numero_cohorte ?? 'N/D' }}</span>
                                 </td>
                                 <td class="text-center pe-4">
                                     <div class="btn-group w-100 shadow-sm" role="group">
                                         <!-- Presente -->
-                                        <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_cohortes }}"
-                                               id="presente_{{ $inscripcion->id_inscripcion_cohortes }}" value="Presente"
+                                        <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_seccion }}"
+                                               id="presente_{{ $inscripcion->id_inscripcion_seccion }}" value="Presente"
                                                {{ $estadoActual == 'Presente' ? 'checked' : '' }} autocomplete="off"
                                                {{ !$puedeEditar ? 'disabled' : '' }}>
-                                        <label class="btn btn-outline-success fw-bold" for="presente_{{ $inscripcion->id_inscripcion_cohortes }}">Presente</label>
+                                        <label class="btn btn-outline-success fw-bold" for="presente_{{ $inscripcion->id_inscripcion_seccion }}">Presente</label>
 
                                         <!-- Ausente -->
-                                        <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_cohortes }}"
-                                               id="ausente_{{ $inscripcion->id_inscripcion_cohortes }}" value="Ausente"
+                                        <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_seccion }}"
+                                               id="ausente_{{ $inscripcion->id_inscripcion_seccion }}" value="Ausente"
                                                {{ $estadoActual == 'Ausente' ? 'checked' : '' }} autocomplete="off"
                                                {{ !$puedeEditar ? 'disabled' : '' }}>
-                                        <label class="btn btn-outline-danger fw-bold" for="ausente_{{ $inscripcion->id_inscripcion_cohortes }}">Ausente</label>
+                                        <label class="btn btn-outline-danger fw-bold" for="ausente_{{ $inscripcion->id_inscripcion_seccion }}">Ausente</label>
 
                                         <!-- Justificado -->
-                                        <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_cohortes }}"
-                                               id="justificado_{{ $inscripcion->id_inscripcion_cohortes }}" value="Justificado"
+                                        <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_seccion }}"
+                                               id="justificado_{{ $inscripcion->id_inscripcion_seccion }}" value="Justificado"
                                                {{ $estadoActual == 'Justificado' ? 'checked' : '' }} autocomplete="off"
                                                {{ !$puedeEditar ? 'disabled' : '' }}>
-                                        <label class="btn btn-outline-warning fw-bold text-dark" for="justificado_{{ $inscripcion->id_inscripcion_cohortes }}">Justificado</label>
+                                        <label class="btn btn-outline-warning fw-bold text-dark" for="justificado_{{ $inscripcion->id_inscripcion_seccion }}">Justificado</label>
                                     </div>
                                 </td>
                             </tr>
@@ -129,7 +132,6 @@
             <input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" id="id_sesiones" value="{{ $sesion->id_sesiones }}">
 
-            {{-- BOTÓN DE GUARDADO CONDICIONADO POR POLICY --}}
             @can('update', $sesion)
             <button type="button" id="btn-procesar-asistencia" class="btn btn-primary btn-lg fw-bold px-5 shadow">
                 <i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar Asistencia
@@ -151,12 +153,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-
         const btnProcesar = document.getElementById('btn-procesar-asistencia');
 
         if (btnProcesar) {
             btnProcesar.addEventListener('click', function() {
-
                 btnProcesar.disabled = true;
                 btnProcesar.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Procesando...';
 
@@ -172,7 +172,8 @@
                     let estadoSeleccionado = radioSeleccionado ? radioSeleccionado.value : 'Presente';
 
                     arregloAsistencias.push({
-                        id_inscripcion_cohortes: idInscripcion,
+                        // Mapeamos a la llave esperada por el endpoint de lotes de asistencia
+                        id_inscripcion_seccion: idInscripcion,
                         estado: estadoSeleccionado
                     });
                 });

@@ -11,6 +11,8 @@ use App\Models\PeriodoReceso;
 use App\Http\Requests\StoreSesionRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class SesionController extends Controller
 {
@@ -22,7 +24,6 @@ class SesionController extends Controller
         $user = Auth::user();
 
         if ($user->isAdmin() || $user->isCoordinador()) {
-            // Los superiores ven TODAS las sesiones de clases de todas las secciones
             $sesiones = Sesion::with(['seccion.periodoAcademico.cohorte', 'seccion.pnf', 'profesor.user'])
                 ->orderBy('fecha_sesion', 'desc')
                 ->paginate(15);
@@ -30,9 +31,9 @@ class SesionController extends Controller
             if (!$user->profesor) {
                 $sesiones = Sesion::where('id_profesor', -1)->paginate(15);
             } else {
-                // El profesor ve solo las sesiones de sus secciones asignadas
                 $sesiones = Sesion::with(['seccion.periodoAcademico.cohorte', 'seccion.pnf'])
                     ->where('id_profesor', $user->profesor->id_profesor)
+                    ->whereDate('fecha_sesion', Carbon::today())
                     ->orderBy('fecha_sesion', 'desc')
                     ->paginate(15);
             }
@@ -43,20 +44,13 @@ class SesionController extends Controller
 
     public function create()
     {
-        Gate::authorize('create', Sesion::class);
-        
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $profesor = $user->profesor;
-
-        if (!$profesor) {
-            return redirect()->route('sesiones.index')
-                ->with('error', 'Acceso denegado: Debes tener una carga académica asignada para poder aperturar clases.');
+        if (!$user->isAdmin() && !$user->isCoordinador()) {
+            abort(403, 'Acceso denegado: Solo el Administrador puede programar y aperturar sesiones de clase.');
         }
 
-        // Secciones asignadas al profesor mediante la relación N:M (pivot profesor_seccion)
-        $secciones = $profesor->secciones()
-            ->with(['periodoAcademico.cohorte', 'pnf'])
+        $secciones = Seccion::with(['periodoAcademico.cohorte', 'pnf', 'profesores.user'])
             ->where('estatus_seccion', 'Activa')
             ->get();
 
@@ -64,37 +58,34 @@ class SesionController extends Controller
             ->select('fecha_inicio_periodo_receso', 'fecha_fin_periodo_receso')
             ->get();
 
-        return view('sesiones.create', compact('secciones', 'profesor', 'periodosRecesos'));
+        return view('sesiones.create', compact('secciones', 'periodosRecesos'));
     }
 
     public function store(StoreSesionRequest $request)
     {
-        Gate::authorize('create', Sesion::class);
-
-        $data = $request->validated();
-        
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $profesor = $user->profesor;
-
-        if (!$profesor) {
-            abort(403, 'Acceso denegado: No posees un perfil docente válido para registrar esta acción.');
+        if (!$user->isAdmin() && !$user->isCoordinador()) {
+            abort(403, 'Acceso denegado: Solo el Administrador puede registrar nuevas sesiones.');
         }
 
-        // Verificamos que el profesor tenga asignada esta sección en la pivote N:M
-        $tieneAcceso = $profesor->secciones()->where('profesor_seccion.id_seccion', $data['id_seccion'])->exists();
+        $data = $request->validated();
 
-        if (!$tieneAcceso) {
+        $profesorValido = Profesor::where('id_profesor', $data['id_profesor'])
+            ->whereHas('secciones', function ($query) use ($data) {
+                $query->where('secciones.id_seccion', $data['id_seccion']);
+            })->exists();
+
+        if (!$profesorValido) {
             return back()->withErrors([
-                'id_seccion' => 'No tienes autorización para aperturar sesiones ni tomar asistencia en esta sección académica.'
+                'id_profesor' => 'El profesor seleccionado no está asignado como docente de esta sección académica.'
             ])->withInput();
         }
 
-        $data['id_profesor'] = $profesor->id_profesor;
         $sesion = Sesion::create($data);
 
         return redirect()->route('sesiones.show', $sesion->id_sesiones)
-            ->with('success', 'Sesión académica aperturada correctamente. Proceda a tomar la asistencia.');
+            ->with('success', 'Sesión académica programada y aperturada correctamente.');
     }
 
     public function show(Sesion $sesion)
@@ -103,17 +94,19 @@ class SesionController extends Controller
 
         $sesion->load(['seccion.periodoAcademico.cohorte', 'seccion.pnf', 'profesor.user']);
 
-        // Estudiantes inscritos en la sección (pueden pertenecer a N cohortes distintas)
+        // FASE 6: Carga de los estudiantes que pertenecen a la sección mixta
         $inscripciones = InscripcionSeccion::with('persona')
             ->where('id_seccion', $sesion->id_seccion)
             ->where('estatus_inscripcion', 'Activo')
             ->get()
             ->sortBy(function($inscripcion) {
-                return $inscripcion->persona->last_name_users ?? '';
+                // Ajustado para ordenar usando la propiedad correcta de Persona
+                return $inscripcion->persona->nombre_completo ?? $inscripcion->persona->cedula_personas;
             });
 
+        // FASE 6: Llave foránea actualizada
         $asistenciasRegistradas = Asistencia::where('id_sesiones', $sesion->id_sesiones)
-            ->pluck('estado_asistencia', 'id_inscripcion_seccion'); // Llave actualizada a la nueva tabla
+            ->pluck('estado_asistencia', 'id_inscripcion_seccion');
 
         return view('sesiones.show', compact('sesion', 'inscripciones', 'asistenciasRegistradas'));
     }

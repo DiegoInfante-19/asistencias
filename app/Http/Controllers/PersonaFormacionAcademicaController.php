@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Persona;
 use App\Models\PersonaFormacionAcademica;
-use App\Http\Requests\StorePersonaFormacionAcademicaRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class PersonaFormacionAcademicaController extends Controller
@@ -12,12 +12,23 @@ class PersonaFormacionAcademicaController extends Controller
     /**
      * Almacena un nuevo registro de formación académica previa.
      */
-    public function store(StorePersonaFormacionAcademicaRequest $request, Persona $persona)
+    public function store(Request $request, Persona $persona)
     {
         try {
-            // Asumiendo que en Persona.php la relación se llama formacionAcademica()
-            // Esto inyecta automáticamente el id_personas en el nuevo registro.
-            $persona->formacionAcademica()->create($request->validated());
+            // Se valida directamente aquí para forzar la inyección de origen_formacion
+            $validated = $request->validate([
+                'id_titulos'                      => 'nullable|exists:titulos,id_titulos',
+                'id_titulos_pnf'                  => 'nullable|exists:titulos_pnf,id_titulos_pnf',
+                'observacion_formacion_academica' => 'nullable|string',
+                'origen_formacion'                => 'required|in:Interno,Externo',
+            ]);
+
+            // Validación de regla de negocio: Debe traer al menos uno de los dos títulos
+            if (empty($validated['id_titulos']) && empty($validated['id_titulos_pnf'])) {
+                return redirect()->back()->with('error', 'Debe seleccionar un título base o un título PNF.');
+            }
+
+            $persona->formacionAcademica()->create($validated);
 
             return redirect()->back()->with('success', 'Formación académica agregada exitosamente.');
             
@@ -33,15 +44,10 @@ class PersonaFormacionAcademicaController extends Controller
     public function destroy(Persona $persona, PersonaFormacionAcademica $formacion)
     {
         try {
-            // Medida de seguridad Senior:
-            // Asegurarnos de que el título que intentan borrar pertenezca a este estudiante.
             if ($formacion->id_personas !== $persona->id_personas) {
                 return redirect()->back()->with('error', 'No tienes permiso para eliminar este registro.');
             }
 
-            // Dado que el modelo PersonaFormacionAcademica usa SoftDeletes,
-            // esto no borra la fila físicamente, sino que llena la columna deleted_at.
-            // Protegiendo el historial en caso de auditorías.
             $formacion->delete();
 
             return redirect()->back()->with('success', 'Formación académica eliminada correctamente.');

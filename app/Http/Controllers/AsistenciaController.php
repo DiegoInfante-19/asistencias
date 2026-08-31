@@ -14,10 +14,10 @@ class AsistenciaController extends Controller
     public function guardarLote(Request $request)
     {
         $request->validate([
-            'id_sesiones'               => 'required|exists:sesiones,id_sesiones',
-            'asistencias'               => 'required|array',
-            'asistencias.*.id_inscripcion_seccion' => 'required|exists:inscripciones_secciones,id_inscripcion_seccion',
-            'asistencias.*.estado'      => 'required|in:Presente,Ausente,Justificado',
+            'id_sesiones'                                => 'required|exists:sesiones,id_sesiones',
+            'asistencias'                                => 'required|array',
+            'asistencias.*.id_inscripcion_seccion'       => 'required|exists:inscripciones_secciones,id_inscripcion_seccion',
+            'asistencias.*.estado'                       => 'required|in:Presente,Ausente,Justificado',
         ]);
 
         $sesion = Sesion::findOrFail($request->id_sesiones);
@@ -32,6 +32,7 @@ class AsistenciaController extends Controller
             
         $totalEnviadosEnLote = count($request->asistencias);
 
+        // Seguridad estricta: No se permiten guardados parciales. Debe coincidir el número exacto.
         if ($totalEnviadosEnLote !== $totalAlumnosInscritos) {
             return response()->json([
                 'success' => false,
@@ -47,11 +48,11 @@ class AsistenciaController extends Controller
             foreach ($request->asistencias as $registro) {
                 Asistencia::updateOrCreate(
                     [
-                        'id_sesiones'           => $idSesiones,
+                        'id_sesiones'            => $idSesiones,
                         'id_inscripcion_seccion' => $registro['id_inscripcion_seccion']
                     ],
                     [
-                        'estado_asistencia'     => $registro['estado']
+                        'estado_asistencia'      => $registro['estado']
                     ]
                 );
             }

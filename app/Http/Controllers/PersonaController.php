@@ -8,7 +8,6 @@ use App\Http\Requests\UpdatePersonaRequest;
 use App\DataTables\PersonasDataTable;
 use Illuminate\Support\Facades\Log;
 use App\Models\Cohorte;
-use App\Models\GrupoAcademico;
 use Illuminate\Support\Facades\DB;
 
 class PersonaController extends Controller{

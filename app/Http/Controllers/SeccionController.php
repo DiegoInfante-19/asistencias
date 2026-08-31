@@ -6,60 +6,71 @@ use App\Models\Seccion;
 use App\Models\PeriodoAcademico;
 use App\Models\Pnf;
 use App\Models\Profesor;
+use App\Models\Empresa;
+use App\Models\Persona;
+use App\DataTables\SeccionDataTable;
 use App\Http\Requests\StoreSeccionRequest;
 use App\Http\Requests\UpdateSeccionRequest;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class SeccionController extends Controller
 {
-    public function index(): View
+    public function index(SeccionDataTable $dataTable)
     {
-        $secciones = Seccion::with(['periodoAcademico.cohorte', 'pnf', 'profesores'])->latest('id_seccion')->paginate(10);
-        $periodos = PeriodoAcademico::with('cohorte')->get();
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->ajax();
+        }
+
         $pnfs = Pnf::all();
         $profesores = Profesor::with('user')->get();
-
-        return view('secciones.index', compact('secciones', 'periodos', 'pnfs', 'profesores'));
-    }
-
-    public function create(): View
-    {
+        $empresas = Empresa::all();
         $periodos = PeriodoAcademico::with('cohorte')->get();
-        $pnfs = Pnf::all();
 
-        return view('secciones.create', compact('periodos', 'pnfs'));
+        return $dataTable->render('secciones.index', compact('pnfs', 'profesores', 'empresas', 'periodos'));
     }
 
     public function store(StoreSeccionRequest $request): RedirectResponse
     {
         Seccion::create($request->validated());
-
-        return redirect()->route('secciones.index')
-                         ->with('success', 'Sección académica creada exitosamente.');
+        return redirect()->route('secciones.index')->with('success', 'Sección académica creada exitosamente.');
     }
 
     public function show(Seccion $seccion): View
     {
-        $seccion->load(['periodoAcademico.cohorte', 'pnf', 'profesores.user', 'inscripciones.persona', 'sesiones']);
+        $seccion->load([
+            'periodoAcademico.cohorte', 
+            'pnf', 
+            'profesores.user', 
+            'inscripciones.persona.empresaPersona.empresa',
+            'inscripciones.persona.cohorte',
+            // CARGA DE HISTORIAL: Sesiones ordenadas y asistencias con datos relacionados
+            'sesiones' => function($query) {
+                $query->orderBy('fecha_sesion', 'desc');
+            },
+            'sesiones.profesor.user',
+            'sesiones.asistencias.inscripcionSeccion.persona'
+        ]);
+
+        // Estudiantes disponibles para inscribir (Filtro estricto: Mismo PNF de la sección)
+        // Se excluyen los que ya están inscritos en esta misma sección
+        $estudiantesYaInscritos = $seccion->inscripciones->pluck('id_personas');
         
-        return view('secciones.show', compact('seccion'));
-    }
+        $estudiantesDisponibles = Persona::whereNotIn('id_personas', $estudiantesYaInscritos)
+            ->whereHas('titulacionPersona', function($q) use ($seccion) {
+                $q->where('id_pnf', $seccion->id_pnf);
+            })
+            ->with(['cohorte', 'empresaPersona.empresa'])
+            ->get();
 
-    public function edit(Seccion $seccion): View
-    {
-        $periodos = PeriodoAcademico::with('cohorte')->get();
-        $pnfs = Pnf::all();
-
-        return view('secciones.edit', compact('seccion', 'periodos', 'pnfs'));
+        return view('secciones.show', compact('seccion', 'estudiantesDisponibles'));
     }
 
     public function update(UpdateSeccionRequest $request, Seccion $seccion): RedirectResponse
     {
         $seccion->update($request->validated());
-
-        return redirect()->route('secciones.index')
-                         ->with('success', 'Sección actualizada correctamente.');
+        return redirect()->route('secciones.index')->with('success', 'Sección actualizada correctamente.');
     }
 
     public function destroy(Seccion $seccion): RedirectResponse
@@ -67,10 +78,38 @@ class SeccionController extends Controller
         if ($seccion->inscripciones()->exists()) {
             return back()->withErrors(['error' => 'No se puede eliminar la sección porque cuenta con estudiantes inscritos.']);
         }
-
         $seccion->delete();
+        return redirect()->route('secciones.index')->with('success', 'Sección eliminada con éxito.');
+    }
 
-        return redirect()->route('secciones.index')
-                         ->with('success', 'Sección eliminada con éxito.');
+    // Método para matricular estudiantes directo desde el show de la sección
+    public function inscribirEstudiante(Request $request, Seccion $seccion): RedirectResponse
+    {
+        $request->validate([
+            'id_personas' => 'required|exists:personas,id_personas'
+        ]);
+
+        // Aplicando el Hook de Integridad del PNF
+        $estudiante = Persona::with('titulacionPersona')->findOrFail($request->id_personas);
+        
+        if (!$estudiante->titulacionPersona || $estudiante->titulacionPersona->id_pnf !== $seccion->id_pnf) {
+            return back()->with('error', 'Violación de regla: El estudiante pertenece a un PNF diferente al de esta sección.');
+        }
+
+        $seccion->inscripciones()->create([
+            'id_personas' => $estudiante->id_personas,
+            'fecha_inscripcion' => now(),
+            'estatus_inscripcion' => 'Activo'
+        ]);
+
+        return back()->with('success', 'Estudiante inscrito exitosamente en la sección.');
+    }
+
+    public function retirarEstudiante(Seccion $seccion, $id_inscripcion): RedirectResponse
+    {
+        $inscripcion = $seccion->inscripciones()->findOrFail($id_inscripcion);
+        $inscripcion->delete();
+
+        return back()->with('success', 'Estudiante retirado de la sección.');
     }
 }

@@ -2,7 +2,7 @@
 
 @section('header')
 <x-page-header title="Portal del Docente">
-    <li class="breadcrumb-item active" aria-current="page">Mis Sesiones de Clase</li>
+    <li class="breadcrumb-item active" aria-current="page">Mis Sesiones de Clase (Hoy)</li>
 </x-page-header>
 @endsection
 
@@ -11,14 +11,19 @@
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="fw-bold text-dark mb-0"><i class="bi bi-easel2-fill me-2 text-primary"></i>Historial de Clases</h4>
-            <p class="text-muted small mb-0 mt-1">Gestione sus sesiones y registros de asistencia</p>
+            <h4 class="fw-bold text-dark mb-0"><i class="bi bi-easel2-fill me-2 text-primary"></i>Clases Programadas para Hoy</h4>
+            <p class="text-muted small mb-0 mt-1">
+                @if(auth()->user()->isAdmin() || auth()->user()->isCoordinador())
+                    Vista global del calendario institucional (Administrador).
+                @else
+                    Mostrando únicamente las clases correspondientes a la fecha actual ({{ \Carbon\Carbon::today()->format('d/m/Y') }}).
+                @endif
+            </p>
         </div>
         
-        {{-- Solo mostramos el botón de aperturar si el usuario tiene permiso de creación según la Policy --}}
         @can('create', App\Models\Sesion::class)
         <a href="{{ route('sesiones.create') }}" class="btn btn-primary fw-bold shadow-sm">
-            <i class="bi bi-plus-circle me-2"></i> Aperturar Nueva Clase
+            <i class="bi bi-plus-circle me-2"></i> Programar Nueva Clase
         </a>
         @endcan
     </div>
@@ -30,8 +35,8 @@
                     <thead class="table-light">
                         <tr>
                             <th class="ps-4">Fecha</th>
-                            <th>Cohorte</th>
-                            <th>PNF / Nivel</th>
+                            <th>Sección</th>
+                            <th>PNF / Cohorte Ref.</th>
                             <th>Observaciones</th>
                             <th class="text-center pe-4">Acciones</th>
                         </tr>
@@ -43,24 +48,24 @@
                                 <i class="bi bi-calendar-event text-secondary me-2"></i>
                                 {{ \Carbon\Carbon::parse($sesion->fecha_sesion)->format('d/m/Y') }}
                             </td>
-                            <td><span class="badge bg-info text-dark">{{ $sesion->grupo->cohorte->numero_cohorte }}</span></td>
                             <td>
-                                <div class="fw-bold text-dark">{{ $sesion->grupo->pnf->nombre_pnf }}</div>
-                                <div class="small text-muted">{{ $sesion->grupo->nivel_academico }}</div>
+                                <span class="fw-bold text-primary">{{ $sesion->seccion->nombre_seccion ?? 'N/D' }}</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ $sesion->seccion->pnf->nombre_pnf ?? 'N/D' }}</div>
+                                <div class="small text-muted">Cohorte Ref. {{ $sesion->seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }}</div>
                             </td>
                             <td class="text-truncate" style="max-width: 200px;" title="{{ $sesion->observacion_sesion }}">
                                 {{ $sesion->observacion_sesion ?? 'Sin observaciones' }}
                             </td>
                             <td class="text-center pe-4">
                                 <div class="btn-group" role="group">
-                                    {{-- Botón de Visualización: Accesible si la Policy 'view' lo permite --}}
                                     @can('view', $sesion)
-                                    <a href="{{ route('sesiones.show', $sesion->id_sesiones) }}" class="btn btn-sm btn-outline-primary fw-bold" title="Ver Lista de Asistencia">
-                                        <i class="bi bi-clipboard-check me-1"></i> Ver Lista
+                                    <a href="{{ route('sesiones.show', $sesion->id_sesiones) }}" class="btn btn-sm btn-outline-primary fw-bold" title="Tomar o Ver Lista de Asistencia">
+                                        <i class="bi bi-clipboard-check me-1"></i> Tomar Asistencia
                                     </a>
                                     @endcan
 
-                                    {{-- Indicador visual si expiró la ventana de 48h para profesores (Administradores siempre pueden) --}}
                                     @php
                                         $expirado = false;
                                         if (!auth()->user()->isAdmin() && !auth()->user()->isCoordinador()) {
@@ -81,8 +86,8 @@
                         <tr>
                             <td colspan="5" class="text-center text-muted py-5">
                                 <i class="bi bi-journal-x fs-1 d-block mb-3 opacity-50"></i>
-                                <h6 class="fw-bold">No hay clases registradas</h6>
-                                <p class="small mb-0">Haga clic en "Aperturar Nueva Clase" para iniciar su primer registro de asistencia.</p>
+                                <h6 class="fw-bold">No hay clases programadas para hoy</h6>
+                                <p class="small mb-0">Usted no posee sesiones asignadas en su bandeja para el día de hoy.</p>
                             </td>
                         </tr>
                         @endforelse
@@ -90,7 +95,6 @@
                 </table>
             </div>
         </div>
-        <!-- Paginación -->
         @if($sesiones->hasPages())
         <div class="card-footer bg-white py-3">
             {{ $sesiones->links() }}
