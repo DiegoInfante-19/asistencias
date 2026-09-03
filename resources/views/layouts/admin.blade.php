@@ -72,19 +72,24 @@
               </a>
             </li>
 
+            <!-- BÓVEDA RESTRINGIDA: ADMINISTRADORES Y COORDINADORES -->
             @if(auth()->user()->isAdmin() || auth()->user()->isCoordinador())
-            <li class="nav-item {{ request()->routeIs('cohortes.*', 'periodos_recesos.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('cohortes.*', 'periodos_recesos.*') ? 'active' : '' }}">
+
+            <!-- NUEVO MÓDULO UNIFICADO: ESTRUCTURA ACADÉMICA -->
+            <li class="nav-item">
+              <a href="{{ route('estructura.index') }}" class="nav-link {{ request()->routeIs('estructura.*') ? 'active' : '' }}">
+                <i class="bi bi-diagram-3-fill"></i>
+                <p>Estructura Académica</p>
+              </a>
+            </li>
+
+            <!-- GESTIÓN COMPLEMENTARIA DE CICLOS -->
+            <li class="nav-item {{ request()->routeIs('periodos_recesos.*') ? 'menu-open' : '' }}">
+              <a href="#" class="nav-link {{ request()->routeIs('periodos_recesos.*') ? 'active' : '' }}">
                 <i class="bi bi-calendar-range"></i>
-                <p>Cohortes<i class="nav-arrow bi bi-chevron-right"></i></p>
+                <p>Calendario y Recesos<i class="nav-arrow bi bi-chevron-right"></i></p>
               </a>
               <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="{{ route('cohortes.index') }}" class="nav-link {{ request()->routeIs('cohortes.*') ? 'active' : '' }}">
-                    <i class="bi bi-hourglass-split ms-3"></i>
-                    <p>Cohortes</p>
-                  </a>
-                </li>
                 <li class="nav-item">
                   <a href="{{ route('periodos_recesos.index') }}" class="nav-link {{ request()->routeIs('periodos_recesos.*') ? 'active' : '' }}">
                     <i class="bi bi-calendar-event ms-3"></i>
@@ -130,16 +135,16 @@
               </ul>
             </li>
 
-            <li class="nav-item {{ request()->routeIs('profesores.*') || request()->routeIs('sesiones.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('profesores.*') || request()->routeIs('sesiones.*') ? 'active' : '' }}">
+            <li class="nav-item {{ request()->routeIs('profesores.*', 'sesiones.*') ? 'menu-open' : '' }}">
+              <a href="#" class="nav-link {{ request()->routeIs('profesores.*', 'sesiones.*') ? 'active' : '' }}">
                 <i class="bi bi-person-video3"></i>
-                <p>Profesores<i class="nav-arrow bi bi-chevron-right"></i></p>
+                <p>Docencia y Clases<i class="nav-arrow bi bi-chevron-right"></i></p>
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="{{ route('profesores.index') }}" class="nav-link {{ request()->routeIs('profesores.*') ? 'active' : '' }}">
                     <i class="bi bi-person-lines-fill ms-3"></i>
-                    <p>Listado</p>
+                    <p>Listado Profesores</p>
                   </a>
                 </li>
                 <li class="nav-item">
@@ -201,6 +206,8 @@
                 </li>
               </ul>
             </li>
+
+            <!-- VISTA BÁSICA: DOCENTES (No tienen acceso al menú de arriba) -->
             @else
             <li class="nav-item">
               <a href="{{ route('sesiones.index') }}" class="nav-link {{ request()->routeIs('sesiones.*') ? 'active' : '' }}">
@@ -210,6 +217,7 @@
             </li>
             @endif
 
+            <!-- MÓDULO COMÚN PARA TODOS -->
             <li class="nav-item {{ request()->routeIs('perfil.*') ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ request()->routeIs('perfil.*') ? 'active' : '' }}">
                 <i class="bi bi-gear-fill"></i>

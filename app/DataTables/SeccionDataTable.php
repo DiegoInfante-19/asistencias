@@ -3,17 +3,16 @@
 namespace App\DataTables;
 
 use App\Models\Seccion;
-use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Services\DataTable;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
-class SeccionDataTable extends DataTable
+class SeccionDataTable extends BaseDataTable
 {
-    public function dataTable(QueryBuilder $query): EloquentDataTable
+    public function dataTable($query): EloquentDataTable
     {
-        return (new EloquentDataTable($query))
+        return EloquentDataTable::create($query)
             ->addColumn('periodo', function ($seccion) {
                 return 'Cohorte ' . ($seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D');
             })
@@ -47,7 +46,7 @@ class SeccionDataTable extends DataTable
             ->setRowId('id_seccion');
     }
 
-    public function query(Seccion $model): QueryBuilder
+    public function query(Seccion $model): EloquentBuilder
     {
         $query = $model->newQuery()->with([
             'periodoAcademico.cohorte',
@@ -88,29 +87,24 @@ class SeccionDataTable extends DataTable
         return $query;
     }
 
+    protected function getTableId(): string
+    {
+        return 'secciones-table';
+    }
+
     public function html(): HtmlBuilder
     {
-        return $this->builder()
-                    ->setTableId('secciones-table')
-                    ->columns($this->getColumns())
+        // Llamamos al constructor base que ya tiene los botones, DOM y el idioma local
+        return $this->sharedHtmlBuilder()
                     ->minifiedAjax('', null, [
                         'filtro_pnf' => '$("#filtro_pnf").val()',
                         'filtro_profesor' => '$("#filtro_profesor").val()',
                         'filtro_empresa' => '$("#filtro_empresa").val()',
                         'filtro_cohorte' => '$("#filtro_cohorte").val()'
-                    ])
-                    ->dom("<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" .
-                          "<'row'<'col-sm-12'tr>>" .
-                          "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>")
-                    ->orderBy(0, 'desc')
-                    ->parameters([
-                        'responsive' => true,
-                        'autoWidth'  => false,
-                        'language'   => ['url' => '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'],
                     ]);
     }
 
-    public function getColumns(): array
+    protected function getColumns(): array
     {
         return [
             Column::make('id_seccion')->title('ID')->width('50px')->addClass('text-center'),
@@ -122,10 +116,5 @@ class SeccionDataTable extends DataTable
             Column::make('estatus_seccion')->title('Estatus')->addClass('text-center'),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('130px')->addClass('text-center'),
         ];
-    }
-
-    protected function filename(): string
-    {
-        return 'Secciones_' . date('YmdHis');
     }
 }

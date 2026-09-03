@@ -48,7 +48,7 @@ class PersonasDataTable extends BaseDataTable
                 return '';
             })
             ->filter(function ($query) {
-                // 1. Filtro por Cohorte (Funciona en el backend aunque no se muestre la columna)
+                // 1. Filtro por Cohorte
                 if (request()->has('filtro_cohorte') && !empty(request()->get('filtro_cohorte'))) {
                     $query->where('id_cohortes', request()->get('filtro_cohorte'));
                 }
@@ -94,6 +94,25 @@ class PersonasDataTable extends BaseDataTable
                         $q->where('id_estado', request()->get('filtro_estado'));
                     });
                 }
+
+                // 8. NUEVO: Filtro por Profesor (A través de las inscripciones a secciones y la relación N:M de profesor_seccion)
+                if (request()->has('filtro_profesor') && !empty(request()->get('filtro_profesor'))) {
+                    $profesorId = request()->get('filtro_profesor');
+                    $query->whereHas('inscripcionesSecciones', function ($q) use ($profesorId) {
+                        $q->whereHas('seccion.profesores', function ($subq) use ($profesorId) {
+                            $subq->where('profesores.id_profesor', $profesorId);
+                        });
+                    });
+                }
+
+                // 9. NUEVO: Filtro por Sección (A través de las inscripciones a secciones directas)
+                if (request()->has('filtro_seccion') && !empty(request()->get('filtro_seccion'))) {
+                    $seccionId = request()->get('filtro_seccion');
+                    $query->whereHas('inscripcionesSecciones', function ($q) use ($seccionId) {
+                        $q->where('id_seccion', $seccionId);
+                    });
+                }
+
             }, true)
             ->rawColumns(['empresa', 'titulo', 'action'])
             ->setRowId('id_personas');
@@ -133,7 +152,6 @@ class PersonasDataTable extends BaseDataTable
         return [
             Column::make('cedula_personas')->title('Cédula')->width(100),
             Column::make('full_name')->title('Nombres y Apellidos')->searchable(true),
-            // Columna de cohorte eliminada de la vista de la tabla
             Column::make('empresa')->title('Empresa')->searchable(false)->orderable(false),
             Column::make('titulo')->title('Título a Optar')->searchable(false)->orderable(false),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width(100)->addClass('text-center all'),

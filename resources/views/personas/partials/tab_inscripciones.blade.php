@@ -1,35 +1,69 @@
 <div class="row g-4 mt-2">
     <!-- COLUMNA IZQUIERDA: FORMULARIO DE INSCRIPCIÓN -->
     <div class="col-md-4">
-        <div class="card shadow-sm h-100">
+        <div class="card shadow-sm h-100" id="card_inscripcion_container">
             <div class="card-header bg-white py-3 fw-bold text-dark">
                 <i class="bi bi-calendar-plus me-1 text-primary"></i> Inscribir en Sección Académica
             </div>
             <div class="card-body bg-white py-4">
 
                 @if(!$persona->titulacionPersona)
+                    <!-- BLOQUEO 1: PNF Faltante -->
                     <div class="text-center py-5">
                         <i class="bi bi-shield-lock-fill text-danger mb-3" style="font-size: 3.5rem;"></i>
                         <h5 class="fw-bold">Acción Bloqueada</h5>
                         <p class="text-muted small px-2">Para poder inscribir a este estudiante, <strong>primero debe asignarle un Programa Nacional de Formación (PNF)</strong> en la pestaña "Exp. Académico".</p>
                     </div>
+
+                @elseif($persona->inscripcionActiva)
+                    <!-- BLOQUEO 2: Estudiante ya matriculado activamente -->
+                    <div class="text-center py-4">
+                        <i class="bi bi-person-check-fill text-success mb-3" style="font-size: 3.5rem;"></i>
+                        <h5 class="fw-bold text-dark">Matrícula Activa</h5>
+                        <p class="text-muted small px-2">Este estudiante ya se encuentra cursando estudios en una sección. Un estudiante no puede estar inscrito enสอง secciones simultáneamente.</p>
+                        
+                        <div class="alert alert-success border-0 shadow-sm text-start mt-3">
+                            <span class="d-block small text-muted fw-bold">Sección Actual:</span>
+                            <span class="d-block fw-bold fs-6">{{ $persona->inscripcionActiva->seccion->nombre_seccion }}</span>
+                        </div>
+                    </div>
+
                 @else
+                    <!-- FORMULARIO DE INSCRIPCIÓN -->
                     <div class="alert alert-primary py-2 shadow-sm border-0 small mb-3">
                         <i class="bi bi-info-circle-fill me-1"></i>
                         Filtrando secciones exclusivas para:<br>
                         <strong>{{ $persona->titulacionPersona->pnf->nombre_pnf ?? 'PNF Asignado' }}</strong>
                     </div>
 
+                    @php
+                        // Filtramos directamente en PHP de manera segura usando el ID del PNF del estudiante
+                        $pnfIdEstudiante = $persona->titulacionPersona->id_pnf;
+                        $seccionesFiltradas = collect($seccionesData ?? [])->filter(function($sec) use ($pnfIdEstudiante) {
+                            return $sec['id_pnf'] == $pnfIdEstudiante;
+                        });
+                    @endphp
+
                     <form action="{{ route('personas.inscripciones.store', $persona->id_personas) }}" method="POST">
                         @csrf
                         <input type="hidden" name="id_personas" value="{{ $persona->id_personas }}">
 
-                        <!-- Select: Sección -->
+                        <!-- Select: Sección (Sin clase select2-buscador para evitar conflictos con elementos deshabilitados) -->
                         <div class="mb-3">
                             <label for="select_seccion" class="form-label fw-bold small text-muted">Sección Académica <span class="text-danger">*</span></label>
-                            <select id="select_seccion" class="form-select select2-buscador" required>
-                                <option value="" selected disabled>Seleccione una sección...</option>
+                            
+                            <select id="select_seccion" class="form-select" required {{ $seccionesFiltradas->isEmpty() ? 'disabled' : '' }}>
+                                <option value="" selected disabled>
+                                    {{ $seccionesFiltradas->isNotEmpty() ? 'Seleccione una sección...' : 'No hay secciones activas para este PNF' }}
+                                </option>
+                                
+                                @foreach($seccionesFiltradas as $sec)
+                                    <option value="{{ $sec['id_seccion'] }}">
+                                        {{ $sec['nombre_seccion'] }}
+                                    </option>
+                                @endforeach
                             </select>
+                            
                             <small class="text-muted d-block mt-1">Solo se muestran secciones activas del PNF del estudiante.</small>
                         </div>
 
@@ -143,38 +177,49 @@
     </div>
 </div>
 
-@if($persona->titulacionPersona)
+@if($persona->titulacionPersona && !$persona->inscripcionActiva)
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const seccionesDisponibles = @json($seccionesData ?? []);
-    const pnfEstudianteId = {{ $persona->titulacionPersona->id_pnf }};
-    const seccionesDelPnf = seccionesDisponibles.filter(s => s.id_pnf == pnfEstudianteId);
+    const $selectSeccion = $('#select_seccion');
+    const $inputSeccionHidden = $('#id_seccion_hidden');
+    const $btnInscribir = $('#btn_inscribir');
 
-    const selectSeccion = document.getElementById('select_seccion');
-    const inputSeccionHidden = document.getElementById('id_seccion_hidden');
-    const btnInscribir = document.getElementById('btn_inscribir');
+    function inicializarSelectSeccionUnico() {
+        if ($selectSeccion.length && !$selectSeccion.prop('disabled')) {
+            if ($selectSeccion.data('select2')) {
+                $selectSeccion.select2('destroy');
+            }
 
-    if(selectSeccion) {
-        if (seccionesDelPnf.length === 0) {
-            selectSeccion.options[0].text = "No hay secciones activas para este PNF";
-            selectSeccion.disabled = true;
-        } else {
-            seccionesDelPnf.forEach(s => {
-                selectSeccion.innerHTML += `<option value="${s.id_seccion}">${s.nombre_seccion}</option>`;
+            // Inicialización con el tema de Bootstrap 5 y control de contenedor
+            $selectSeccion.select2({
+                width: '100%',
+                theme: 'bootstrap-5', // <--- Aplica los estilos y bordes nativos de Bootstrap
+                placeholder: 'Seleccione una sección...',
+                dropdownParent: $('#card_inscripcion_container')
             });
         }
-
-        $('#select_seccion').on('select2:select', function (e) {
-            inputSeccionHidden.value = e.params.data.id;
-            btnInscribir.disabled = (this.value === '');
-        });
-
-        $('#select_seccion').on('select2:unselect', function () {
-            inputSeccionHidden.value = '';
-            btnInscribir.disabled = true;
-        });
     }
+
+    // Retardo prudente para asegurar el pintado correcto de Bootstrap Tabs
+    setTimeout(inicializarSelectSeccionUnico, 200);
+
+    // Re-vincular al cambiar de pestaña
+    $('button[data-bs-toggle="tab"], a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab shown.bs.pill', function () {
+        setTimeout(inicializarSelectSeccionUnico, 100);
+    });
+
+    // Evento change robusto para sincronizar el input oculto y habilitar el botón
+    $selectSeccion.on('change', function () {
+        const valor = $(this).val();
+        $inputSeccionHidden.val(valor);
+        
+        if (valor) {
+            $btnInscribir.prop('disabled', false);
+        } else {
+            $btnInscribir.prop('disabled', true);
+        }
+    });
 });
 </script>
 @endpush

@@ -34,7 +34,7 @@ class SeccionController extends Controller
     public function store(StoreSeccionRequest $request): RedirectResponse
     {
         Seccion::create($request->validated());
-        return redirect()->route('secciones.index')->with('success', 'Sección académica creada exitosamente.');
+        return redirect()->route('estructura.index')->with('success', 'Sección académica creada exitosamente.');
     }
 
     public function show(Seccion $seccion): View
@@ -45,7 +45,6 @@ class SeccionController extends Controller
             'profesores.user', 
             'inscripciones.persona.empresaPersona.empresa',
             'inscripciones.persona.cohorte',
-            // CARGA DE HISTORIAL: Sesiones ordenadas y asistencias con datos relacionados
             'sesiones' => function($query) {
                 $query->orderBy('fecha_sesion', 'desc');
             },
@@ -53,8 +52,6 @@ class SeccionController extends Controller
             'sesiones.asistencias.inscripcionSeccion.persona'
         ]);
 
-        // Estudiantes disponibles para inscribir (Filtro estricto: Mismo PNF de la sección)
-        // Se excluyen los que ya están inscritos en esta misma sección
         $estudiantesYaInscritos = $seccion->inscripciones->pluck('id_personas');
         
         $estudiantesDisponibles = Persona::whereNotIn('id_personas', $estudiantesYaInscritos)
@@ -70,26 +67,24 @@ class SeccionController extends Controller
     public function update(UpdateSeccionRequest $request, Seccion $seccion): RedirectResponse
     {
         $seccion->update($request->validated());
-        return redirect()->route('secciones.index')->with('success', 'Sección actualizada correctamente.');
+        return redirect()->route('estructura.index')->with('success', 'Sección actualizada correctamente.');
     }
 
     public function destroy(Seccion $seccion): RedirectResponse
     {
         if ($seccion->inscripciones()->exists()) {
-            return back()->withErrors(['error' => 'No se puede eliminar la sección porque cuenta con estudiantes inscritos.']);
+            return redirect()->route('estructura.index')->withErrors(['error' => 'No se puede eliminar la sección porque cuenta con estudiantes inscritos.']);
         }
         $seccion->delete();
-        return redirect()->route('secciones.index')->with('success', 'Sección eliminada con éxito.');
+        return redirect()->route('estructura.index')->with('success', 'Sección eliminada con éxito.');
     }
 
-    // Método para matricular estudiantes directo desde el show de la sección
     public function inscribirEstudiante(Request $request, Seccion $seccion): RedirectResponse
     {
         $request->validate([
             'id_personas' => 'required|exists:personas,id_personas'
         ]);
 
-        // Aplicando el Hook de Integridad del PNF
         $estudiante = Persona::with('titulacionPersona')->findOrFail($request->id_personas);
         
         if (!$estudiante->titulacionPersona || $estudiante->titulacionPersona->id_pnf !== $seccion->id_pnf) {

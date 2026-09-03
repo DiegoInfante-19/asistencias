@@ -22,18 +22,14 @@
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white py-3">
             <h5 class="card-title text-dark mb-0 fw-bold fs-6">
-                <i class="bi bi-info-circle-fill text-primary me-1"></i> Información General del Estudiante
+                Información General del Estudiante
             </h5>
         </div>
         <div class="card-body bg-white py-4">
             <div class="row align-items-center">
-                <!-- Columna de Avatar/Icono -->
-                <div class="col-md-2 d-flex justify-content-center align-items-center border-end">
-                    <i class="bi bi-person-bounding-box text-secondary" style="font-size: 5rem;"></i>
-                </div>
-
-                <!-- Columna de Información -->
-                <div class="col-md-10">
+              
+                <!-- Columna de Iformación -->
+                <div class="col-md-12">
                     <div class="row g-3">
                         <div class="col-md-4">
                             <span class="text-muted d-block small fw-bold">Cédula</span>
@@ -75,12 +71,72 @@
                             <span class="fs-6 text-dark">{{ $persona->lugarNacimiento->detalles_adicionales ?? 'Sin detalles adicionales registrados' }}</span>
                         </div>
                     </div>
+
+                    <!-- NUEVO BLOQUE: RESUMEN RÁPIDO DE LOS TABS -->
+                    <hr class="my-4 text-muted" style="opacity: 0.15;">
+                    <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-clipboard-data me-1"></i> Resumen Rápido del Expediente</h6>
+                    
+                    <div class="row g-3">
+                        <!-- 1. Teléfonos -->
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded border border-light-subtle h-100">
+                                <span class="text-muted d-block small fw-bold text-uppercase"><i class="bi bi-telephone-fill me-1"></i> Teléfonos</span>
+                                <span class="fs-6 text-dark fw-semibold d-block mt-1">
+                                    {{ $persona->telefonos->count() }} Número(s) registrado(s)
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 2. Académico (PNF) -->
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded border border-light-subtle h-100">
+                                <span class="text-muted d-block small fw-bold text-uppercase"><i class="bi bi-mortarboard-fill me-1"></i> Académico</span>
+                                @if($persona->titulacionPersona)
+                                    <span class="fs-6 text-dark fw-bold d-block mt-1 text-truncate" title="{{ $persona->titulacionPersona->pnf->nombre_pnf }}">
+                                        {{ $persona->titulacionPersona->pnf->nombre_pnf }}
+                                    </span>
+                                    <span class="badge bg-primary mt-1">{{ $persona->titulacionPersona->estatus->nombre_estatus_expediente ?? 'Asignado' }}</span>
+                                @else
+                                    <span class="fs-6 text-muted fw-semibold d-block mt-1">Sin PNF asignado</span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- 3. Sección Activa -->
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded border border-light-subtle h-100">
+                                <span class="text-muted d-block small fw-bold text-uppercase"><i class="bi bi-calendar-check-fill me-1"></i> Sección Actual</span>
+                                @if($persona->inscripcionActiva)
+                                    <span class="fs-6 text-success fw-bold d-block mt-1">{{ $persona->inscripcionActiva->seccion->nombre_seccion }}</span>
+                                @else
+                                    <span class="fs-6 text-muted fw-semibold d-block mt-1">No matriculado</span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- 4. Perfil Laboral -->
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded border border-light-subtle h-100">
+                                <span class="text-muted d-block small fw-bold text-uppercase"><i class="bi bi-briefcase-fill me-1"></i> Laboral</span>
+                                @if($persona->empresaPersona)
+                                    <span class="fs-6 text-dark fw-bold d-block mt-1 text-truncate" title="{{ $persona->empresaPersona->empresa->nombre_empresa }}">
+                                        {{ $persona->empresaPersona->empresa->nombre_empresa }}
+                                    </span>
+                                    <span class="small text-muted text-truncate d-block">{{ $persona->empresaPersona->cargo->descripcion_cargo ?? '' }}</span>
+                                @else
+                                    <span class="fs-6 text-muted fw-semibold d-block mt-1">Sin registro</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FIN BLOQUE RESUMEN RÁPIDO -->
+
                 </div>
             </div>
         </div>
         <!-- Footer gris para la tarjeta de perfil -->
-        <div class="card-footer bg-light py-2 text-muted small">
-            Perfil registrado en el sistema.
+        <div class="card-footer bg-light py-2 text-muted small d-flex justify-content-between">
+            <span>Perfil registrado en el sistema.</span>
         </div>
     </div>
 

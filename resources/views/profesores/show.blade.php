@@ -97,7 +97,8 @@
                         <div class="row g-2 mb-3">
                             <div class="col-md-7">
                                 <label class="form-label fw-bold small text-muted">PNF Asignado <span class="text-danger">*</span></label>
-                                <select class="form-select" name="id_pnf" required>
+                                <!-- Se agregó select2-buscador -->
+                                <select class="form-select select2-buscador" name="id_pnf" required>
                                     <option value="" disabled {{ !$user->profesor ? 'selected' : '' }}>Seleccione...</option>
                                     @foreach($pnfs as $pnf)
                                     <option value="{{ $pnf->id_pnf }}" {{ ($user->profesor && $user->profesor->id_pnf == $pnf->id_pnf) ? 'selected' : '' }}>
@@ -108,7 +109,8 @@
                             </div>
                             <div class="col-md-5">
                                 <label class="form-label fw-bold small text-muted">Nivel <span class="text-danger">*</span></label>
-                                <select class="form-select" name="nivel_asignado" required>
+                                <!-- Se agregó select2-buscador -->
+                                <select class="form-select select2-buscador" name="nivel_asignado" required>
                                     <option value="" disabled {{ !$user->profesor || !$user->profesor->nivel_asignado ? 'selected' : '' }}>Seleccione...</option>
                                     <option value="TSU" {{ ($user->profesor && $user->profesor->nivel_asignado == 'TSU') ? 'selected' : '' }}>TSU</option>
                                     <option value="Ingeniería" {{ ($user->profesor && $user->profesor->nivel_asignado == 'Ingeniería') ? 'selected' : '' }}>Ingeniería</option>
@@ -130,7 +132,7 @@
             </div>
         </div>
 
-        <!-- SECCIÓN INFERIOR: CARGA ACADÉMICA (SECCIONES ASIGNADAS N:M + ACORDEÓN DE ESTUDIANTES) -->
+        <!-- SECCIÓN INFERIOR: CARGA ACADÉMICA -->
         @if($user->profesor && $user->profesor->id_pnf && $user->profesor->nivel_asignado)
         <div class="col-12 mb-4">
             <div class="card border-0 shadow-sm">
@@ -142,102 +144,107 @@
                         <!-- Formulario para agregar una sección -->
                         <div class="col-md-4 border-end pe-4">
                             <h6 class="fw-bold mb-3 text-secondary">Asignar Nueva Sección</h6>
+
+                            @php
+                            $hayDisponibles = false;
+                            if(isset($seccionesDisponibles)) {
+                            foreach($seccionesDisponibles as $seccion) {
+                            if(!$user->profesor->secciones->contains('id_seccion', $seccion->id_seccion)) {
+                            $hayDisponibles = true; break;
+                            }
+                            }
+                            }
+                            @endphp
+
                             <form action="{{ route('usuarios.asignar_seccion', $user->id_users) }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold">Seleccione la Sección disponible</label>
-                                    <select class="form-select" name="id_seccion" required>
-                                        <option value="" selected disabled>Seleccione una sección...</option>
-                                        @php $hayDisponibles = false; @endphp
-                                        @foreach($seccionesDisponibles as $seccion)
-                                            {{-- RESTRICCIÓN: No mostrar las que ya tiene asignadas --}}
-                                            @if(!$user->profesor->secciones->contains('id_seccion', $seccion->id_seccion))
-                                                @php $hayDisponibles = true; @endphp
-                                                <option value="{{ $seccion->id_seccion }}">
-                                                    {{ $seccion->nombre_seccion }} (Cohorte Ref. {{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }})
-                                                </option>
-                                            @endif
-                                        @endforeach
+                                    <select class="form-select select2-buscador" id="select_seccion_prof" name="id_seccion" required>
+                                        <option value="" selected disabled>
+                                            {{ $hayDisponibles ? 'Seleccione una sección...' : 'No hay secciones activas para este PNF' }}
+                                        </option>
 
-                                        @if(!$hayDisponibles)
-                                            <option value="" disabled>No hay secciones activas disponibles para este PNF</option>
+                                        @if($hayDisponibles)
+                                        @foreach($seccionesDisponibles as $seccion)
+                                        @if(!$user->profesor->secciones->contains('id_seccion', $seccion->id_seccion))
+                                        <option value="{{ $seccion->id_seccion }}">
+                                            {{ $seccion->nombre_seccion_formateado ?? $seccion->nombre_completo_select }}
+                                        </option>
+                                        @endif
+                                        @endforeach
                                         @endif
                                     </select>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">
+                                <button type="submit" id="btn_asignar_seccion" class="btn btn-primary w-100 fw-bold shadow-sm" {{ !$hayDisponibles ? 'disabled' : '' }}>
                                     <i class="bi bi-plus-circle me-1"></i> Añadir a la Carga
                                 </button>
                             </form>
                         </div>
 
-                        <!-- Lista de Secciones Asignadas con Acordeón de Alumnos -->
+                        <!-- Lista de Secciones Asignadas -->
                         <div class="col-md-8 ps-4">
                             <h6 class="fw-bold mb-3 text-secondary">Secciones Actuales del Docente</h6>
-                            
+
                             @forelse($user->profesor->secciones as $seccionAsignada)
-                                <div class="card border mb-3 shadow-sm">
-                                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                                        <div>
-                                            <span class="fw-bold text-dark fs-6 me-2">{{ $seccionAsignada->nombre_seccion }}</span>
-                                            <span class="badge bg-info text-dark">Cohorte Ref. {{ $seccionAsignada->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }}</span>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <!-- Botón Acordeón: Ver Alumnos -->
-                                            <button class="btn btn-outline-primary btn-sm fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAlumnos{{ $seccionAsignada->id_seccion }}" aria-expanded="false" aria-controls="collapseAlumnos{{ $seccionAsignada->id_seccion }}">
-                                                <i class="bi bi-people me-1"></i> Ver Alumnos ({{ $seccionAsignada->inscripciones->where('estatus_inscripcion', 'Activo')->count() }})
+                            <div class="card border mb-3 shadow-sm">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                                    <div>
+                                        <span class="fw-bold text-dark fs-6 me-2">{{ $seccionAsignada->nombre_seccion }}</span>
+                                        <span class="badge bg-info text-dark">Cohorte Ref. {{ $seccionAsignada->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button class="btn btn-outline-primary btn-sm fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAlumnos{{ $seccionAsignada->id_seccion }}" aria-expanded="false" aria-controls="collapseAlumnos{{ $seccionAsignada->id_seccion }}">
+                                            <i class="bi bi-people me-1"></i> Ver Alumnos ({{ $seccionAsignada->inscripciones->where('estatus_inscripcion', 'Activo')->count() }})
+                                        </button>
+
+                                        <form action="{{ route('usuarios.remover_seccion', ['id_usuario' => $user->id_users, 'id_seccion' => $seccionAsignada->id_seccion]) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de remover esta sección?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Quitar sección">
+                                                <i class="bi bi-trash3-fill"></i>
                                             </button>
-                                            
-                                            <!-- Botón para Remover Sección -->
-                                            <form action="{{ route('usuarios.remover_seccion', ['id_usuario' => $user->id_users, 'id_seccion' => $seccionAsignada->id_seccion]) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de remover esta sección de la carga académica del profesor?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Quitar sección">
-                                                    <i class="bi bi-trash3-fill"></i>
-                                                </button>
-                                            </form>
-                                        </div>
+                                        </form>
                                     </div>
+                                </div>
 
-                                    <!-- ACORDEÓN DESPLEGABLE CON LA LISTA DE ESTUDIANTES -->
-                                    <div class="collapse" id="collapseAlumnos{{ $seccionAsignada->id_seccion }}">
-                                        <div class="card-body bg-white p-3 border-top">
-                                            <div class="table-responsive">
-                                                <table class="table table-sm table-striped align-middle mb-0">
-                                                    <thead class="table-dark">
-                                                        <tr>
-                                                            <th>Cédula</th>
-                                                            <th>Apellidos y Nombres</th>
-                                                            <th>Cohorte (Origen)</th>
-                                                            <th>Empresa</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @forelse($seccionAsignada->inscripciones->where('estatus_inscripcion', 'Activo') as $inscripcion)
-                                                            <tr>
-                                                                <td class="fw-bold">{{ $inscripcion->persona->cedula_personas }}</td>
-                                                                <td>{{ $inscripcion->persona->nombre_completo }}</td>
-                                                                <td><span class="badge bg-secondary">Cohorte {{ $inscripcion->persona->cohorte->numero_cohorte ?? 'N/D' }}</span></td>
-                                                                <td>{{ $inscripcion->persona->empresaPersona->empresa->nombre_empresa ?? 'Independiente' }}</td>
-                                                            </tr>
-                                                        @empty
-                                                            <tr>
-                                                                <td colspan="4" class="text-center text-muted py-2 small">No hay estudiantes inscritos en esta sección todavía.</td>
-                                                            </tr>
-                                                        @endforelse
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                <div class="collapse" id="collapseAlumnos{{ $seccionAsignada->id_seccion }}">
+                                    <div class="card-body bg-white p-3 border-top">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-striped align-middle mb-0">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th>Cédula</th>
+                                                        <th>Apellidos y Nombres</th>
+                                                        <th>Cohorte (Origen)</th>
+                                                        <th>Empresa</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @forelse($seccionAsignada->inscripciones->where('estatus_inscripcion', 'Activo') as $inscripcion)
+                                                    <tr>
+                                                        <td class="fw-bold">{{ $inscripcion->persona->cedula_personas }}</td>
+                                                        <td>{{ $inscripcion->persona->nombre_completo }}</td>
+                                                        <td><span class="badge bg-secondary">Cohorte {{ $inscripcion->persona->cohorte->numero_cohorte ?? 'N/D' }}</span></td>
+                                                        <td>{{ $inscripcion->persona->empresaPersona->empresa->nombre_empresa ?? 'Independiente' }}</td>
+                                                    </tr>
+                                                    @empty
+                                                    <tr>
+                                                        <td colspan="4" class="text-center text-muted py-2 small">No hay estudiantes inscritos en esta sección todavía.</td>
+                                                    </tr>
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
                             @empty
-                                <div class="text-center text-muted py-4 border rounded bg-light">
-                                    <i class="bi bi-journal-x fs-2 d-block mb-2 opacity-50"></i>
-                                    El profesor no tiene secciones asignadas aún.<br>
-                                    <small>No podrá registrar asistencias hasta que se le asigne al menos una sección.</small>
-                                </div>
+                            <div class="text-center text-muted py-4 border rounded bg-light">
+                                <i class="bi bi-journal-x fs-2 d-block mb-2 opacity-50"></i>
+                                El profesor no tiene secciones asignadas aún.
+                            </div>
                             @endforelse
-
                         </div>
                     </div>
                 </div>
@@ -245,7 +252,6 @@
         </div>
         @endif
         @endif
-
     </div>
 </div>
 @endsection

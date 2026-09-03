@@ -9,11 +9,10 @@ use App\Http\Requests\UpdatePeriodoAcademicoRequest;
 use App\DataTables\PeriodosAcademicosDataTable; // <-- NUEVO
 use Illuminate\Http\Request;
 
-class PeriodoAcademicoController extends Controller
-{
-    public function index(PeriodosAcademicosDataTable $dataTable) 
-    {
+class PeriodoAcademicoController extends Controller{
+    public function index(PeriodosAcademicosDataTable $dataTable) {
         // Blindaje AJAX para DataTables
+        
         if (request()->ajax() || request()->wantsJson()) {
             return $dataTable->ajax();
         }
@@ -36,7 +35,7 @@ class PeriodoAcademicoController extends Controller
             ]);
         }
 
-        return redirect()->route('periodos-academicos.index')
+        return redirect()->route('estructura.index')
                          ->with('success', 'Período académico creado exitosamente.');
     }
 
@@ -51,8 +50,20 @@ class PeriodoAcademicoController extends Controller
             ]);
         }
 
-        return redirect()->route('periodos-academicos.index')
+        return redirect()->route('estructura.index')
                          ->with('success', 'Período académico actualizado correctamente.');
+    }
+    
+    public function destroy(PeriodoAcademico $periodo)
+    {
+        try {
+            $periodo->delete();
+            return redirect()->route('estructura.index')
+                ->with('success', 'Período académico eliminado correctamente.');
+        } catch (\Exception $e) {
+            return redirect()->route('estructura.index')
+                ->with('error', 'No se puede eliminar el período porque tiene secciones vinculadas.');
+        }
     }
 
     // Los métodos show() y destroy() se mantienen exactamente iguales a tu código.

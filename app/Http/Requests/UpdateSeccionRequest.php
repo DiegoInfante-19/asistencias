@@ -14,8 +14,12 @@ class UpdateSeccionRequest extends FormRequest
 
     public function rules(): array
     {
-        // Rescatamos el ID de la sección desde la ruta (ej: {seccion})
         $seccionId = $this->route('seccion');
+
+        // Si id_periodo o id_pnf no viajan en el request de actualización, los rescatamos del modelo actual para que la regla unique no falle
+        $seccionActual = \App\Models\Seccion::find($seccionId);
+        $idPeriodo = $this->input('id_periodo', $seccionActual->id_periodo ?? null);
+        $idPnf = $this->input('id_pnf', $seccionActual->id_pnf ?? null);
 
         return [
             'id_periodo'      => ['sometimes', 'required', 'integer', 'exists:periodos_academicos,id_periodo'],
@@ -25,9 +29,9 @@ class UpdateSeccionRequest extends FormRequest
                 'required', 
                 'string', 
                 'max:50',
-                Rule::unique('secciones')->where(function ($query) {
-                    return $query->where('id_periodo', $this->id_periodo)
-                                 ->where('id_pnf', $this->id_pnf);
+                Rule::unique('secciones')->where(function ($query) use ($idPeriodo, $idPnf) {
+                    return $query->where('id_periodo', $idPeriodo)
+                                   ->where('id_pnf', $idPnf);
                 })->ignore($seccionId, 'id_seccion')
             ],
             'estatus_seccion' => ['sometimes', 'required', 'string', 'max:50']

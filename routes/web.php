@@ -13,7 +13,7 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PnfController;
 use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\PeriodoAcademicoController; 
-use App\Http\Controllers\SeccionController;                
+use App\Http\Controllers\SeccionController;                     
 use App\Http\Controllers\TituloController;
 use App\Http\Controllers\EstatusExpedienteController;
 use App\Http\Controllers\PeriodoRecesoController;
@@ -24,9 +24,9 @@ use App\Http\Controllers\PersonaTitulacionController;
 use App\Http\Controllers\PersonaFormacionAcademicaController;
 use App\Http\Controllers\PersonaInscripcionController;
 use App\Http\Controllers\PersonaController;
-
 use App\Http\Controllers\SesionController;
 use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\EstructuraAcademicaController;
 
 Auth::routes(['register' => true]);
 
@@ -65,7 +65,7 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
     // BÓVEDA 2: ACCESO RESTRINGIDO (Solo Administrador y Coordinador)
     // ---------------------------------------------------------------------
     Route::middleware(['role:Administrador,Coordinador'])->group(function () {
-        
+
         // Gestión de Usuarios y Profesores
         Route::resource('usuarios', UserController::class);
         Route::post('/usuarios/{usuario}/asignar-pnf', [UserController::class, 'asignarPnf'])->name('usuarios.asignar_pnf');
@@ -111,6 +111,9 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             Route::delete('/pnfs/empresas/{empresa_pnf}', 'desvincularEmpresa')->name('pnfs.empresas.destroy');
         });
 
+        // Interfaz Unificada de Estructura Académica
+        Route::get('/estructura-academica', [EstructuraAcademicaController::class, 'index'])->name('estructura.index');
+
         Route::controller(CohorteController::class)->group(function () {
             Route::get('/cohortes', 'index')->name('cohortes.index');
             Route::post('/cohortes', 'store')->name('cohortes.store');
@@ -123,8 +126,11 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
         ]);
 
         // Gestión de Secciones Académicas y Matrícula Interna
-        Route::resource('secciones', SeccionController::class);
-        // NUEVO: Rutas para inscribir y retirar estudiantes directamente en la sección
+        Route::resource('secciones', SeccionController::class)->parameters([
+            'secciones' => 'seccion'
+        ]);
+        
+        // Rutas para inscribir y retirar estudiantes directamente en la sección
         Route::post('/secciones/{seccion}/inscribir', [SeccionController::class, 'inscribirEstudiante'])->name('secciones.inscribir');
         Route::delete('/secciones/{seccion}/retirar/{id_inscripcion}', [SeccionController::class, 'retirarEstudiante'])->name('secciones.retirar');
 

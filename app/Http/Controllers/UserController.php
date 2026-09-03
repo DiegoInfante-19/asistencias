@@ -110,11 +110,15 @@ class UserController extends Controller
             $pnfs = Pnf::where('vigencia_pnf', true)->orderBy('nombre_pnf', 'asc')->get();
 
             if ($user->profesor && $user->profesor->id_pnf) {
-                // El administrador puede asignar secciones que coincidan con el PNF del profesor
+                // FASE 2 - PASO 2.2: Aplicamos el Scope estricto y transformamos con el nombre enriquecido
                 $seccionesDisponibles = \App\Models\Seccion::with(['periodoAcademico.cohorte', 'pnf'])
                     ->where('id_pnf', $user->profesor->id_pnf)
-                    ->where('estatus_seccion', 'Activa')
-                    ->get();
+                    ->activasParaAsignacion()
+                    ->get()
+                    ->map(function ($seccion) {
+                        $seccion->nombre_seccion_formateado = $seccion->nombre_completo_select;
+                        return $seccion;
+                    });
             }
         }
 

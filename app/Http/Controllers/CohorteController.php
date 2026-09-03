@@ -25,7 +25,7 @@ class CohorteController extends Controller
     {
         Cohorte::create($request->validated());
 
-        return redirect()->route('cohortes.index')
+        return redirect()->route('estructura.index')
             ->with('success', 'Sello de cohorte registrado correctamente.');
     }
 
@@ -34,7 +34,7 @@ class CohorteController extends Controller
         $cohorte = Cohorte::findOrFail($id);
         $cohorte->update($request->validated());
 
-        return redirect()->route('cohortes.index')
+        return redirect()->route('estructura.index')
             ->with('success', 'Sello de cohorte actualizado correctamente.');
     }
 
@@ -44,10 +44,10 @@ class CohorteController extends Controller
             $cohorte = Cohorte::findOrFail($id);
             $cohorte->delete();
 
-            return redirect()->route('cohortes.index')
+            return redirect()->route('estructura.index')
                 ->with('success', 'Sello de cohorte eliminado correctamente.');
         } catch (QueryException $e) {
-            return redirect()->route('cohortes.index')
+            return redirect()->route('estructura.index')
                 ->with('error', 'No se puede eliminar este sello de cohorte porque tiene períodos académicos vinculados.');
         }
     }

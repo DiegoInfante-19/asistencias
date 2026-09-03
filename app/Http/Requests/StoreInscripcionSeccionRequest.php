@@ -18,17 +18,20 @@ class StoreInscripcionSeccionRequest extends FormRequest
                 'exists:personas,id_personas',
                 // REGLA 1: Impedir doble inscripción activa en el sistema
                 function ($attribute, $value, $fail) {
-                    $inscripcionActiva = DB::table('inscripciones_secciones')
-                        ->where('id_personas', $value)
-                        ->where('estatus_inscripcion', 'Activo')
-                        ->whereNull('deleted_at')
-                        ->exists();
-                    if ($inscripcionActiva) {
-                        $fail('El participante ya cuenta con una inscripción activa en una sección. Debe retirar la inscripción anterior antes de registrar una nueva.');
+                    // Solo bloqueamos si la nueva inscripción que intentan crear es "Activo"
+                    if (request()->input('estatus_inscripcion') === 'Activo') {
+                        $inscripcionActiva = DB::table('inscripciones_secciones')
+                            ->where('id_personas', $value)
+                            ->where('estatus_inscripcion', 'Activo')
+                            ->whereNull('deleted_at')
+                            ->exists();
+                        
+                        if ($inscripcionActiva) {
+                            $fail('El estudiante ya cuenta con una matrícula activa en otra sección. Debe retirarlo de su sección actual antes de registrar una nueva.');
+                        }
                     }
                 },
             ],
-            // ACTUALIZADO: Validamos contra la nueva tabla 'secciones'
             'id_seccion' => [
                 'required',
                 'integer',

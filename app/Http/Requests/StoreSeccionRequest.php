@@ -20,11 +20,10 @@ class StoreSeccionRequest extends FormRequest
             'nombre_seccion'  => [
                 'required', 
                 'string', 
-                'max:50',
-                // REGLA DE INTEGRIDAD: Nombre único condicionado al Periodo y al PNF
+                'max:50', // Sin filtros de formato rígidos: total flexibilidad para texto libre o notas del admin
                 Rule::unique('secciones')->where(function ($query) {
                     return $query->where('id_periodo', $this->id_periodo)
-                                 ->where('id_pnf', $this->id_pnf);
+                                   ->where('id_pnf', $this->id_pnf);
                 })
             ],
             'estatus_seccion' => ['nullable', 'string', 'max:50']

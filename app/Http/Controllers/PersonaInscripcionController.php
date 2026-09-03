@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Persona;
-use App\Models\InscripcionSeccion; // Reemplaza a InscripcionCohorte
-use App\Http\Requests\StoreInscripcionSeccionRequest; // Reemplaza al request viejo
+use App\Models\InscripcionSeccion; 
+use App\Http\Requests\StoreInscripcionSeccionRequest; 
 use Illuminate\Support\Facades\Log;
 
 class PersonaInscripcionController extends Controller
@@ -12,7 +12,12 @@ class PersonaInscripcionController extends Controller
     public function store(StoreInscripcionSeccionRequest $request, Persona $persona)
     {
         try {
-            // El request ya validó la coherencia de PNF y exclusividad de estatus activo
+            // DOBLE BLINDAJE: Si superó el Request pero el controlador detecta que ya tiene una inscripción activa
+            if ($request->estatus_inscripcion === 'Activo' && $persona->inscripcionActiva()->exists()) {
+                return redirect()->back()
+                    ->with('error', 'Error de seguridad: El estudiante ya se encuentra cursando estudios en una sección activa.');
+            }
+
             $persona->inscripcionesSecciones()->create($request->validated());
 
             return redirect()->back()->with('success', 'Estudiante inscrito en la sección académica exitosamente.');
