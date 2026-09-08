@@ -31,4 +31,26 @@ class PeriodoAcademico extends Model
     {
         return $this->hasMany(Seccion::class, 'id_periodo', 'id_periodo');
     }
+
+    /**
+     * Eventos del modelo PeriodoAcademico.
+     */
+    protected static function booted()
+    {
+        static::updated(function ($periodo) {
+            // Verificamos si el estatus del período cambió
+            if ($periodo->isDirty('estatus_periodo')) {
+                
+                // Mapeo: 'Activo' -> 'Activa', cualquier otro ('Finalizada', etc.) -> 'Inactiva'
+                $estatusSeccion = $periodo->estatus_periodo === 'Activo' ? 'Activa' : 'Inactiva';
+
+                // Instanciamos cada sección y la actualizamos
+                foreach ($periodo->secciones as $seccion) {
+                    $seccion->update([
+                        'estatus_seccion' => $estatusSeccion
+                    ]);
+                }
+            }
+        });
+    }
 }

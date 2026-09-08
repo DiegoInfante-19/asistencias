@@ -28,7 +28,7 @@ class StoreCohorteRequest extends FormRequest
                 'string',
                 'max:20',
                 'unique:cohortes,numero_cohorte',
-                'regex:/^[A-Z0-9\s\-]+$/' // Permite letras mayúsculas, números, espacios y guiones
+                'regex:/^[A-Z0-9\s\-]+$/'
             ],
             'descripcion_cohorte' => [
                 'nullable', 
@@ -40,6 +40,16 @@ class StoreCohorteRequest extends FormRequest
                 'string', 
                 'max:50'
             ],
+            // Validaciones para el período académico asociado
+            'fecha_inicio' => [
+                'required',
+                'date'
+            ],
+            'fecha_fin' => [
+                'required',
+                'date',
+                'after_or_equal:fecha_inicio'
+            ],
         ];
     }
 
@@ -50,6 +60,9 @@ class StoreCohorteRequest extends FormRequest
             'numero_cohorte.unique'    => 'Este número de cohorte ya existe.',
             'numero_cohorte.regex'     => 'El número de cohorte debe contener únicamente letras, números y espacios.',
             'estatus_cohorte.required' => 'El estatus es obligatorio.',
+            'fecha_inicio.required'    => 'La fecha de inicio del período es obligatoria.',
+            'fecha_fin.required'       => 'La fecha de fin del período es obligatoria.',
+            'fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
         ];
     }
 }

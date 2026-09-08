@@ -9,6 +9,8 @@ use App\Models\Profesor;
 use App\Models\Empresa;
 use App\Models\Persona;
 use App\DataTables\SeccionDataTable;
+use App\DataTables\InscripcionSeccionDataTable;
+use App\DataTables\ProfesorSeccionDataTable;
 use App\Http\Requests\StoreSeccionRequest;
 use App\Http\Requests\UpdateSeccionRequest;
 use Illuminate\Http\Request;
@@ -37,14 +39,24 @@ class SeccionController extends Controller
         return redirect()->route('estructura.index')->with('success', 'Sección académica creada exitosamente.');
     }
 
-    public function show(Seccion $seccion): View
+    public function show(Seccion $seccion, InscripcionSeccionDataTable $dataTable, ProfesorSeccionDataTable $profesorDataTable)
     {
+        // Intercepta peticiones asíncronas (AJAX) diferenciando qué tabla está solicitando los datos
+        if (request()->ajax() || request()->wantsJson()) {
+            if (request()->has('table') && request()->get('table') === 'docentes-table') {
+                return $profesorDataTable->with('seccion', $seccion)->ajax();
+            }
+            return $dataTable->with('seccion', $seccion)->ajax();
+        }
+
         $seccion->load([
             'periodoAcademico.cohorte', 
             'pnf', 
             'profesores.user', 
+            'profesores.pnf', 
+            'inscripciones.persona.lugarNacimiento.ciudad.estado',
+            'inscripciones.persona.titulacionPersona.pnf',
             'inscripciones.persona.empresaPersona.empresa',
-            'inscripciones.persona.cohorte',
             'sesiones' => function($query) {
                 $query->orderBy('fecha_sesion', 'desc');
             },
@@ -52,16 +64,26 @@ class SeccionController extends Controller
             'sesiones.asistencias.inscripcionSeccion.persona'
         ]);
 
-        $estudiantesYaInscritos = $seccion->inscripciones->pluck('id_personas');
-        
-        $estudiantesDisponibles = Persona::whereNotIn('id_personas', $estudiantesYaInscritos)
+        // RESTRICCIÓN ESTRICTA ESTUDIANTES: Solo personas que NO tengan inscripciones activas
+        $estudiantesDisponibles = Persona::whereDoesntHave('inscripcionesSecciones')
             ->whereHas('titulacionPersona', function($q) use ($seccion) {
                 $q->where('id_pnf', $seccion->id_pnf);
             })
-            ->with(['cohorte', 'empresaPersona.empresa'])
+            ->with(['titulacionPersona.pnf', 'cohorte'])
             ->get();
 
-        return view('secciones.show', compact('seccion', 'estudiantesDisponibles'));
+        // RESTRICCIÓN ESTRICTA DOCENTES: Ningún profesor se puede poner dos veces en la misma sección
+        $profesoresDisponibles = Profesor::with(['user', 'pnf'])
+            ->whereDoesntHave('secciones', function ($q) use ($seccion) {
+                $q->where('secciones.id_seccion', $seccion->id_seccion);
+            })
+            ->get();
+
+        return view('secciones.show', compact('seccion', 'estudiantesDisponibles', 'profesoresDisponibles'))
+            ->with([
+                'dataTable' => $dataTable->with('seccion', $seccion),
+                'profesorDataTable' => $profesorDataTable->with('seccion', $seccion)
+            ]);
     }
 
     public function update(UpdateSeccionRequest $request, Seccion $seccion): RedirectResponse
@@ -79,6 +101,8 @@ class SeccionController extends Controller
         return redirect()->route('estructura.index')->with('success', 'Sección eliminada con éxito.');
     }
 
+    // --- MÉTODOS DE MATRÍCULA DE ESTUDIANTES ---
+
     public function inscribirEstudiante(Request $request, Seccion $seccion): RedirectResponse
     {
         $request->validate([
@@ -86,7 +110,7 @@ class SeccionController extends Controller
         ]);
 
         $estudiante = Persona::with('titulacionPersona')->findOrFail($request->id_personas);
-        
+
         if (!$estudiante->titulacionPersona || $estudiante->titulacionPersona->id_pnf !== $seccion->id_pnf) {
             return back()->with('error', 'Violación de regla: El estudiante pertenece a un PNF diferente al de esta sección.');
         }
@@ -106,5 +130,25 @@ class SeccionController extends Controller
         $inscripcion->delete();
 
         return back()->with('success', 'Estudiante retirado de la sección.');
+    }
+
+    // --- MÉTODOS DE ASIGNACIÓN DE DOCENTES ---
+
+    public function asignarProfesor(Request $request, Seccion $seccion): RedirectResponse
+    {
+        $request->validate([
+            'id_profesor' => 'required|exists:profesores,id_profesor'
+        ]);
+
+        $seccion->profesores()->syncWithoutDetaching([$request->id_profesor]);
+
+        return back()->with('success', 'Profesor asignado a la sección exitosamente.');
+    }
+
+    public function removerProfesor(Seccion $seccion, $id_profesor): RedirectResponse
+    {
+        $seccion->profesores()->detach($id_profesor);
+
+        return back()->with('success', 'Profesor removido de la sección correctamente.');
     }
 }

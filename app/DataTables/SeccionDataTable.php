@@ -13,36 +13,18 @@ class SeccionDataTable extends BaseDataTable
     public function dataTable($query): EloquentDataTable
     {
         return EloquentDataTable::create($query)
-            ->addColumn('periodo', function ($seccion) {
-                return 'Cohorte ' . ($seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D');
-            })
-            ->addColumn('pnf_nombre', function ($seccion) {
-                return '<span class="fw-bold text-primary">' . ($seccion->pnf->nombre_pnf ?? 'N/D') . '</span>';
-            })
             ->addColumn('profesores_lista', function ($seccion) {
-                if ($seccion->profesores->isEmpty()) {
+                // CONTADOR DE DOCENTES EN VEZ DE NOMBRES
+                $cantidad = $seccion->profesores->count();
+                if ($cantidad === 0) {
                     return '<span class="text-muted small">Sin asignar</span>';
                 }
-                return $seccion->profesores->map(function ($profesor) {
-                    $nombre = $profesor->user->name_users ?? 'Profesor';
-                    $apellido = $profesor->user->last_name_users ?? '';
-                    return '<span class="badge bg-info text-dark me-1">' . trim("$nombre $apellido") . '</span>';
-                })->implode('');
-            })
-            ->addColumn('total_estudiantes', function ($seccion) {
-                $count = $seccion->inscripciones()->where('estatus_inscripcion', 'Activo')->count();
-                return '<span class="badge bg-secondary px-2 py-1">' . $count . ' Estudiantes</span>';
-            })
-            ->editColumn('estatus_seccion', function ($seccion) {
-                if ($seccion->estatus_seccion === 'Activa') {
-                    return '<span class="badge bg-success">Activa</span>';
-                }
-                return '<span class="badge bg-secondary">Inactiva</span>';
+                return '<span class="badge bg-info text-dark">' . $cantidad . ' Asignado(s)</span>';
             })
             ->addColumn('action', function ($seccion) {
                 return view('secciones.partials.actions', compact('seccion'))->render();
             })
-            ->rawColumns(['pnf_nombre', 'profesores_lista', 'total_estudiantes', 'estatus_seccion', 'action'])
+            ->rawColumns(['profesores_lista', 'action'])
             ->setRowId('id_seccion');
     }
 
@@ -54,11 +36,6 @@ class SeccionDataTable extends BaseDataTable
             'profesores.user',
             'inscripciones.persona.empresaPersona'
         ]);
-
-        // FILTRO AVANZADO: Por PNF
-        if ($this->request()->filled('filtro_pnf')) {
-            $query->where('id_pnf', $this->request()->get('filtro_pnf'));
-        }
 
         // FILTRO AVANZADO: Por Profesor (Relación N:M)
         if ($this->request()->filled('filtro_profesor')) {
@@ -97,7 +74,6 @@ class SeccionDataTable extends BaseDataTable
         // Llamamos al constructor base que ya tiene los botones, DOM y el idioma local
         return $this->sharedHtmlBuilder()
                     ->minifiedAjax('', null, [
-                        'filtro_pnf' => '$("#filtro_pnf").val()',
                         'filtro_profesor' => '$("#filtro_profesor").val()',
                         'filtro_empresa' => '$("#filtro_empresa").val()',
                         'filtro_cohorte' => '$("#filtro_cohorte").val()'
@@ -107,14 +83,9 @@ class SeccionDataTable extends BaseDataTable
     protected function getColumns(): array
     {
         return [
-            Column::make('id_seccion')->title('ID')->width('50px')->addClass('text-center'),
-            Column::make('nombre_seccion')->title('Sección')->addClass('text-center fw-bold'),
-            Column::make('periodo')->title('Período Base'),
-            Column::make('pnf_nombre')->title('PNF'),
-            Column::make('profesores_lista')->title('Docentes Asignados')->orderable(false),
-            Column::make('total_estudiantes')->title('Inscritos')->addClass('text-center')->orderable(false),
-            Column::make('estatus_seccion')->title('Estatus')->addClass('text-center'),
-            Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('130px')->addClass('text-center'),
+            Column::make('nombre_seccion')->title('Sección')->addClass('text-center fw-bold')->width('40%'),
+            Column::make('profesores_lista')->title('Docentes Asignados')->addClass('text-center')->orderable(false)->width('35%'),
+            Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('25%')->addClass('text-center'),
         ];
     }
 }

@@ -3,30 +3,52 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cohorte;
+use App\Models\PeriodoAcademico;
 use App\DataTables\CohortesDataTable;
 use App\Http\Requests\StoreCohorteRequest;
 use App\Http\Requests\UpdateCohorteRequest;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 class CohorteController extends Controller
 {
     public function index(CohortesDataTable $dataTable)
     {
-        // Si es una petición asíncrona de DataTables, devolvemos exclusivamente el JSON
         if (request()->ajax() || request()->wantsJson()) {
             return $dataTable->ajax();
         }
 
-        // Si es una entrada normal por el navegador, renderizamos la vista completa
         return $dataTable->render('cohortes.index');
     }
 
     public function store(StoreCohorteRequest $request)
     {
-        Cohorte::create($request->validated());
+        try {
+            DB::transaction(function () use ($request) {
+                // 1. Crear la Cohorte
+                $cohorte = Cohorte::create([
+                    'numero_cohorte'      => $request->numero_cohorte,
+                    'descripcion_cohorte' => $request->descripcion_cohorte,
+                    'estatus_cohorte'     => $request->estatus_cohorte,
+                ]);
 
-        return redirect()->route('estructura.index')
-            ->with('success', 'Sello de cohorte registrado correctamente.');
+                // 2. Crear automáticamente su Período Académico asociado (Relación 1 a 1)
+                PeriodoAcademico::create([
+                    'id_cohortes'     => $cohorte->id_cohortes,
+                    'fecha_inicio'    => $request->fecha_inicio,
+                    'fecha_fin'       => $request->fecha_fin,
+                    'estatus_periodo' => $request->estatus_cohorte === 'Activo' ? 'Activo' : 'Finalizado',
+                ]);
+            });
+
+            return redirect()->route('estructura.index')
+                ->with('success', 'Cohorte y período académico registrados correctamente.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error al registrar la cohorte: ' . $e->getMessage());
+        }
     }
 
     public function update(UpdateCohorteRequest $request, $id)

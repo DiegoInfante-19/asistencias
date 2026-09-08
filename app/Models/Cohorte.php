@@ -25,4 +25,30 @@ class Cohorte extends Model
     {
         return $this->hasMany(PeriodoAcademico::class, 'id_cohortes', 'id_cohortes');
     }
+
+    // RELACIÓN: Para contar todos los estudiantes inscritos en la cohorte general
+    public function personas(): HasMany
+    {
+        return $this->hasMany(Persona::class, 'id_cohortes', 'id_cohortes');
+    }
+
+    /**
+     * Eventos del modelo Cohorte.
+     */
+    protected static function booted()
+    {
+        static::updated(function ($cohorte) {
+            // Verificamos si el estatus de la cohorte cambió
+            if ($cohorte->isDirty('estatus_cohorte')) {
+                
+                // Iteramos sobre los períodos. Al actualizar la instancia, 
+                // se dispara automáticamente el evento updated de PeriodoAcademico.
+                foreach ($cohorte->periodosAcademicos as $periodo) {
+                    $periodo->update([
+                        'estatus_periodo' => $cohorte->estatus_cohorte
+                    ]);
+                }
+            }
+        });
+    }
 }

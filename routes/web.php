@@ -13,7 +13,7 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PnfController;
 use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\PeriodoAcademicoController; 
-use App\Http\Controllers\SeccionController;                     
+use App\Http\Controllers\SeccionController;                         
 use App\Http\Controllers\TituloController;
 use App\Http\Controllers\EstatusExpedienteController;
 use App\Http\Controllers\PeriodoRecesoController;
@@ -133,6 +133,10 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
         // Rutas para inscribir y retirar estudiantes directamente en la sección
         Route::post('/secciones/{seccion}/inscribir', [SeccionController::class, 'inscribirEstudiante'])->name('secciones.inscribir');
         Route::delete('/secciones/{seccion}/retirar/{id_inscripcion}', [SeccionController::class, 'retirarEstudiante'])->name('secciones.retirar');
+
+        // Rutas para asignar y remover profesores directamente en la sección
+        Route::post('/secciones/{seccion}/profesores', [SeccionController::class, 'asignarProfesor'])->name('secciones.asignar-profesor');
+        Route::delete('/secciones/{seccion}/profesores/{id_profesor}', [SeccionController::class, 'removerProfesor'])->name('secciones.remover-profesor');
 
         Route::controller(TituloController::class)->group(function () {
             Route::get('/titulos', 'index')->name('titulos.index');
