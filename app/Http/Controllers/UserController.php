@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Pnf;
+use App\Models\Seccion;
 use App\Models\Profesor;
 use Illuminate\Support\Facades\Hash;
 use App\DataTables\UsersDataTable;
@@ -23,7 +24,10 @@ class UserController extends Controller
         }
 
         $roles = Role::all();
-        return $dataTable->render('profesores.index', compact('roles'));
+        $pnfs = Pnf::orderBy('nombre_pnf')->get();
+        $secciones = Seccion::orderBy('nombre_seccion')->get();
+
+        return $dataTable->render('profesores.index', compact('roles', 'pnfs', 'secciones'));
     }
 
     public function create()
@@ -93,7 +97,6 @@ class UserController extends Controller
 
     public function show($id)
     {
-        // FASE 3: Cargamos profundamente las secciones del profesor, incluyendo su PNF, período y la lista de estudiantes inscritos
         $user = User::with([
             'rol', 
             'profesor.pnf', 
@@ -109,8 +112,8 @@ class UserController extends Controller
         if ($user->isProfesor()) {
             $pnfs = Pnf::where('vigencia_pnf', true)->orderBy('nombre_pnf', 'asc')->get();
 
-            if ($user->profesor && $user->profesor->id_pnf) {
-                // FASE 2 - PASO 2.2: Aplicamos el Scope estricto y transformamos con el nombre enriquecido
+            if ($user->profesor && $user->profesor->id_pnf && $user->profesor->nivel_asignado) {
+                // Consultamos las secciones disponibles filtrando por el PNF del profesor sin invocar columnas inexistentes
                 $seccionesDisponibles = \App\Models\Seccion::with(['periodoAcademico.cohorte', 'pnf'])
                     ->where('id_pnf', $user->profesor->id_pnf)
                     ->activasParaAsignacion()
@@ -159,7 +162,6 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Debe configurar el PNF del profesor antes de asignarle secciones.');
         }
 
-        // Usamos syncWithoutDetaching para añadir la sección de forma ágil a su carga múltiple N:M
         $user->profesor->secciones()->syncWithoutDetaching([$request->id_seccion]);
 
         return redirect()->back()->with('success', 'Sección académica asignada exitosamente a la carga del profesor.');

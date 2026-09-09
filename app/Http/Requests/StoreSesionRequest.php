@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class StoreSesionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return true; // La autorización se delega a la Policy o Control de Roles
     }
 
     public function rules(): array
@@ -18,36 +20,40 @@ class StoreSesionRequest extends FormRequest
                 'required',
                 'exists:secciones,id_seccion'
             ],
-            // AGREGADO: Validación obligatoria del profesor responsable de la sesión
             'id_profesor' => [
                 'required',
                 'exists:profesores,id_profesor'
             ],
             'fecha_sesion' => [
                 'required',
-                'date', // Valida que sea una fecha/hora válida para un campo dateTime
-                'before_or_equal:today', 
+                'date',
+                // NOTA: Se removió 'before_or_equal:today' para dar flexibilidad a los encargados 
+                // de registrar clases pasadas (hojas de papel), la UI y la lógica de negocio controlan el pasado válido.
                 function ($attribute, $value, $fail) {
-                    $numeroDia = date('N', strtotime($value));
-                    if ($numeroDia != 3) {
-                        $fail('Las clases solo pueden aperturarse los días miércoles.');
+                    $fecha = Carbon::parse($value);
+
+                    // 1. Restricción de Día de Clase: Estrictamente Miércoles (Carbon::WEDNESDAY = 3)
+                    if ($fecha->dayOfWeek !== Carbon::WEDNESDAY) {
+                        $fail('Las clases y sesiones solo pueden programarse y realizarse los días miércoles.');
                     }
                 },
                 function ($attribute, $value, $fail) {
+                    // 2. Validación de Feriados y Periodos de Receso con suspensión de actividades
                     $recesoOcupado = DB::table('periodo_recesos')
                         ->where('suspension_actividades', 1)
                         ->whereDate('fecha_inicio_periodo_receso', '<=', $value)
                         ->whereDate('fecha_fin_periodo_receso', '>=', $value)
                         ->first();
+
                     if ($recesoOcupado) {
-                        $fail("El día seleccionado es feriado por el motivo: {$recesoOcupado->nombre_periodo_receso}");
+                        $fail("El día seleccionado es feriado o periodo sin actividades por el motivo: {$recesoOcupado->nombre_periodo_receso}");
                     }
                 },
                 function ($attribute, $value, $fail) {
-                    // PREVENCIÓN DE DOBLE SESIÓN alineada a la migración dateTime
+                    // 3. Prevención de Doble Sesión por sección y fecha
                     $idSeccion = $this->input('id_seccion');
                     if ($idSeccion) {
-                        $fechaSoloDia = date('Y-m-d', strtotime($value));
+                        $fechaSoloDia = Carbon::parse($value)->toDateString();
                         
                         $sesionDuplicada = DB::table('sesiones')
                             ->where('id_seccion', $idSeccion)
@@ -72,14 +78,14 @@ class StoreSesionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'id_seccion.required'          => 'Debe seleccionar una sección académica obligatoria.',
-            'id_seccion.exists'            => 'La sección seleccionada no es válida en el sistema.',
-            'id_profesor.required'         => 'Debe asignar un profesor responsable de la sesión.',
-            'id_profesor.exists'           => 'El profesor seleccionado no es válido en el sistema.',
-            'fecha_sesion.required'        => 'La fecha y hora de la sesión es obligatoria.',
-            'fecha_sesion.date'            => 'El formato de fecha y hora no es válido.',
-            'fecha_sesion.before_or_equal' => 'No se pueden aperturar clases con fechas futuras.',
-            'observacion_sesion.max'       => 'Las observaciones no pueden exceder los 1000 caracteres.',
+            'id_seccion.required'    => 'Debe seleccionar una sección académica obligatoria.',
+            'id_seccion.exists'      => 'La sección seleccionada no es válida en el sistema.',
+            'id_profesor.required'   => 'Debe asignar un profesor responsable de la sesión.',
+            'id_profesor.exists'     => 'El profesor seleccionado no es válido en el sistema.',
+            'id_profesor.required'   => 'Debe asignar un profesor responsable de la sesión.',
+            'fecha_sesion.required'  => 'La fecha y hora de la sesión es obligatoria.',
+            'fecha_sesion.date'      => 'El formato de fecha y hora no es válido.',
+            'observacion_sesion.max' => 'Las observaciones no pueden exceder los 1000 caracteres.',
         ];
     }
 }

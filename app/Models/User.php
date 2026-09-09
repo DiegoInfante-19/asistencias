@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
@@ -119,5 +120,55 @@ class User extends Authenticatable
     {
         // Refactorizado: Ahora verifica el ID directamente (Más rápido y seguro)
         return (int) $this->id_rol === self::ROLE_PROFESOR;
+    }
+
+    /**
+     * ==========================================================
+     * LOCAL SCOPES PARA FILTROS (DATATABLES)
+     * ==========================================================
+     */
+
+    // Filtro 1: Tiene Sección (1) / No tiene Sección (0)
+    public function scopeTieneSeccion(Builder $query, $booleano): Builder
+    {
+        if ($booleano === '1') {
+            return $query->has('profesor.secciones');
+        } elseif ($booleano === '0') {
+            return $query->doesntHave('profesor.secciones');
+        }
+        return $query;
+    }
+
+    // Filtro 2: Tiene PNF (1) / No tiene PNF (0)
+    public function scopeTienePnf(Builder $query, $booleano): Builder
+    {
+        if ($booleano === '1') {
+            return $query->whereHas('profesor', function ($q) {
+                $q->whereNotNull('id_pnf');
+            });
+        } elseif ($booleano === '0') {
+            return $query->where(function ($q) {
+                $q->doesntHave('profesor')
+                  ->orWhereHas('profesor', function ($q2) {
+                      $q2->whereNull('id_pnf');
+                  });
+            });
+        }
+        return $query;
+    }
+
+    // Filtro 3: Tiene Secciones Activas (1) / No tiene (0)
+    public function scopeSeccionActiva(Builder $query, $booleano): Builder
+    {
+        if ($booleano === '1') {
+            return $query->whereHas('profesor.secciones', function ($q) {
+                $q->where('estatus_seccion', 'Activa');
+            });
+        } elseif ($booleano === '0') {
+            return $query->whereDoesntHave('profesor.secciones', function ($q) {
+                $q->where('estatus_seccion', 'Activa');
+            });
+        }
+        return $query;
     }
 }

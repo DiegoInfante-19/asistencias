@@ -27,13 +27,64 @@ class UsersDataTable extends BaseDataTable
             ->addColumn('action', function ($user) {
                 return view('profesores.partials.actions', compact('user'))->render();
             })
-            ->rawColumns(['action', 'status_users']);
+            ->filter(function ($query) {
+                // 1. Filtro por Rol
+                if (request()->has('filtro_rol') && !empty(request()->get('filtro_rol'))) {
+                    $query->where('id_rol', request()->get('filtro_rol'));
+                }
+
+                // 2. Filtro por Estatus
+                if (request()->has('filtro_estatus') && !empty(request()->get('filtro_estatus'))) {
+                    $query->where('status_users', request()->get('filtro_estatus'));
+                }
+
+                // 3. Filtro por PNF específico
+                if (request()->has('filtro_pnf') && !empty(request()->get('filtro_pnf'))) {
+                    $idPnf = request()->get('filtro_pnf');
+                    $query->whereHas('profesor', function ($subq) use ($idPnf) {
+                        $subq->where('id_pnf', $idPnf);
+                    });
+                }
+
+                // 4. Filtro por Nivel Académico del PNF asignado (TSU o Ingeniería)
+                if (request()->has('filtro_nivel') && !empty(request()->get('filtro_nivel'))) {
+                    $nivelAsignado = request()->get('filtro_nivel');
+                    $query->whereHas('profesor', function ($subq) use ($nivelAsignado) {
+                        $subq->where('nivel_asignado', $nivelAsignado);
+                    });
+                }
+
+                // 5. Filtro por Sección específica
+                if (request()->has('filtro_seccion') && !empty(request()->get('filtro_seccion'))) {
+                    $idSeccion = request()->get('filtro_seccion');
+                    $query->whereHas('profesor.secciones', function ($subq) use ($idSeccion) {
+                        $subq->where('secciones.id_seccion', $idSeccion);
+                    });
+                }
+
+                // 6. Filtro por Sección Activa
+                if (request()->has('filtro_seccion_activa') && request()->get('filtro_seccion_activa') !== '') {
+                    $query->seccionActiva(request()->get('filtro_seccion_activa'));
+                }
+
+                // 7. Filtro Booleano: Tiene PNF
+                if (request()->has('filtro_tiene_pnf') && request()->get('filtro_tiene_pnf') !== '') {
+                    $query->tienePnf(request()->get('filtro_tiene_pnf'));
+                }
+
+                // 8. Filtro Booleano: Tiene Sección
+                if (request()->has('filtro_tiene_seccion') && request()->get('filtro_tiene_seccion') !== '') {
+                    $query->tieneSeccion(request()->get('filtro_tiene_seccion'));
+                }
+            }, true)
+            ->rawColumns(['action', 'status_users'])
+            ->setRowId('id_users');
     }
 
     public function query(User $model): EloquentBuilder
     {
         return $model->newQuery()
-            ->with('rol')
+            ->with(['rol', 'profesor.pnf', 'profesor.secciones'])
             ->selectRaw("*, CONCAT(name_users, ' ', last_name_users) as full_name");
     }
 

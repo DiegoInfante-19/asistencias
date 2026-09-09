@@ -2,13 +2,14 @@
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    
+
+    <!-- 1, 2 Y 3. ENCABEZADO PRINCIPAL Y PANEL DE ESTADÍSTICAS FIJO -->
     <!-- 1, 2 Y 3. ENCABEZADO PRINCIPAL Y PANEL DE ESTADÍSTICAS FIJO -->
     <div class="row g-4 mb-4">
-        
+
         <!-- Tarjeta Principal de Información -->
         <div class="col-lg-6">
-            <div class="card h-100 border-0 shadow-sm">
+            <div class="card h-100 border shadow-sm rounded">
                 <div class="card-body p-4 bg-white rounded d-flex flex-column justify-content-between">
                     <div>
                         <div class="d-flex align-items-center gap-3 mb-2">
@@ -25,10 +26,10 @@
                         </p>
                         <p class="text-muted mb-0 small">
                             @if($seccion->periodoAcademico && $seccion->periodoAcademico->fecha_inicio && $seccion->periodoAcademico->fecha_fin)
-                                Inicia el {{ $seccion->periodoAcademico->fecha_inicio->format('d') }} de {{ \Carbon\Carbon::parse($seccion->periodoAcademico->fecha_inicio)->locale('es')->monthName }} del año {{ $seccion->periodoAcademico->fecha_inicio->format('Y') }}<br>
-                                y finaliza el {{ $seccion->periodoAcademico->fecha_fin->format('d') }} de {{ \Carbon\Carbon::parse($seccion->periodoAcademico->fecha_fin)->locale('es')->monthName }} del año {{ $seccion->periodoAcademico->fecha_fin->format('Y') }}.
+                            Inicia el {{ $seccion->periodoAcademico->fecha_inicio->format('d') }} de {{ \Carbon\Carbon::parse($seccion->periodoAcademico->fecha_inicio)->locale('es')->monthName }} del año {{ $seccion->periodoAcademico->fecha_inicio->format('Y') }}<br>
+                            y finaliza el {{ $seccion->periodoAcademico->fecha_fin->format('d') }} de {{ \Carbon\Carbon::parse($seccion->periodoAcademico->fecha_fin)->locale('es')->monthName }} del año {{ $seccion->periodoAcademico->fecha_fin->format('Y') }}.
                             @else
-                                Fechas de período no disponibles.
+                            Fechas de período no disponibles.
                             @endif
                         </p>
                     </div>
@@ -43,16 +44,16 @@
 
         <!-- Panel de Estadísticas Fijo -->
         <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-light py-3 d-flex align-items-center justify-content-between rounded-top">
+            <div class="card border shadow-sm h-100 rounded">
+                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom rounded-top">
                     <h5 class="mb-0 fw-bold text-dark fs-6">
                         <i class="bi bi-pie-chart-fill text-primary me-2"></i> Estadísticas de la Sección
                     </h5>
                     <span class="badge bg-primary px-3 py-2 fs-6">Total: {{ $seccion->inscripciones->count() }}</span>
                 </div>
-                <div class="card-body p-3 bg-white d-flex flex-column justify-content-between">
+                <div class="card-body p-3 bg-white d-flex flex-column justify-content-between rounded-bottom">
                     <div class="accordion accordion-flush" id="subAccordionEstadisticas">
-                        
+
                         <div class="accordion-item border-bottom">
                             <h2 class="accordion-header" id="subHeadingTitulo">
                                 <button class="accordion-button collapsed py-2 small fw-semibold text-dark shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#subCollapseTitulo" aria-expanded="false" aria-controls="subCollapseTitulo">
@@ -63,13 +64,13 @@
                                 <div class="accordion-body py-2 px-3 small bg-light">
                                     <ul class="list-unstyled mb-0">
                                         @php
-                                            $porTitulo = $seccion->inscripciones->groupBy(fn($i) => $i->persona->titulo_base ?? 'Sin Título Especificado');
+                                        $porTitulo = $seccion->inscripciones->groupBy(fn($i) => $i->persona->titulo_base ?? 'Sin Título Especificado');
                                         @endphp
                                         @foreach($porTitulo as $nombreTitulo => $items)
-                                            <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                                <span>{{ $nombreTitulo }}</span>
-                                                <span class="fw-bold text-dark">{{ $items->count() }}</span>
-                                            </li>
+                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
+                                            <span>{{ $nombreTitulo }}</span>
+                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        </li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -86,17 +87,17 @@
                                 <div class="accordion-body py-2 px-3 small bg-light">
                                     <ul class="list-unstyled mb-0">
                                         @php
-                                            $porEstado = $seccion->inscripciones->groupBy(function($i) {
-                                                return $i->persona->lugarNacimiento?->ciudad?->estado?->nombre_estado ?? 'No registrado';
-                                            })->filter(fn($items, $estado) => $estado !== 'No registrado' && $items->count() > 0);
+                                        $porEstado = $seccion->inscripciones->groupBy(function($i) {
+                                        return $i->persona->lugarNacimiento?->ciudad?->estado?->nombre_estado ?? 'No registrado';
+                                        })->filter(fn($items, $estado) => $estado !== 'No registrado' && $items->count() > 0);
                                         @endphp
                                         @forelse($porEstado as $nombreEstado => $items)
-                                            <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                                <span>{{ $nombreEstado }}</span>
-                                                <span class="fw-bold text-dark">{{ $items->count() }}</span>
-                                            </li>
+                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
+                                            <span>{{ $nombreEstado }}</span>
+                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        </li>
                                         @empty
-                                            <li class="text-muted text-center py-1">Sin registros geográficos > 0</li>
+                                        <li class="text-muted text-center py-1">Sin registros geográficos > 0</li>
                                         @endforelse
                                     </ul>
                                 </div>
@@ -113,20 +114,20 @@
                                 <div class="accordion-body py-2 px-3 small bg-light">
                                     <ul class="list-unstyled mb-0">
                                         @php
-                                            $porExpediente = $seccion->inscripciones->groupBy(function($i) {
-                                                $titulacion = $i->persona->titulacionPersona->first();
-                                                if ($titulacion && $titulacion->id_estatus_expediente) {
-                                                    $estExp = \App\Models\EstatusExpediente::find($titulacion->id_estatus_expediente);
-                                                    return $estExp ? $estExp->nombre_estatus_expediente : 'Sin Estatus';
-                                                }
-                                                return 'Sin Expediente';
-                                            });
+                                        $porExpediente = $seccion->inscripciones->groupBy(function($i) {
+                                        $titulacion = $i->persona->titulacionPersona->first();
+                                        if ($titulacion && $titulacion->id_estatus_expediente) {
+                                        $estExp = \App\Models\EstatusExpediente::find($titulacion->id_estatus_expediente);
+                                        return $estExp ? $estExp->nombre_estatus_expediente : 'Sin Estatus';
+                                        }
+                                        return 'Sin Expediente';
+                                        });
                                         @endphp
                                         @foreach($porExpediente as $estatusExp => $items)
-                                            <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                                <span>{{ $estatusExp }}</span>
-                                                <span class="fw-bold text-dark">{{ $items->count() }}</span>
-                                            </li>
+                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
+                                            <span>{{ $estatusExp }}</span>
+                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        </li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -143,13 +144,13 @@
                                 <div class="accordion-body py-2 px-3 small bg-light">
                                     <ul class="list-unstyled mb-0">
                                         @php
-                                            $porCohorte = $seccion->inscripciones->groupBy(fn($i) => $i->persona->cohorte->numero_cohorte ?? 'Externa');
+                                        $porCohorte = $seccion->inscripciones->groupBy(fn($i) => $i->persona->cohorte->numero_cohorte ?? 'Externa');
                                         @endphp
                                         @foreach($porCohorte as $numCohorte => $items)
-                                            <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                                <span>{{ $numCohorte }}</span>
-                                                <span class="fw-bold text-dark">{{ $items->count() }}</span>
-                                            </li>
+                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
+                                            <span>{{ $numCohorte }}</span>
+                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        </li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -166,13 +167,13 @@
                                 <div class="accordion-body py-2 px-3 small bg-light">
                                     <ul class="list-unstyled mb-0">
                                         @php
-                                            $porEmpresa = $seccion->inscripciones->groupBy(fn($i) => $i->persona->empresaPersona->first()?->empresa->nombre_empresa ?? 'Independiente');
+                                        $porEmpresa = $seccion->inscripciones->groupBy(fn($i) => $i->persona->empresaPersona->first()?->empresa->nombre_empresa ?? 'Independiente');
                                         @endphp
                                         @foreach($porEmpresa as $nombreEmpresa => $items)
-                                            <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                                <span class="text-truncate me-2">{{ $nombreEmpresa }}</span>
-                                                <span class="fw-bold text-dark">{{ $items->count() }}</span>
-                                            </li>
+                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
+                                            <span class="text-truncate me-2">{{ $nombreEmpresa }}</span>
+                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        </li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -187,23 +188,32 @@
     </div>
 
     <!-- TARJETA CONTENEDORA DE PESTAÑAS (TABS) -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-0 pt-3">
-            <ul class="nav nav-tabs nav-fill card-header-tabs" id="seccionTab" role="tablist">
+    <div class="card shadow-sm">
+
+        <!-- Header de la tarjeta contenedora con título global opcional o directo a las pestañas -->
+        <div class="card-header bg-white py-3 d-flex align-items-center">
+            <h5 class="card-title text-dark mb-0 fw-bold fs-6 me-auto">
+                <i class="bi bi-folder2-open text-primary me-1"></i> Gestión de la Sección Académica
+            </h5>
+        </div>
+
+        <!-- Navegación de las pestañas unificada -->
+        <div class="card-header bg-light pt-2 pb-0 border-top border-bottom">
+            <ul class="nav nav-tabs card-header-tabs nav-fill" id="seccionTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active fw-bold py-3 text-secondary" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes-pane" type="button" role="tab" aria-controls="estudiantes-pane" aria-selected="true">
-                        <i class="bi bi-people-fill fs-5 me-2 text-primary"></i> Estudiantes Inscritos ({{ $seccion->inscripciones->count() }})
+                    <button class="nav-link active fw-bold text-dark py-3" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes-pane" type="button" role="tab" aria-controls="estudiantes-pane" aria-selected="true">
+                        <i class="bi bi-people-fill me-1 text-primary"></i> Estudiantes Inscritos ({{ $seccion->inscripciones->count() }})
                     </button>
                 </li>
                 <!-- PESTAÑA DOCENTES -->
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold py-3 text-secondary" id="docentes-tab" data-bs-toggle="tab" data-bs-target="#docentes-pane" type="button" role="tab" aria-controls="docentes-pane" aria-selected="false">
-                        <i class="bi bi-person-video3 fs-5 me-2 text-warning"></i> Docentes Asignados ({{ $seccion->profesores->count() }})
+                    <button class="nav-link fw-bold text-dark py-3" id="docentes-tab" data-bs-toggle="tab" data-bs-target="#docentes-pane" type="button" role="tab" aria-controls="docentes-pane" aria-selected="false">
+                        <i class="bi bi-person-video3 me-1 text-warning"></i> Docentes Asignados ({{ $seccion->profesores->count() }})
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold py-3 text-secondary" id="historial-tab" data-bs-toggle="tab" data-bs-target="#historial-pane" type="button" role="tab" aria-controls="historial-pane" aria-selected="false">
-                        <i class="bi bi-calendar-check-fill fs-5 me-2 text-success"></i> Historial y Asistencias ({{ $seccion->sesiones->count() }})
+                    <button class="nav-link fw-bold text-dark py-3" id="historial-tab" data-bs-toggle="tab" data-bs-target="#historial-pane" type="button" role="tab" aria-controls="historial-pane" aria-selected="false">
+                        <i class="bi bi-calendar-check-fill me-1 text-success"></i> Historial y Asistencias ({{ $seccion->sesiones->count() }})
                     </button>
                 </li>
             </ul>
@@ -211,7 +221,7 @@
 
         <div class="card-body bg-white p-4">
             <div class="tab-content" id="seccionTabContent">
-                
+
                 <!-- PESTAÑA 1: MATRÍCULA Y NÓMINA -->
                 <div class="tab-pane fade show active" id="estudiantes-pane" role="tabpanel" aria-labelledby="estudiantes-tab" tabindex="0">
                     <div class="card border border-primary-subtle shadow-sm mb-4">
@@ -223,9 +233,9 @@
                                     <select name="id_personas" class="form-select select2-buscador" required>
                                         <option value="" selected disabled>Buscar estudiante disponible (Cédula o Nombre)...</option>
                                         @foreach($estudiantesDisponibles as $estudiante)
-                                            <option value="{{ $estudiante->id_personas }}">
-                                                V-{{ ltrim($estudiante->cedula_personas, 'V-') }} - {{ $estudiante->nombre_corto }} - {{ $estudiante->cohorte->numero_cohorte ?? 'Externa' }} - {{ $estudiante->titulo_base }}
-                                            </option>
+                                        <option value="{{ $estudiante->id_personas }}">
+                                            V-{{ ltrim($estudiante->cedula_personas, 'V-') }} - {{ $estudiante->nombre_corto }} - {{ $estudiante->cohorte->numero_cohorte ?? 'Externa' }} - {{ $estudiante->titulo_base }}
+                                        </option>
                                         @endforeach
                                     </select>
                                 </form>
@@ -238,7 +248,7 @@
                         </div>
                     </div>
                     <div class="card border shadow-sm">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                             <h5 class="mb-0 fw-bold text-dark fs-6"><i class="bi bi-table me-2 text-primary"></i>Nómina Activa</h5>
                         </div>
                         <div class="card-body bg-white p-3">
@@ -260,9 +270,9 @@
                                     <select name="id_profesor" class="form-select select2-profesores" required>
                                         <option value="" selected disabled>Buscar profesor disponible (Cédula o Nombre)...</option>
                                         @foreach($profesoresDisponibles as $profeDisp)
-                                            <option value="{{ $profeDisp->id_profesor }}">
-                                                V-{{ ltrim($profeDisp->user->cedula_users, 'V-') }} — {{ $profeDisp->user->name_users }} {{ $profeDisp->user->last_name_users }} (PNF: {{ $profeDisp->pnf->nombre_pnf ?? 'Sin PNF' }})
-                                            </option>
+                                        <option value="{{ $profeDisp->id_profesor }}">
+                                            V-{{ ltrim($profeDisp->user->cedula_users, 'V-') }} — {{ $profeDisp->user->name_users }} {{ $profeDisp->user->last_name_users }} (PNF: {{ $profeDisp->pnf->nombre_pnf ?? 'Sin PNF' }})
+                                        </option>
                                         @endforeach
                                     </select>
                                 </form>
@@ -275,7 +285,7 @@
                         </div>
                     </div>
                     <div class="card border shadow-sm">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                             <h5 class="mb-0 fw-bold text-dark fs-6"><i class="bi bi-briefcase me-2 text-warning"></i>Carga Docente de la Sección</h5>
                         </div>
                         <div class="card-body bg-white p-3">
@@ -289,65 +299,65 @@
                 <!-- PESTAÑA 3: HISTORIAL Y ASISTENCIAS -->
                 <div class="tab-pane fade" id="historial-pane" role="tabpanel" aria-labelledby="historial-tab" tabindex="0">
                     <div class="card border shadow-sm">
-                        <div class="card-header bg-light py-3">
+                        <div class="card-header bg-white py-3">
                             <h5 class="mb-0 fw-bold text-dark fs-6"><i class="bi bi-journal-text me-2 text-success"></i>Auditoría Histórica de Clases y Asistencias</h5>
                             <small class="text-muted">Registro de solo lectura de las sesiones impartidas.</small>
                         </div>
                         <div class="card-body p-4 bg-white">
                             @forelse($seccion->sesiones as $sesion)
-                                <div class="card border mb-4 shadow-sm">
-                                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
-                                        <div>
-                                            <span class="fw-bold text-primary fs-6 me-3">
-                                                <i class="bi bi-calendar-event me-1"></i> {{ \Carbon\Carbon::parse($sesion->fecha_sesion)->format('d/m/Y') }}
-                                            </span>
-                                            <span class="badge bg-secondary">Docente: {{ $sesion->profesor->user->name_users ?? 'N/D' }} {{ $sesion->profesor->user->last_name_users ?? '' }}</span>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-success me-1">Presentes: {{ $sesion->asistencias->where('estado_asistencia', App\Enums\EstadoAsistencia::Presente)->count() }}</span>
-                                            <span class="badge bg-danger me-1">Ausentes: {{ $sesion->asistencias->where('estado_asistencia', App\Enums\EstadoAsistencia::Ausente)->count() }}</span>
-                                            <span class="badge bg-warning text-dark">Justificados: {{ $sesion->asistencias->where('estado_asistencia', App\Enums\EstadoAsistencia::Justificado)->count() }}</span>
-                                        </div>
+                            <div class="card border mb-4 shadow-sm">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                                    <div>
+                                        <span class="fw-bold text-primary fs-6 me-3">
+                                            <i class="bi bi-calendar-event me-1"></i> {{ \Carbon\Carbon::parse($sesion->fecha_sesion)->format('d/m/Y') }}
+                                        </span>
+                                        <span class="badge bg-secondary">Docente: {{ $sesion->profesor->user->name_users ?? 'N/D' }} {{ $sesion->profesor->user->last_name_users ?? '' }}</span>
                                     </div>
-                                    <div class="card-body p-3 bg-white">
-                                        @if($sesion->observacion_sesion)
-                                            <p class="small text-muted mb-3"><strong>Tema / Observación:</strong> {{ $sesion->observacion_sesion }}</p>
-                                        @endif
-                                        <div class="table-responsive">
-                                            <table class="table table-sm table-bordered align-middle mb-0">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th>Cédula</th>
-                                                        <th>Estudiante</th>
-                                                        <th class="text-center" style="width: 150px;">Asistencia</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($sesion->asistencias as $asistencia)
-                                                        <tr>
-                                                            <td class="fw-bold">{{ $asistencia->inscripcionSeccion->persona->cedula_personas ?? 'N/D' }}</td>
-                                                            <td>{{ $asistencia->inscripcionSeccion->persona->nombre_completo ?? 'Estudiante Eliminado' }}</td>
-                                                            <td class="text-center">
-                                                                @if($asistencia->estado_asistencia === App\Enums\EstadoAsistencia::Presente)
-                                                                    <span class="badge bg-success w-100 py-1">Presente</span>
-                                                                @elseif($asistencia->estado_asistencia === App\Enums\EstadoAsistencia::Ausente)
-                                                                    <span class="badge bg-danger w-100 py-1">Ausente</span>
-                                                                @else
-                                                                    <span class="badge bg-warning text-dark w-100 py-1">Justificado</span>
-                                                                @endif
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                    <div>
+                                        <span class="badge bg-success me-1">Presentes: {{ $sesion->asistencias->where('estado_asistencia', App\Enums\EstadoAsistencia::Presente)->count() }}</span>
+                                        <span class="badge bg-danger me-1">Ausentes: {{ $sesion->asistencias->where('estado_asistencia', App\Enums\EstadoAsistencia::Ausente)->count() }}</span>
+                                        <span class="badge bg-warning text-dark">Justificados: {{ $sesion->asistencias->where('estado_asistencia', App\Enums\EstadoAsistencia::Justificado)->count() }}</span>
                                     </div>
                                 </div>
+                                <div class="card-body p-3 bg-white">
+                                    @if($sesion->observacion_sesion)
+                                    <p class="small text-muted mb-3"><strong>Tema / Observación:</strong> {{ $sesion->observacion_sesion }}</p>
+                                    @endif
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered align-middle mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Cédula</th>
+                                                    <th>Estudiante</th>
+                                                    <th class="text-center" style="width: 150px;">Asistencia</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($sesion->asistencias as $asistencia)
+                                                <tr>
+                                                    <td class="fw-bold">{{ $asistencia->inscripcionSeccion->persona->cedula_personas ?? 'N/D' }}</td>
+                                                    <td>{{ $asistencia->inscripcionSeccion->persona->nombre_completo ?? 'Estudiante Eliminado' }}</td>
+                                                    <td class="text-center">
+                                                        @if($asistencia->estado_asistencia === App\Enums\EstadoAsistencia::Presente)
+                                                        <span class="badge bg-success w-100 py-1">Presente</span>
+                                                        @elseif($asistencia->estado_asistencia === App\Enums\EstadoAsistencia::Ausente)
+                                                        <span class="badge bg-danger w-100 py-1">Ausente</span>
+                                                        @else
+                                                        <span class="badge bg-warning text-dark w-100 py-1">Justificado</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                             @empty
-                                <div class="text-center text-muted py-5 border rounded bg-light">
-                                    <i class="bi bi-clock-history fs-1 d-block mb-2 opacity-50"></i>
-                                    <h5>No se han dictado clases para esta sección todavía.</h5>
-                                </div>
+                            <div class="text-center text-muted py-5 border rounded bg-light">
+                                <i class="bi bi-clock-history fs-1 d-block mb-2 opacity-50"></i>
+                                <h5>No se han dictado clases para esta sección todavía.</h5>
+                            </div>
                             @endforelse
                         </div>
                     </div>
@@ -365,11 +375,13 @@
 
 @section('styles')
 <style>
+    /* Estética unificada para las pestañas y corrección del solapamiento */
     .card-header-tabs {
         margin-right: 0 !important;
         margin-left: 0 !important;
         margin-bottom: -1px !important;
     }
+
     .card-header-tabs .nav-link {
         border-top-left-radius: 0.375rem;
         border-top-right-radius: 0.375rem;
@@ -377,14 +389,33 @@
         border: 1px solid transparent;
         padding: 0.75rem 1rem;
     }
+
     .card-header-tabs .nav-link:hover {
         border-color: #e9ecef #e9ecef #dee2e6;
         background-color: rgba(255, 255, 255, 0.5);
     }
+
     .card-header-tabs .nav-link.active {
         color: #0d6efd !important;
         background-color: #ffffff !important;
         border-color: #dee2e6 #dee2e6 #ffffff !important;
+    }
+
+    /* Blindaje visual para tarjetas internas en los tabs */
+    .tab-content .card {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        background-color: #ffffff !important;
+    }
+
+    .tab-content .card .card-header {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+
+    .tab-content .card .card-footer {
+        background-color: #f8f9fa !important;
+        border-top: 1px solid #dee2e6 !important;
     }
 </style>
 @endsection
