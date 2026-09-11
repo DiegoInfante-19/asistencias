@@ -45,12 +45,11 @@ class Seccion extends Model
 
     public function sesiones(): HasMany
     {
-        return $this->hasMany(Sesion::class, 'id_seccion', 'id_seccion');
+        // CORRECCIÓN: Ordenamos siempre de la más reciente a la más vieja
+        return $this->hasMany(Sesion::class, 'id_seccion', 'id_seccion')
+                    ->orderBy('fecha_sesion', 'desc');
     }
 
-    /**
-     * FASE 1 - PASO 1.1: Query Scope para secciones activas de periodos y cohortes activos.
-     */
     public function scopeActivasParaAsignacion(Builder $query): Builder
     {
         return $query->where('estatus_seccion', 'Activa')
@@ -62,10 +61,48 @@ class Seccion extends Model
             });
     }
 
+    // =========================================================================
+    // LOCAL SCOPES PARA FILTROS AVANZADOS (Módulo de Clases y Asistencias)
+    // =========================================================================
+
     /**
-     * FASE 1 - PASO 1.2: Accessor para el nombre completo enriquecido en Selects.
-     * Combina la flexibilidad del nombre ingresado con el contexto de PNF, Período y Cohorte.
+     * Filtra las secciones que pertenecen a un PNF específico.
      */
+    public function scopePorPnf($query, $idPnf)
+    {
+        return $query->where('id_pnf', $idPnf);
+    }
+
+    /**
+     * Filtra las secciones donde un profesor específico está asignado.
+     */
+    public function scopePorProfesor($query, $idProfesor)
+    {
+        return $query->whereHas('profesores', function ($q) use ($idProfesor) {
+            $q->where('profesor_seccion.id_profesor', $idProfesor); 
+        });
+    }
+
+    /**
+     * Filtra las secciones que contienen al menos un estudiante asociado a una empresa específica.
+     */
+    public function scopePorEmpresa($query, $idEmpresa)
+    {
+        return $query->whereHas('inscripciones.persona.empresaPersona', function ($q) use ($idEmpresa) {
+            $q->where('id_empresa', $idEmpresa);
+        });
+    }
+
+    /**
+     * Filtra las secciones que contienen al menos un estudiante optando por un título específico.
+     */
+    public function scopePorTitulo($query, $idTitulo)
+    {
+        return $query->whereHas('inscripciones.persona.titulacionPersona', function ($q) use ($idTitulo) {
+            $q->where('id_titulo', $idTitulo); 
+        });
+    }
+
     public function getNombreCompletoSelectAttribute(): string
     {
         $pnfNombre = $this->pnf->nombre_pnf ?? 'Sin PNF';

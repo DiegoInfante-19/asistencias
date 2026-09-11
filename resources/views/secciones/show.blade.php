@@ -3,10 +3,8 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
 
-    <!-- 1, 2 Y 3. ENCABEZADO PRINCIPAL Y PANEL DE ESTADÍSTICAS FIJO -->
-    <!-- 1, 2 Y 3. ENCABEZADO PRINCIPAL Y PANEL DE ESTADÍSTICAS FIJO -->
+    <!-- 1. ENCABEZADO PRINCIPAL Y PANEL DE ESTADÍSTICAS FIJO -->
     <div class="row g-4 mb-4">
-
         <!-- Tarjeta Principal de Información -->
         <div class="col-lg-6">
             <div class="card h-100 border shadow-sm rounded">
@@ -184,20 +182,16 @@
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- TARJETA CONTENEDORA DE PESTAÑAS (TABS) -->
+    <!-- 2. TARJETA CONTENEDORA DE PESTAÑAS (TABS) -->
     <div class="card shadow-sm">
-
-        <!-- Header de la tarjeta contenedora con título global opcional o directo a las pestañas -->
         <div class="card-header bg-white py-3 d-flex align-items-center">
             <h5 class="card-title text-dark mb-0 fw-bold fs-6 me-auto">
                 <i class="bi bi-folder2-open text-primary me-1"></i> Gestión de la Sección Académica
             </h5>
         </div>
 
-        <!-- Navegación de las pestañas unificada -->
         <div class="card-header bg-light pt-2 pb-0 border-top border-bottom">
             <ul class="nav nav-tabs card-header-tabs nav-fill" id="seccionTab" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -205,7 +199,6 @@
                         <i class="bi bi-people-fill me-1 text-primary"></i> Estudiantes Inscritos ({{ $seccion->inscripciones->count() }})
                     </button>
                 </li>
-                <!-- PESTAÑA DOCENTES -->
                 <li class="nav-item" role="presentation">
                     <button class="nav-link fw-bold text-dark py-3" id="docentes-tab" data-bs-toggle="tab" data-bs-target="#docentes-pane" type="button" role="tab" aria-controls="docentes-pane" aria-selected="false">
                         <i class="bi bi-person-video3 me-1 text-warning"></i> Docentes Asignados ({{ $seccion->profesores->count() }})
@@ -221,148 +214,20 @@
 
         <div class="card-body bg-white p-4">
             <div class="tab-content" id="seccionTabContent">
-
                 <!-- PESTAÑA 1: MATRÍCULA Y NÓMINA -->
                 <div class="tab-pane fade show active" id="estudiantes-pane" role="tabpanel" aria-labelledby="estudiantes-tab" tabindex="0">
-                    <div class="card border border-primary-subtle shadow-sm mb-4">
-                        <div class="card-body bg-light rounded d-flex flex-column flex-md-row align-items-md-end gap-3 p-3">
-                            <div class="flex-grow-1">
-                                <label class="form-label fw-bold text-dark mb-1"><i class="bi bi-person-plus me-1 text-success"></i> Añadir Estudiante a la Sección</label>
-                                <form id="formMatricular" action="{{ route('secciones.inscribir', $seccion->id_seccion) }}" method="POST">
-                                    @csrf
-                                    <select name="id_personas" class="form-select select2-buscador" required>
-                                        <option value="" selected disabled>Buscar estudiante disponible (Cédula o Nombre)...</option>
-                                        @foreach($estudiantesDisponibles as $estudiante)
-                                        <option value="{{ $estudiante->id_personas }}">
-                                            V-{{ ltrim($estudiante->cedula_personas, 'V-') }} - {{ $estudiante->nombre_corto }} - {{ $estudiante->cohorte->numero_cohorte ?? 'Externa' }} - {{ $estudiante->titulo_base }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                </form>
-                            </div>
-                            <div class="mt-2 mt-md-0">
-                                <button type="submit" form="formMatricular" class="btn btn-success fw-bold px-4 py-2 h-100 shadow-sm w-100">
-                                    <i class="bi bi-plus-circle me-1"></i> Inscribir
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card border shadow-sm">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 fw-bold text-dark fs-6"><i class="bi bi-table me-2 text-primary"></i>Nómina Activa</h5>
-                        </div>
-                        <div class="card-body bg-white p-3">
-                            <div class="table-responsive">
-                                {{ $dataTable->html()->table(['class' => 'table table-hover table-striped align-middle border w-100']) }}
-                            </div>
-                        </div>
-                    </div>
+                    @include('secciones.partials.tab_estudiantes')
                 </div>
 
                 <!-- PESTAÑA 2: DOCENTES ASIGNADOS -->
                 <div class="tab-pane fade" id="docentes-pane" role="tabpanel" aria-labelledby="docentes-tab" tabindex="0">
-                    <div class="card border border-warning-subtle shadow-sm mb-4">
-                        <div class="card-body bg-light rounded d-flex flex-column flex-md-row align-items-md-end gap-3 p-3">
-                            <div class="flex-grow-1">
-                                <label class="form-label fw-bold text-dark mb-1"><i class="bi bi-person-badge me-1 text-warning"></i> Asignar Docente a la Sección</label>
-                                <form id="formDocente" action="{{ route('secciones.asignar-profesor', $seccion->id_seccion) }}" method="POST">
-                                    @csrf
-                                    <select name="id_profesor" class="form-select select2-profesores" required>
-                                        <option value="" selected disabled>Buscar profesor disponible (Cédula o Nombre)...</option>
-                                        @foreach($profesoresDisponibles as $profeDisp)
-                                        <option value="{{ $profeDisp->id_profesor }}">
-                                            V-{{ ltrim($profeDisp->user->cedula_users, 'V-') }} — {{ $profeDisp->user->name_users }} {{ $profeDisp->user->last_name_users }} (PNF: {{ $profeDisp->pnf->nombre_pnf ?? 'Sin PNF' }})
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                </form>
-                            </div>
-                            <div class="mt-2 mt-md-0">
-                                <button type="submit" form="formDocente" class="btn btn-warning text-dark fw-bold px-4 py-2 h-100 shadow-sm w-100">
-                                    <i class="bi bi-plus-circle me-1"></i> Asignar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card border shadow-sm">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 fw-bold text-dark fs-6"><i class="bi bi-briefcase me-2 text-warning"></i>Carga Docente de la Sección</h5>
-                        </div>
-                        <div class="card-body bg-white p-3">
-                            <div class="table-responsive">
-                                {{ $profesorDataTable->html()->table(['class' => 'table table-hover table-striped align-middle border w-100']) }}
-                            </div>
-                        </div>
-                    </div>
+                    @include('secciones.partials.tab_docentes')
                 </div>
 
                 <!-- PESTAÑA 3: HISTORIAL Y ASISTENCIAS -->
                 <div class="tab-pane fade" id="historial-pane" role="tabpanel" aria-labelledby="historial-tab" tabindex="0">
-                    <div class="card border shadow-sm">
-                        <div class="card-header bg-white py-3">
-                            <h5 class="mb-0 fw-bold text-dark fs-6"><i class="bi bi-journal-text me-2 text-success"></i>Auditoría Histórica de Clases y Asistencias</h5>
-                            <small class="text-muted">Registro de solo lectura de las sesiones impartidas.</small>
-                        </div>
-                        <div class="card-body p-4 bg-white">
-                            @forelse($seccion->sesiones as $sesion)
-                            <div class="card border mb-4 shadow-sm">
-                                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
-                                    <div>
-                                        <span class="fw-bold text-primary fs-6 me-3">
-                                            <i class="bi bi-calendar-event me-1"></i> {{ \Carbon\Carbon::parse($sesion->fecha_sesion)->format('d/m/Y') }}
-                                        </span>
-                                        <span class="badge bg-secondary">Docente: {{ $sesion->profesor->user->name_users ?? 'N/D' }} {{ $sesion->profesor->user->last_name_users ?? '' }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="badge bg-success me-1">Presentes: {{ $sesion->asistencias->where('estado_asistencia', App\Enums\EstadoAsistencia::Presente)->count() }}</span>
-                                        <span class="badge bg-danger me-1">Ausentes: {{ $sesion->asistencias->where('estado_asistencia', App\Enums\EstadoAsistencia::Ausente)->count() }}</span>
-                                        <span class="badge bg-warning text-dark">Justificados: {{ $sesion->asistencias->where('estado_asistencia', App\Enums\EstadoAsistencia::Justificado)->count() }}</span>
-                                    </div>
-                                </div>
-                                <div class="card-body p-3 bg-white">
-                                    @if($sesion->observacion_sesion)
-                                    <p class="small text-muted mb-3"><strong>Tema / Observación:</strong> {{ $sesion->observacion_sesion }}</p>
-                                    @endif
-                                    <div class="table-responsive">
-                                        <table class="table table-sm table-bordered align-middle mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Cédula</th>
-                                                    <th>Estudiante</th>
-                                                    <th class="text-center" style="width: 150px;">Asistencia</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($sesion->asistencias as $asistencia)
-                                                <tr>
-                                                    <td class="fw-bold">{{ $asistencia->inscripcionSeccion->persona->cedula_personas ?? 'N/D' }}</td>
-                                                    <td>{{ $asistencia->inscripcionSeccion->persona->nombre_completo ?? 'Estudiante Eliminado' }}</td>
-                                                    <td class="text-center">
-                                                        @if($asistencia->estado_asistencia === App\Enums\EstadoAsistencia::Presente)
-                                                        <span class="badge bg-success w-100 py-1">Presente</span>
-                                                        @elseif($asistencia->estado_asistencia === App\Enums\EstadoAsistencia::Ausente)
-                                                        <span class="badge bg-danger w-100 py-1">Ausente</span>
-                                                        @else
-                                                        <span class="badge bg-warning text-dark w-100 py-1">Justificado</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            @empty
-                            <div class="text-center text-muted py-5 border rounded bg-light">
-                                <i class="bi bi-clock-history fs-1 d-block mb-2 opacity-50"></i>
-                                <h5>No se han dictado clases para esta sección todavía.</h5>
-                            </div>
-                            @endforelse
-                        </div>
-                    </div>
+                    @include('secciones.partials.tab_sesiones')
                 </div>
-
             </div>
         </div>
 
@@ -371,6 +236,10 @@
         </div>
     </div>
 </div>
+
+<!-- INCLUIMOS EL ARCHIVO CENTRAL DE MODALES -->
+@include('secciones.partials.modales_seccion')
+
 @endsection
 
 @section('styles')
@@ -423,6 +292,8 @@
 @push('scripts')
 {{ $dataTable->html()->scripts() }}
 {{ $profesorDataTable->html()->scripts() }}
+<!-- IMPORTAMOS LOS SCRIPTS DE LA NUEVA TABLA DE SESIONES -->
+{{ $sesionesDataTable->html()->scripts() }}
 
 <script type="module">
     $(document).ready(function() {

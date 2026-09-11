@@ -14,10 +14,11 @@ class AsistenciaController extends Controller
     public function guardarLote(Request $request)
     {
         $request->validate([
-            'id_sesiones'                                => 'required|exists:sesiones,id_sesiones',
-            'asistencias'                                => 'required|array',
-            'asistencias.*.id_inscripcion_seccion'       => 'required|exists:inscripciones_secciones,id_inscripcion_seccion',
-            'asistencias.*.estado'                       => 'required|in:Presente,Ausente,Justificado',
+            'id_sesiones'                           => 'required|exists:sesiones,id_sesiones',
+            'asistencias'                           => 'required|array',
+            'asistencias.*.id_inscripcion_seccion'   => 'required|exists:inscripciones_secciones,id_inscripcion_seccion',
+            'asistencias.*.estado'                   => 'required|in:Presente,Ausente,Justificado',
+            'asistencias.*.observacion'              => 'nullable|string|max:255', // Añadido para soportar observaciones/justificaciones
         ]);
 
         $sesion = Sesion::findOrFail($request->id_sesiones);
@@ -25,14 +26,12 @@ class AsistenciaController extends Controller
         // Prevención IDOR y ventana de tiempo
         Gate::authorize('update', $sesion);
 
-        // Contamos cuántos estudiantes están inscritos en la sección mixta de esta sesión
         $totalAlumnosInscritos = InscripcionSeccion::where('id_seccion', $sesion->id_seccion)
             ->where('estatus_inscripcion', 'Activo')
             ->count();
             
         $totalEnviadosEnLote = count($request->asistencias);
 
-        // Seguridad estricta: No se permiten guardados parciales. Debe coincidir el número exacto.
         if ($totalEnviadosEnLote !== $totalAlumnosInscritos) {
             return response()->json([
                 'success' => false,
@@ -52,7 +51,8 @@ class AsistenciaController extends Controller
                         'id_inscripcion_seccion' => $registro['id_inscripcion_seccion']
                     ],
                     [
-                        'estado_asistencia'      => $registro['estado']
+                        'estado_asistencia'      => $registro['estado'],
+                        'observacion_asistencia' => $registro['observacion'] ?? null, // Guardado de la observación
                     ]
                 );
             }

@@ -72,10 +72,8 @@
               </a>
             </li>
 
-            <!-- BÓVEDA RESTRINGIDA: ADMINISTRADORES Y COORDINADORES -->
             @if(auth()->user()->isAdmin() || auth()->user()->isCoordinador())
 
-            <!-- NUEVO MÓDULO UNIFICADO: ESTRUCTURA ACADÉMICA -->
             <li class="nav-item">
               <a href="{{ route('estructura.index') }}" class="nav-link {{ request()->routeIs('estructura.*') ? 'active' : '' }}">
                 <i class="bi bi-diagram-3-fill"></i>
@@ -83,7 +81,6 @@
               </a>
             </li>
 
-            <!-- GESTIÓN COMPLEMENTARIA DE CICLOS -->
             <li class="nav-item {{ request()->routeIs('periodos_recesos.*') ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ request()->routeIs('periodos_recesos.*') ? 'active' : '' }}">
                 <i class="bi bi-calendar-range"></i>
@@ -135,8 +132,8 @@
               </ul>
             </li>
 
-            <li class="nav-item {{ request()->routeIs('profesores.*', 'sesiones.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('profesores.*', 'sesiones.*') ? 'active' : '' }}">
+            <li class="nav-item {{ request()->routeIs('profesores.*', 'clases.secciones.*', 'sesiones.*') ? 'menu-open' : '' }}">
+              <a href="#" class="nav-link {{ request()->routeIs('profesores.*', 'clases.secciones.*', 'sesiones.*') ? 'active' : '' }}">
                 <i class="bi bi-person-video3"></i>
                 <p>Docencia y Clases<i class="nav-arrow bi bi-chevron-right"></i></p>
               </a>
@@ -148,7 +145,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{ route('sesiones.index') }}" class="nav-link {{ request()->routeIs('sesiones.*') ? 'active' : '' }}">
+                  <a href="{{ route('clases.secciones.index') }}" class="nav-link {{ request()->routeIs('clases.secciones.*', 'sesiones.*') ? 'active' : '' }}">
                     <i class="bi bi-journal-check ms-3"></i>
                     <p>Portal de Clases</p>
                   </a>
@@ -207,17 +204,15 @@
               </ul>
             </li>
 
-            <!-- VISTA BÁSICA: DOCENTES (No tienen acceso al menú de arriba) -->
             @else
             <li class="nav-item">
-              <a href="{{ route('sesiones.index') }}" class="nav-link {{ request()->routeIs('sesiones.*') ? 'active' : '' }}">
+              <a href="{{ route('clases.secciones.index') }}" class="nav-link {{ request()->routeIs('clases.secciones.*', 'sesiones.*') ? 'active' : '' }}">
                 <i class="bi bi-journal-check"></i>
                 <p>Mis Clases y Asistencias</p>
               </a>
             </li>
             @endif
 
-            <!-- MÓDULO COMÚN PARA TODOS -->
             <li class="nav-item {{ request()->routeIs('perfil.*') ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ request()->routeIs('perfil.*') ? 'active' : '' }}">
                 <i class="bi bi-gear-fill"></i>

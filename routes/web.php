@@ -13,7 +13,7 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PnfController;
 use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\PeriodoAcademicoController; 
-use App\Http\Controllers\SeccionController;                         
+use App\Http\Controllers\SeccionController;                                
 use App\Http\Controllers\TituloController;
 use App\Http\Controllers\EstatusExpedienteController;
 use App\Http\Controllers\PeriodoRecesoController;
@@ -50,12 +50,23 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
         Route::put('/perfil/seguridad/preguntas/update', [SecuritySettingsController::class, 'updateSecurityQuestions'])->name('seguridad.preguntas.update');
         Route::put('/seguridad/preguntas', [SecurityController::class, 'storePreguntas'])->name('seguridad.preguntas.store');
 
-        // Módulo Docente: Portal de Clases y Asistencias
+        // =====================================================================
+        // Módulo Docente: Portal de Clases y Asistencias (Flujo Jerárquico)
+        // =====================================================================
         Route::controller(SesionController::class)->group(function () {
+            
+            // Paso 1: Índice Maestro de Secciones (Datatable + AJAX)
+            Route::get('/clases/secciones', 'seccionesIndex')->name('clases.secciones.index');
+            
+            // Paso 2: Historial de Sesiones por Sección
+            Route::get('/clases/secciones/{seccion}/sesiones', 'sesionesPorSeccion')->name('clases.secciones.sesiones');
+            
+            // Paso 3: Gestión de Asistencia y CRUD de Sesiones
             Route::get('/sesiones/crear', 'create')->name('sesiones.create');
-            Route::get('/sesiones', 'index')->name('sesiones.index');
             Route::post('/sesiones', 'store')->name('sesiones.store');
             Route::get('/sesiones/{sesion}', 'show')->name('sesiones.show');
+            Route::put('/sesiones/{sesion}', 'update')->name('sesiones.update');
+            Route::delete('/sesiones/{sesion}', 'destroy')->name('sesiones.destroy');
         });
         
         Route::post('/asistencias/guardar-lote', [AsistenciaController::class, 'guardarLote'])->name('asistencias.guardar_lote');
@@ -88,7 +99,7 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
         Route::controller(EmpresaController::class)->group(function () {
             Route::get('/empresas', 'index')->name('empresas.index');  
             Route::post('/empresas', 'store')->name('empresas.store'); 
-            Route::put('/empresas/{empresa}', 'update')->name('empresas.update');     
+            Route::put('/empresas/{empresa}', 'update')->name('empresas.update');   
             Route::delete('/empresas/{empresa}', 'destroy')->name('empresas.destroy'); 
         });
 
@@ -111,7 +122,6 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             Route::delete('/pnfs/empresas/{empresa_pnf}', 'desvincularEmpresa')->name('pnfs.empresas.destroy');
         });
 
-        // Interfaz Unificada de Estructura Académica
         Route::get('/estructura-academica', [EstructuraAcademicaController::class, 'index'])->name('estructura.index');
 
         Route::controller(CohorteController::class)->group(function () {
@@ -125,16 +135,13 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             'periodos-academicos' => 'periodo'
         ]);
 
-        // Gestión de Secciones Académicas y Matrícula Interna
         Route::resource('secciones', SeccionController::class)->parameters([
             'secciones' => 'seccion'
         ]);
-        
-        // Rutas para inscribir y retirar estudiantes directamente en la sección
+         
         Route::post('/secciones/{seccion}/inscribir', [SeccionController::class, 'inscribirEstudiante'])->name('secciones.inscribir');
         Route::delete('/secciones/{seccion}/retirar/{id_inscripcion}', [SeccionController::class, 'retirarEstudiante'])->name('secciones.retirar');
 
-        // Rutas para asignar y remover profesores directamente en la sección
         Route::post('/secciones/{seccion}/profesores', [SeccionController::class, 'asignarProfesor'])->name('secciones.asignar-profesor');
         Route::delete('/secciones/{seccion}/profesores/{id_profesor}', [SeccionController::class, 'removerProfesor'])->name('secciones.remover-profesor');
 
@@ -159,7 +166,6 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             Route::delete('/periodos-recesos/{periodo_receso}', 'destroy')->name('periodos_recesos.destroy');
         });
 
-        // Mega-CRUD (Personas)
         Route::resource('personas', PersonaController::class);
 
         Route::prefix('personas/{persona}')->name('personas.')->group(function () {
@@ -174,7 +180,7 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             Route::post('/inscripciones', [PersonaInscripcionController::class, 'store'])->name('inscripciones.store');
             Route::delete('/inscripciones/{inscripcion}', [PersonaInscripcionController::class, 'destroy'])->name('inscripciones.destroy');
         });
-        
+         
         Route::get('/titulos-por-pnf/{id_pnf}', [PersonaTitulacionController::class, 'getTitulosPorPnf'])->name('api.titulos.pnf');
     });
 

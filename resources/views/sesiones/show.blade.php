@@ -2,7 +2,7 @@
 
 @section('header')
 <x-page-header title="Toma de Asistencia">
-    <li class="breadcrumb-item"><a href="{{ route('sesiones.index') }}">Mis Clases</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('clases.secciones.sesiones', $sesion->id_seccion) }}">Sesiones de la Sección</a></li>
     <li class="breadcrumb-item active" aria-current="page">Lista de Alumnos</li>
 </x-page-header>
 @endsection
@@ -11,7 +11,7 @@
 <div class="content pt-4" style="margin: 20px;">
 
     @php
-        $puedeEditar = auth()->user()->can('update', $sesion);
+    $puedeEditar = auth()->user()->can('update', $sesion);
     @endphp
 
     @unless($puedeEditar)
@@ -81,7 +81,7 @@
                         <tbody>
                             @foreach($inscripciones as $inscripcion)
                             @php
-                                $estadoActual = $asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'Presente';
+                            $estadoActual = $asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'Presente';
                             @endphp
 
                             <tr class="fila-estudiante" data-inscripcion="{{ $inscripcion->id_inscripcion_seccion }}">
@@ -98,23 +98,23 @@
                                     <div class="btn-group w-100 shadow-sm" role="group">
                                         <!-- Presente -->
                                         <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_seccion }}"
-                                               id="presente_{{ $inscripcion->id_inscripcion_seccion }}" value="Presente"
-                                               {{ $estadoActual == 'Presente' ? 'checked' : '' }} autocomplete="off"
-                                               {{ !$puedeEditar ? 'disabled' : '' }}>
+                                            id="presente_{{ $inscripcion->id_inscripcion_seccion }}" value="Presente"
+                                            {{ $estadoActual == 'Presente' ? 'checked' : '' }} autocomplete="off"
+                                            {{ !$puedeEditar ? 'disabled' : '' }}>
                                         <label class="btn btn-outline-success fw-bold" for="presente_{{ $inscripcion->id_inscripcion_seccion }}">Presente</label>
 
                                         <!-- Ausente -->
                                         <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_seccion }}"
-                                               id="ausente_{{ $inscripcion->id_inscripcion_seccion }}" value="Ausente"
-                                               {{ $estadoActual == 'Ausente' ? 'checked' : '' }} autocomplete="off"
-                                               {{ !$puedeEditar ? 'disabled' : '' }}>
+                                            id="ausente_{{ $inscripcion->id_inscripcion_seccion }}" value="Ausente"
+                                            {{ $estadoActual == 'Ausente' ? 'checked' : '' }} autocomplete="off"
+                                            {{ !$puedeEditar ? 'disabled' : '' }}>
                                         <label class="btn btn-outline-danger fw-bold" for="ausente_{{ $inscripcion->id_inscripcion_seccion }}">Ausente</label>
 
                                         <!-- Justificado -->
                                         <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_seccion }}"
-                                               id="justificado_{{ $inscripcion->id_inscripcion_seccion }}" value="Justificado"
-                                               {{ $estadoActual == 'Justificado' ? 'checked' : '' }} autocomplete="off"
-                                               {{ !$puedeEditar ? 'disabled' : '' }}>
+                                            id="justificado_{{ $inscripcion->id_inscripcion_seccion }}" value="Justificado"
+                                            {{ $estadoActual == 'Justificado' ? 'checked' : '' }} autocomplete="off"
+                                            {{ !$puedeEditar ? 'disabled' : '' }}>
                                         <label class="btn btn-outline-warning fw-bold text-dark" for="justificado_{{ $inscripcion->id_inscripcion_seccion }}">Justificado</label>
                                     </div>
                                 </td>
@@ -172,7 +172,6 @@
                     let estadoSeleccionado = radioSeleccionado ? radioSeleccionado.value : 'Presente';
 
                     arregloAsistencias.push({
-                        // Mapeamos a la llave esperada por el endpoint de lotes de asistencia
                         id_inscripcion_seccion: idInscripcion,
                         estado: estadoSeleccionado
                     });
@@ -183,42 +182,42 @@
                     asistencias: arregloAsistencias
                 };
 
-                fetch('/asistencias/guardar-lote', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
+                fetch("{{ route('asistencias.guardar_lote') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Asistencia Guardada!',
+                                text: 'El registro de asistencia se procesó correctamente.',
+                                confirmButtonText: 'Volver a Mis Clases',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "{{ route('clases.secciones.sesiones', $sesion->id_seccion) }}";
+                                }
+                            });
+                        } else {
+                            throw new Error(data.message || 'Error desconocido del servidor');
+                        }
+                    })
+                    .catch(error => {
                         Swal.fire({
-                            icon: 'success',
-                            title: '¡Asistencia Guardada!',
-                            text: 'El registro de asistencia se procesó correctamente.',
-                            confirmButtonText: 'Volver a Mis Clases',
-                            allowOutsideClick: false
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "{{ route('sesiones.index') }}";
-                            }
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Ocurrió un error al guardar la asistencia: ' + error.message,
                         });
-                    } else {
-                        throw new Error(data.message || 'Error desconocido del servidor');
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Ocurrió un error al guardar la asistencia: ' + error.message,
+                        btnProcesar.disabled = false;
+                        btnProcesar.innerHTML = '<i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar Asistencia';
                     });
-                    btnProcesar.disabled = false;
-                    btnProcesar.innerHTML = '<i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar Asistencia';
-                });
             });
         }
     });

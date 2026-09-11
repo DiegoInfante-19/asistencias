@@ -11,6 +11,7 @@ use App\Models\Persona;
 use App\DataTables\SeccionDataTable;
 use App\DataTables\InscripcionSeccionDataTable;
 use App\DataTables\ProfesorSeccionDataTable;
+use App\DataTables\SesionesSeccionDataTable; // <--- IMPORTACIÓN NUEVA
 use App\Http\Requests\StoreSeccionRequest;
 use App\Http\Requests\UpdateSeccionRequest;
 use Illuminate\Http\Request;
@@ -39,13 +40,24 @@ class SeccionController extends Controller
         return redirect()->route('estructura.index')->with('success', 'Sección académica creada exitosamente.');
     }
 
-    public function show(Seccion $seccion, InscripcionSeccionDataTable $dataTable, ProfesorSeccionDataTable $profesorDataTable)
-    {
-        // Intercepta peticiones asíncronas (AJAX) diferenciando qué tabla está solicitando los datos
+    // ACTUALIZACIÓN: Inyectamos la 3ra tabla (SesionesSeccionDataTable)
+    public function show(
+        Seccion $seccion, 
+        InscripcionSeccionDataTable $dataTable, 
+        ProfesorSeccionDataTable $profesorDataTable, 
+        SesionesSeccionDataTable $sesionesDataTable
+    ) {
+        // INTERCEPTOR AJAX PARA MÚLTIPLES DATATABLES
         if (request()->ajax() || request()->wantsJson()) {
-            if (request()->has('table') && request()->get('table') === 'docentes-table') {
+            $table = request()->get('table');
+            
+            if ($table === 'docentes-table') {
                 return $profesorDataTable->with('seccion', $seccion)->ajax();
             }
+            if ($table === 'sesiones-seccion-table') {
+                return $sesionesDataTable->with('id_seccion', $seccion->id_seccion)->ajax();
+            }
+            // Por defecto, carga la tabla de estudiantes
             return $dataTable->with('seccion', $seccion)->ajax();
         }
 
@@ -64,7 +76,7 @@ class SeccionController extends Controller
             'sesiones.asistencias.inscripcionSeccion.persona'
         ]);
 
-        // RESTRICCIÓN ESTRICTA ESTUDIANTES: Solo personas que NO tengan inscripciones activas
+        // RESTRICCIÓN ESTRICTA ESTUDIANTES
         $estudiantesDisponibles = Persona::whereDoesntHave('inscripcionesSecciones')
             ->whereHas('titulacionPersona', function($q) use ($seccion) {
                 $q->where('id_pnf', $seccion->id_pnf);
@@ -72,17 +84,19 @@ class SeccionController extends Controller
             ->with(['titulacionPersona.pnf', 'cohorte'])
             ->get();
 
-        // RESTRICCIÓN ESTRICTA DOCENTES: Ningún profesor se puede poner dos veces en la misma sección
+        // RESTRICCIÓN ESTRICTA DOCENTES
         $profesoresDisponibles = Profesor::with(['user', 'pnf'])
             ->whereDoesntHave('secciones', function ($q) use ($seccion) {
                 $q->where('secciones.id_seccion', $seccion->id_seccion);
             })
             ->get();
 
+        // Enviamos las tres tablas empaquetadas a la vista
         return view('secciones.show', compact('seccion', 'estudiantesDisponibles', 'profesoresDisponibles'))
             ->with([
                 'dataTable' => $dataTable->with('seccion', $seccion),
-                'profesorDataTable' => $profesorDataTable->with('seccion', $seccion)
+                'profesorDataTable' => $profesorDataTable->with('seccion', $seccion),
+                'sesionesDataTable' => $sesionesDataTable->with('id_seccion', $seccion->id_seccion)
             ]);
     }
 
