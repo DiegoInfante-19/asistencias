@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Sesion;
 use App\Models\Seccion;
 use App\Models\Profesor;
-use App\Models\InscripcionSeccion; 
+use App\Models\InscripcionSeccion;
 use App\Models\Asistencia;
 use App\Models\PeriodoReceso;
 use App\Models\Pnf;
@@ -13,6 +13,8 @@ use App\Models\Empresa;
 use App\Models\Titulo;
 use App\Http\Requests\StoreSesionRequest;
 use App\DataTables\SeccionClasesDataTable;
+use App\DataTables\SesionesPorSeccionDataTable;
+use App\DataTables\AsistenciaSesionDataTable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
@@ -20,9 +22,6 @@ use Carbon\Carbon;
 
 class SesionController extends Controller
 {
-    /**
-     * PASO 1: Listado maestro de Secciones (Datatable con filtros avanzados)
-     */
     public function seccionesIndex(SeccionClasesDataTable $dataTable)
     {
         Gate::authorize('viewAny', Sesion::class);
@@ -30,20 +29,17 @@ class SesionController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Si es una petición AJAX de Yajra, retornamos el DataTable directamente
         if (request()->ajax()) {
             return $dataTable->ajax();
         }
 
-        // Catálogos para poblar los filtros avanzados de la vista
         $pnfs = Pnf::where('vigencia_pnf', 1)->orderBy('nombre_pnf')->get();
         $empresas = Empresa::orderBy('nombre_empresa')->get();
         $titulos = Titulo::all();
-        
-        // Si es Admin/Coordinador cargamos todos los profesores para el filtro, si es profesor no es necesario
+
         $profesores = collect();
         if ($user->isAdmin() || $user->isCoordinador()) {
-            $profesores = Profesor::with('user')->get()->sortBy(function($p) {
+            $profesores = Profesor::with('user')->get()->sortBy(function ($p) {
                 return ($p->user->name_users ?? '') . ' ' . ($p->user->last_name_users ?? '');
             });
         }
@@ -51,10 +47,7 @@ class SesionController extends Controller
         return $dataTable->render('sesiones.secciones_index', compact('pnfs', 'empresas', 'titulos', 'profesores'));
     }
 
-    /**
-     * PASO 2: Historial de Sesiones programadas exclusivo de una Sección
-     */
-    public function sesionesPorSeccion(Seccion $seccion)
+    public function sesionesPorSeccion(Seccion $seccion, SesionesPorSeccionDataTable $dataTable)
     {
         Gate::authorize('viewAny', Sesion::class);
 
@@ -65,21 +58,20 @@ class SesionController extends Controller
         if (!$user->isAdmin() && !$user->isCoordinador()) {
             $profesorId = $user->profesor ? $user->profesor->id_profesor : -1;
             $tieneAcceso = $seccion->profesores()->where('profesor_seccion.id_profesor', $profesorId)->exists();
-            
+
             if (!$tieneAcceso) {
                 abort(403, 'No posee autorizacion para ver las sesiones de esta seccion.');
             }
         }
 
+        // Interceptor AJAX para que Yajra reciba el JSON de la tabla de sesiones
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->withIdSeccion($seccion->id_seccion)->ajax();
+        }
+
         $seccion->load(['periodoAcademico.cohorte', 'pnf', 'profesores.user']);
 
-        // Obtenemos las sesiones exclusivas de esta sección con su respectivo profesor
-        $sesiones = Sesion::with(['profesor.user'])
-            ->where('id_seccion', $seccion->id_seccion)
-            ->orderBy('fecha_sesion', 'desc')
-            ->paginate(15);
-
-        return view('sesiones.por_seccion', compact('seccion', 'sesiones'));
+        return $dataTable->withIdSeccion($seccion->id_seccion)->render('sesiones.por_seccion', compact('seccion'));
     }
 
     public function create(Request $request)
@@ -121,35 +113,48 @@ class SesionController extends Controller
 
         Sesion::create($data);
 
-        // Redirigir limpiamente de vuelta al historial de sesiones de esa sección exacta
         return redirect()->route('clases.secciones.sesiones', $data['id_seccion'])
             ->with('success', 'Sesión académica programada y registrada correctamente.');
     }
 
-    public function show(Sesion $sesion)
+    public function show(Sesion $sesion, AsistenciaSesionDataTable $dataTable)
     {
         Gate::authorize('view', $sesion);
 
         $sesion->load(['seccion.periodoAcademico.cohorte', 'seccion.pnf', 'profesor.user']);
 
-        $inscripciones = InscripcionSeccion::with('persona')
-            ->where('id_seccion', $sesion->id_seccion)
-            ->where('estatus_inscripcion', 'Activo')
-            ->get()
-            ->sortBy(function($inscripcion) {
-                return $inscripcion->persona->nombre_completo ?? $inscripcion->persona->cedula_personas;
-            });
-
         $asistenciasRegistradas = Asistencia::where('id_sesiones', $sesion->id_sesiones)
-            ->pluck('estado_asistencia', 'id_inscripcion_seccion');
+            ->pluck('estado_asistencia', 'id_inscripcion_seccion')
+            ->toArray();
 
-        return view('sesiones.show', compact('sesion', 'inscripciones', 'asistenciasRegistradas'));
+        $puedeEditar = Auth::user()->can('update', $sesion);
+
+        // Interceptor AJAX para Yajra DataTables
+        if (request()->ajax() || request()->wantsJson()) {
+            return $dataTable->withSesionData(
+                $sesion->id_sesiones,
+                $sesion->id_seccion,
+                $asistenciasRegistradas,
+                $puedeEditar
+            )->ajax();
+        }
+
+        $totalInscritos = InscripcionSeccion::where('id_seccion', $sesion->id_seccion)
+            ->where('estatus_inscripcion', 'Activo')
+            ->count();
+
+        return $dataTable->withSesionData(
+            $sesion->id_sesiones,
+            $sesion->id_seccion,
+            $asistenciasRegistradas,
+            $puedeEditar
+        )->render('sesiones.show', compact('sesion', 'totalInscritos', 'puedeEditar'));
     }
 
     public function destroy(Sesion $sesion)
     {
         Gate::authorize('delete', $sesion);
-        
+
         $idSeccion = $sesion->id_seccion;
         $sesion->delete();
 

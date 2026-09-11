@@ -19,9 +19,6 @@ class Seccion extends Model
         'estatus_seccion'
     ];
 
-    /**
-     * RELACIONES
-     */
     public function periodoAcademico(): BelongsTo
     {
         return $this->belongsTo(PeriodoAcademico::class, 'id_periodo', 'id_periodo');
@@ -45,7 +42,6 @@ class Seccion extends Model
 
     public function sesiones(): HasMany
     {
-        // CORRECCIÓN: Ordenamos siempre de la más reciente a la más vieja
         return $this->hasMany(Sesion::class, 'id_seccion', 'id_seccion')
                     ->orderBy('fecha_sesion', 'desc');
     }
@@ -61,21 +57,11 @@ class Seccion extends Model
             });
     }
 
-    // =========================================================================
-    // LOCAL SCOPES PARA FILTROS AVANZADOS (Módulo de Clases y Asistencias)
-    // =========================================================================
-
-    /**
-     * Filtra las secciones que pertenecen a un PNF específico.
-     */
     public function scopePorPnf($query, $idPnf)
     {
         return $query->where('id_pnf', $idPnf);
     }
 
-    /**
-     * Filtra las secciones donde un profesor específico está asignado.
-     */
     public function scopePorProfesor($query, $idProfesor)
     {
         return $query->whereHas('profesores', function ($q) use ($idProfesor) {
@@ -83,9 +69,6 @@ class Seccion extends Model
         });
     }
 
-    /**
-     * Filtra las secciones que contienen al menos un estudiante asociado a una empresa específica.
-     */
     public function scopePorEmpresa($query, $idEmpresa)
     {
         return $query->whereHas('inscripciones.persona.empresaPersona', function ($q) use ($idEmpresa) {
@@ -93,9 +76,6 @@ class Seccion extends Model
         });
     }
 
-    /**
-     * Filtra las secciones que contienen al menos un estudiante optando por un título específico.
-     */
     public function scopePorTitulo($query, $idTitulo)
     {
         return $query->whereHas('inscripciones.persona.titulacionPersona', function ($q) use ($idTitulo) {

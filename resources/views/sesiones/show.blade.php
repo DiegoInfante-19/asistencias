@@ -10,10 +10,6 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
 
-    @php
-    $puedeEditar = auth()->user()->can('update', $sesion);
-    @endphp
-
     @unless($puedeEditar)
     <div class="alert alert-warning border-0 shadow-sm mb-4 d-flex align-items-center">
         <i class="bi bi-lock-fill fs-4 me-3"></i>
@@ -46,89 +42,30 @@
                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
                     <div class="badge bg-light text-dark p-3 border shadow-sm fs-6">
                         <i class="bi bi-people-fill text-secondary me-2"></i>
-                        Total Inscritos: <span class="fw-bold text-primary">{{ $inscripciones->count() }}</span>
+                        Total Inscritos: <span class="fw-bold text-primary">{{ $totalInscritos }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TABLA INTERACTIVA DE ASISTENCIA -->
+    <!-- TARJETA PRINCIPAL CON DATATABLE INTERACTIVO -->
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-list-check me-2"></i>Lista de Estudiantes</h5>
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
+                <i class="bi bi-list-check me-2 text-primary"></i>Lista de Estudiantes
+            </h5>
         </div>
 
-        <div class="card-body p-0">
-            @if($inscripciones->isEmpty())
-            <div class="text-center py-5 text-muted">
-                <i class="bi bi-person-x fs-1 d-block mb-3 opacity-50"></i>
-                <h5 class="fw-bold">No hay estudiantes inscritos</h5>
-                <p>Matricule estudiantes en esta sección desde el panel administrativo para poder tomar asistencia.</p>
-            </div>
-            @else
+        <div class="card-body bg-white py-4">
             <form id="formulario-asistencia">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-4">Cédula</th>
-                                <th>Apellidos y Nombres</th>
-                                <th>Cohorte (Origen)</th>
-                                <th class="text-center" style="width: 350px;">Estado de Asistencia</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($inscripciones as $inscripcion)
-                            @php
-                            $estadoActual = $asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'Presente';
-                            @endphp
-
-                            <tr class="fila-estudiante" data-inscripcion="{{ $inscripcion->id_inscripcion_seccion }}">
-                                <td class="ps-4 fw-semibold text-secondary">
-                                    V-{{ $inscripcion->persona->cedula_personas ?? 'S/C' }}
-                                </td>
-                                <td class="fw-bold text-dark">
-                                    {{ $inscripcion->persona->nombre_completo ?? 'N/D' }}
-                                </td>
-                                <td>
-                                    <span class="badge bg-info text-dark">Cohorte {{ $inscripcion->persona->cohorte->numero_cohorte ?? 'N/D' }}</span>
-                                </td>
-                                <td class="text-center pe-4">
-                                    <div class="btn-group w-100 shadow-sm" role="group">
-                                        <!-- Presente -->
-                                        <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_seccion }}"
-                                            id="presente_{{ $inscripcion->id_inscripcion_seccion }}" value="Presente"
-                                            {{ $estadoActual == 'Presente' ? 'checked' : '' }} autocomplete="off"
-                                            {{ !$puedeEditar ? 'disabled' : '' }}>
-                                        <label class="btn btn-outline-success fw-bold" for="presente_{{ $inscripcion->id_inscripcion_seccion }}">Presente</label>
-
-                                        <!-- Ausente -->
-                                        <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_seccion }}"
-                                            id="ausente_{{ $inscripcion->id_inscripcion_seccion }}" value="Ausente"
-                                            {{ $estadoActual == 'Ausente' ? 'checked' : '' }} autocomplete="off"
-                                            {{ !$puedeEditar ? 'disabled' : '' }}>
-                                        <label class="btn btn-outline-danger fw-bold" for="ausente_{{ $inscripcion->id_inscripcion_seccion }}">Ausente</label>
-
-                                        <!-- Justificado -->
-                                        <input type="radio" class="btn-check btn-estado" name="estado_{{ $inscripcion->id_inscripcion_seccion }}"
-                                            id="justificado_{{ $inscripcion->id_inscripcion_seccion }}" value="Justificado"
-                                            {{ $estadoActual == 'Justificado' ? 'checked' : '' }} autocomplete="off"
-                                            {{ !$puedeEditar ? 'disabled' : '' }}>
-                                        <label class="btn btn-outline-warning fw-bold text-dark" for="justificado_{{ $inscripcion->id_inscripcion_seccion }}">Justificado</label>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
                 </div>
             </form>
-            @endif
         </div>
 
-        @if($inscripciones->isNotEmpty())
-        <div class="card-footer bg-white py-4 border-top d-flex justify-content-end">
+        <div class="card-footer bg-white py-3 border-top d-flex justify-content-end">
             <input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" id="id_sesiones" value="{{ $sesion->id_sesiones }}">
 
@@ -137,22 +74,21 @@
                 <i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar Asistencia
             </button>
             @else
-            <a href="{{ route('sesiones.index') }}" class="btn btn-secondary btn-lg fw-bold px-4 shadow-sm">
-                <i class="bi bi-arrow-left me-2"></i> Volver al Listado
+            <a href="{{ route('clases.secciones.sesiones', $sesion->id_seccion) }}" class="btn btn-secondary btn-lg fw-bold px-4 shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i> Volver al Historial
             </a>
             @endcan
         </div>
-        @endif
     </div>
 
 </div>
 @endsection
 
-@section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@push('scripts')
+{!! $dataTable->scripts(null, ['type' => 'module']) !!}
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+<script type="module">
+    $(document).ready(function() {
         const btnProcesar = document.getElementById('btn-procesar-asistencia');
 
         if (btnProcesar) {
@@ -194,27 +130,36 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: '¡Asistencia Guardada!',
-                                text: 'El registro de asistencia se procesó correctamente.',
-                                confirmButtonText: 'Volver a Mis Clases',
-                                allowOutsideClick: false
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = "{{ route('clases.secciones.sesiones', $sesion->id_seccion) }}";
-                                }
-                            });
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Asistencia Guardada!',
+                                    text: 'El registro de asistencia se procesó correctamente.',
+                                    confirmButtonText: 'Volver al Historial',
+                                    allowOutsideClick: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "{{ route('clases.secciones.sesiones', $sesion->id_seccion) }}";
+                                    }
+                                });
+                            } else {
+                                alert('¡Asistencia Guardada correctamente!');
+                                window.location.href = "{{ route('clases.secciones.sesiones', $sesion->id_seccion) }}";
+                            }
                         } else {
                             throw new Error(data.message || 'Error desconocido del servidor');
                         }
                     })
                     .catch(error => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Ocurrió un error al guardar la asistencia: ' + error.message,
-                        });
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Ocurrió un error al guardar la asistencia: ' + error.message,
+                            });
+                        } else {
+                            alert('Ocurrió un error al guardar la asistencia: ' + error.message);
+                        }
                         btnProcesar.disabled = false;
                         btnProcesar.innerHTML = '<i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar Asistencia';
                     });
@@ -222,4 +167,4 @@
         }
     });
 </script>
-@endsection
+@endpush

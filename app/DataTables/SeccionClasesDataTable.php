@@ -18,10 +18,6 @@ class SeccionClasesDataTable extends BaseDataTable
             ->addColumn('pnf_nombre', function ($seccion) {
                 return $seccion->pnf->nombre_pnf ?? 'Sin PNF';
             })
-            ->addColumn('cohorte_num', function ($seccion) {
-                // Devolvemos únicamente el número de la cohorte plano, sin badges ni etiquetas
-                return $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'S/C';
-            })
             ->addColumn('profesores_nombres', function ($seccion) {
                 if ($seccion->profesores->isEmpty()) {
                     return '<span class="text-muted small fst-italic">Sin asignar</span>';
@@ -31,18 +27,33 @@ class SeccionClasesDataTable extends BaseDataTable
                     return '• ' . $nombre;
                 })->implode('<br>');
             })
+            ->addColumn('cohorte_num', function ($seccion) {
+                return $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'S/C';
+            })
+            // Usamos editColumn para el campo sesiones_count proveniente de withCount()
+            ->editColumn('sesiones_count', function ($seccion) {
+                $total = $seccion->sesiones_count ?? 0;
+
+                if ($total > 0) {
+                    return '<span class="fw-bold text-primary fs-6">' . $total . '</span>';
+                }
+                
+                return '<span class="text-muted small fst-italic">Sin clases</span>';
+            })
             ->addColumn('action', function ($seccion) {
                 return view('sesiones.partials.actions_secciones', compact('seccion'))->render();
             })
-            ->rawColumns(['profesores_nombres', 'action'])
+            ->rawColumns(['profesores_nombres', 'sesiones_count', 'action'])
             ->setRowId('id_seccion');
     }
 
     public function query(Seccion $model): EloquentBuilder
     {
+        // CORRECCIÓN A: Primero select('secciones.*') y luego withCount('sesiones')
         $query = $model->newQuery()
+            ->select('secciones.*')
             ->with(['pnf', 'periodoAcademico.cohorte', 'profesores.user'])
-            ->select('secciones.*');
+            ->withCount('sesiones');
 
         $query->activasParaAsignacion();
 
@@ -98,13 +109,12 @@ class SeccionClasesDataTable extends BaseDataTable
     protected function getColumns(): array
     {
         return [
-            Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center'),
-            
+            Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->addClass('text-center'),
             Column::make('nombre_seccion')->title('Sección')->width(140),
-            Column::make('pnf_nombre')->title('PNF')->searchable(false)->orderable(false),
-            Column::make('profesores_nombres')->title('Profesor')->searchable(false)->orderable(false),
-            Column::make('cohorte_num')->title('Cohorte')->searchable(false)->orderable(false),
-            Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width(100)->addClass('text-center'),
+            Column::make('pnf_nombre')->title('PNF')->searchable(false),
+            Column::make('profesores_nombres')->title('Profesor')->searchable(false),
+            Column::make('sesiones_count')->title('Clases')->searchable(false)->orderable(true)->addClass('text-center'),
+            Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->addClass('text-center'),
         ];
     }
 }

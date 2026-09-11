@@ -26,10 +26,6 @@ class Sesion extends Model
         'fecha_sesion' => 'datetime',
     ];
 
-    /**
-     * RELACIONES
-     */
-
     public function seccion(): BelongsTo
     {
         return $this->belongsTo(Seccion::class, 'id_seccion', 'id_seccion');
