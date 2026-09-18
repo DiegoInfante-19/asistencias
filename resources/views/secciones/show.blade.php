@@ -5,10 +5,11 @@
 
     <!-- 1. ENCABEZADO PRINCIPAL Y PANEL DE ESTADÍSTICAS FIJO -->
     <div class="row g-4 mb-4">
-        <!-- Tarjeta Principal de Información -->
+        
+        <!-- Tarjeta Principal de Información (Hereda el borde perfecto nativo) -->
         <div class="col-lg-6">
-            <div class="card h-100 border shadow-sm rounded">
-                <div class="card-body p-4 bg-white rounded d-flex flex-column justify-content-between">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body p-4 bg-white d-flex flex-column justify-content-between rounded">
                     <div>
                         <div class="d-flex align-items-center gap-3 mb-2">
                             <h3 class="fw-bold text-dark mb-0">Sección: {{ $seccion->nombre_seccion }}</h3>
@@ -40,18 +41,19 @@
             </div>
         </div>
 
-        <!-- Panel de Estadísticas Fijo -->
+        <!-- Panel de Estadísticas Fijo (Hereda el borde perfecto nativo) -->
         <div class="col-lg-6">
-            <div class="card border shadow-sm h-100 rounded">
-                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom rounded-top">
+            <div class="card h-100 shadow-sm overflow-hidden">
+                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom">
                     <h5 class="mb-0 fw-bold text-dark fs-6">
-                        <i class="bi bi-pie-chart-fill text-primary me-2"></i> Estadísticas de la Sección
+                        Estadísticas de la Sección
                     </h5>
                     <span class="badge bg-primary px-3 py-2 fs-6">Total: {{ $seccion->inscripciones->count() }}</span>
                 </div>
-                <div class="card-body p-3 bg-white d-flex flex-column justify-content-between rounded-bottom">
+                <div class="card-body p-3 bg-white d-flex flex-column justify-content-between">
                     <div class="accordion accordion-flush" id="subAccordionEstadisticas">
 
+                        <!-- COLAPSABLE: Por Título a Optar -->
                         <div class="accordion-item border-bottom">
                             <h2 class="accordion-header" id="subHeadingTitulo">
                                 <button class="accordion-button collapsed py-2 small fw-semibold text-dark shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#subCollapseTitulo" aria-expanded="false" aria-controls="subCollapseTitulo">
@@ -59,15 +61,15 @@
                                 </button>
                             </h2>
                             <div id="subCollapseTitulo" class="accordion-collapse collapse" aria-labelledby="subHeadingTitulo" data-bs-parent="#subAccordionEstadisticas">
-                                <div class="accordion-body py-2 px-3 small bg-light">
+                                <div class="accordion-body py-2 px-3 small bg-light overflow-y-auto" style="max-height: 250px;">
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porTitulo = $seccion->inscripciones->groupBy(fn($i) => $i->persona->titulo_base ?? 'Sin Título Especificado');
                                         @endphp
                                         @foreach($porTitulo as $nombreTitulo => $items)
-                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                            <span>{{ $nombreTitulo }}</span>
-                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        <li class="py-1 border-bottom-subtle">
+                                            <span class="fw-bold text-dark">{{ $nombreTitulo }}:&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="fw-bold text-primary">{{ $items->count() }}</span>
                                         </li>
                                         @endforeach
                                     </ul>
@@ -75,6 +77,7 @@
                             </div>
                         </div>
 
+                        <!-- COLAPSABLE: Por Estado -->
                         <div class="accordion-item border-bottom">
                             <h2 class="accordion-header" id="subHeadingEstado">
                                 <button class="accordion-button collapsed py-2 small fw-semibold text-dark shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#subCollapseEstado" aria-expanded="false" aria-controls="subCollapseEstado">
@@ -82,7 +85,7 @@
                                 </button>
                             </h2>
                             <div id="subCollapseEstado" class="accordion-collapse collapse" aria-labelledby="subHeadingEstado" data-bs-parent="#subAccordionEstadisticas">
-                                <div class="accordion-body py-2 px-3 small bg-light">
+                                <div class="accordion-body py-2 px-3 small bg-light overflow-y-auto" style="max-height: 250px;">
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porEstado = $seccion->inscripciones->groupBy(function($i) {
@@ -90,18 +93,19 @@
                                         })->filter(fn($items, $estado) => $estado !== 'No registrado' && $items->count() > 0);
                                         @endphp
                                         @forelse($porEstado as $nombreEstado => $items)
-                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                            <span>{{ $nombreEstado }}</span>
-                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        <li class="py-1 border-bottom-subtle">
+                                            <span class="fw-bold text-dark">{{ $nombreEstado }}:&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="fw-bold text-primary">{{ $items->count() }}</span>
                                         </li>
                                         @empty
-                                        <li class="text-muted text-center py-1">Sin registros geográficos > 0</li>
+                                        <li class="text-muted py-1">Sin registros geográficos > 0</li>
                                         @endforelse
                                     </ul>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- COLAPSABLE: Por Estatus de Expediente -->
                         <div class="accordion-item border-bottom">
                             <h2 class="accordion-header" id="subHeadingExpediente">
                                 <button class="accordion-button collapsed py-2 small fw-semibold text-dark shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#subCollapseExpediente" aria-expanded="false" aria-controls="subCollapseExpediente">
@@ -109,7 +113,7 @@
                                 </button>
                             </h2>
                             <div id="subCollapseExpediente" class="accordion-collapse collapse" aria-labelledby="subHeadingExpediente" data-bs-parent="#subAccordionEstadisticas">
-                                <div class="accordion-body py-2 px-3 small bg-light">
+                                <div class="accordion-body py-2 px-3 small bg-light overflow-y-auto" style="max-height: 250px;">
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porExpediente = $seccion->inscripciones->groupBy(function($i) {
@@ -122,9 +126,9 @@
                                         });
                                         @endphp
                                         @foreach($porExpediente as $estatusExp => $items)
-                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                            <span>{{ $estatusExp }}</span>
-                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        <li class="py-1 border-bottom-subtle">
+                                            <span class="fw-bold text-dark">{{ $estatusExp }}:&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="fw-bold text-primary">{{ $items->count() }}</span>
                                         </li>
                                         @endforeach
                                     </ul>
@@ -132,6 +136,7 @@
                             </div>
                         </div>
 
+                        <!-- COLAPSABLE: Por Cohorte -->
                         <div class="accordion-item border-bottom">
                             <h2 class="accordion-header" id="subHeadingCohorte">
                                 <button class="accordion-button collapsed py-2 small fw-semibold text-dark shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#subCollapseCohorte" aria-expanded="false" aria-controls="subCollapseCohorte">
@@ -139,15 +144,15 @@
                                 </button>
                             </h2>
                             <div id="subCollapseCohorte" class="accordion-collapse collapse" aria-labelledby="subHeadingCohorte" data-bs-parent="#subAccordionEstadisticas">
-                                <div class="accordion-body py-2 px-3 small bg-light">
+                                <div class="accordion-body py-2 px-3 small bg-light overflow-y-auto" style="max-height: 250px;">
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porCohorte = $seccion->inscripciones->groupBy(fn($i) => $i->persona->cohorte->numero_cohorte ?? 'Externa');
                                         @endphp
                                         @foreach($porCohorte as $numCohorte => $items)
-                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                            <span>{{ $numCohorte }}</span>
-                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        <li class="py-1 border-bottom-subtle">
+                                            <span class="fw-bold text-dark">{{ $numCohorte }}:&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="fw-bold text-primary">{{ $items->count() }}</span>
                                         </li>
                                         @endforeach
                                     </ul>
@@ -155,6 +160,7 @@
                             </div>
                         </div>
 
+                        <!-- COLAPSABLE: Por Empresa -->
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="subHeadingEmpresa">
                                 <button class="accordion-button collapsed py-2 small fw-semibold text-dark shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#subCollapseEmpresa" aria-expanded="false" aria-controls="subCollapseEmpresa">
@@ -162,15 +168,15 @@
                                 </button>
                             </h2>
                             <div id="subCollapseEmpresa" class="accordion-collapse collapse" aria-labelledby="subHeadingEmpresa" data-bs-parent="#subAccordionEstadisticas">
-                                <div class="accordion-body py-2 px-3 small bg-light">
+                                <div class="accordion-body py-2 px-3 small bg-light overflow-y-auto" style="max-height: 250px;">
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porEmpresa = $seccion->inscripciones->groupBy(fn($i) => $i->persona->empresaPersona->first()?->empresa->nombre_empresa ?? 'Independiente');
                                         @endphp
                                         @foreach($porEmpresa as $nombreEmpresa => $items)
-                                        <li class="d-flex justify-content-between py-1 border-bottom-subtle">
-                                            <span class="text-truncate me-2">{{ $nombreEmpresa }}</span>
-                                            <span class="fw-bold text-dark">{{ $items->count() }}</span>
+                                        <li class="py-1 border-bottom-subtle">
+                                            <span class="fw-bold text-dark">{{ $nombreEmpresa }}:&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="fw-bold text-primary">{{ $items->count() }}</span>
                                         </li>
                                         @endforeach
                                     </ul>
@@ -184,11 +190,11 @@
         </div>
     </div>
 
-    <!-- 2. TARJETA CONTENEDORA DE PESTAÑAS (TABS) -->
+    <!-- 2. TARJETA CONTENEDORA DE PESTAÑAS (TABS) RESTAURADA -->
     <div class="card shadow-sm">
         <div class="card-header bg-white py-3 d-flex align-items-center">
             <h5 class="card-title text-dark mb-0 fw-bold fs-6 me-auto">
-                <i class="bi bi-folder2-open text-primary me-1"></i> Gestión de la Sección Académica
+                 Gestión de la Sección Académica
             </h5>
         </div>
 
@@ -196,17 +202,17 @@
             <ul class="nav nav-tabs card-header-tabs nav-fill" id="seccionTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fw-bold text-dark py-3" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes-pane" type="button" role="tab" aria-controls="estudiantes-pane" aria-selected="true">
-                        <i class="bi bi-people-fill me-1 text-primary"></i> Estudiantes Inscritos ({{ $seccion->inscripciones->count() }})
+                        Estudiantes Inscritos ({{ $seccion->inscripciones->count() }})
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link fw-bold text-dark py-3" id="docentes-tab" data-bs-toggle="tab" data-bs-target="#docentes-pane" type="button" role="tab" aria-controls="docentes-pane" aria-selected="false">
-                        <i class="bi bi-person-video3 me-1 text-warning"></i> Docentes Asignados ({{ $seccion->profesores->count() }})
+                        Docentes Asignados ({{ $seccion->profesores->count() }})
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link fw-bold text-dark py-3" id="historial-tab" data-bs-toggle="tab" data-bs-target="#historial-pane" type="button" role="tab" aria-controls="historial-pane" aria-selected="false">
-                        <i class="bi bi-calendar-check-fill me-1 text-success"></i> Historial y Asistencias ({{ $seccion->sesiones->count() }})
+                        Historial y Asistencias ({{ $seccion->sesiones->count() }})
                     </button>
                 </li>
             </ul>
@@ -231,7 +237,7 @@
             </div>
         </div>
 
-        <div class="card-footer bg-light py-2 text-muted small">
+        <div class="card-footer bg-light py-2 text-muted small border-top">
             Secciones operativas del expediente del módulo de secciones.
         </div>
     </div>

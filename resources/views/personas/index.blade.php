@@ -167,7 +167,7 @@
 
         <!-- FOOTER DE LA TARJETA DE FILTROS -->
         <div class="card-footer bg-white py-3 d-flex justify-content-end">
-            <button type="button" id="btn-limpiar-filtros" class="btn btn-success">
+            <button type="button" id="btn-limpiar-filtros" class="btn btn-success shadow-sm">
                 <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar Filtros
             </button>
         </div>

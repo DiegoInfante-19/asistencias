@@ -14,28 +14,27 @@ class AsistenciaController extends Controller
     public function guardarLote(Request $request)
     {
         $request->validate([
-            'id_sesiones'                           => 'required|exists:sesiones,id_sesiones',
-            'asistencias'                           => 'required|array',
-            'asistencias.*.id_inscripcion_seccion'   => 'required|exists:inscripciones_secciones,id_inscripcion_seccion',
-            'asistencias.*.estado'                   => 'required|in:Presente,Ausente,Justificado',
-            'asistencias.*.observacion'              => 'nullable|string|max:255', // Añadido para soportar observaciones/justificaciones
+            'id_sesiones'                            => 'required|exists:sesiones,id_sesiones',
+            'asistencias'                            => 'required|array',
+            'asistencias.*.id_inscripcion_seccion'   => 'required|exists:inscripciones_secciones,id_inscripcion_seccion|distinct',
+            'asistencias.*.estado'                   => 'required|in:presente,ausente,justificada',
+            'asistencias.*.observacion'              => 'nullable|string|max:255',
         ]);
 
         $sesion = Sesion::findOrFail($request->id_sesiones);
 
-        // Prevención IDOR y ventana de tiempo
         Gate::authorize('update', $sesion);
 
         $totalAlumnosInscritos = InscripcionSeccion::where('id_seccion', $sesion->id_seccion)
             ->where('estatus_inscripcion', 'Activo')
             ->count();
-            
+
         $totalEnviadosEnLote = count($request->asistencias);
 
         if ($totalEnviadosEnLote !== $totalAlumnosInscritos) {
             return response()->json([
                 'success' => false,
-                'message' => "Error de integridad: El lote enviado contiene {$totalEnviadosEnLote} registros, pero la sección posee {$totalAlumnosInscritos} estudiantes activos. No se permiten guardados parciales."
+                'message' => "Error de integridad: El lote enviado contiene {$totalEnviadosEnLote} registros, pero la sección posee {$totalAlumnosInscritos} estudiantes activos. No se permiten guardados parciales o duplicados."
             ], 422);
         }
 
@@ -52,7 +51,7 @@ class AsistenciaController extends Controller
                     ],
                     [
                         'estado_asistencia'      => $registro['estado'],
-                        'observacion_asistencia' => $registro['observacion'] ?? null, // Guardado de la observación
+                        'observacion_asistencia' => $registro['observacion'] ?? null,
                     ]
                 );
             }
@@ -62,7 +61,6 @@ class AsistenciaController extends Controller
                 'success' => true,
                 'message' => 'El registro de asistencia se guardó correctamente.'
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([

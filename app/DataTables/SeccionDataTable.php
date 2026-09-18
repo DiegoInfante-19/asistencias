@@ -14,30 +14,42 @@ class SeccionDataTable extends BaseDataTable
     {
         return EloquentDataTable::create($query)
             ->addColumn('profesores_lista', function ($seccion) {
-                // CONTADOR DE DOCENTES EN VEZ DE NOMBRES
                 $cantidad = $seccion->profesores->count();
                 if ($cantidad === 0) {
                     return '<span class="text-muted small">Sin asignar</span>';
                 }
-                return '<span class="badge bg-info text-dark">' . $cantidad . ' Asignado(s)</span>';
+                return '<span class="badge bg-info text-dark">' . $cantidad . ' Docente(s)</span>';
+            })
+            ->addColumn('n_estudiantes', function ($seccion) {
+                $cantidad = $seccion->inscripciones->count();
+                return '<span class="badge bg-light text-dark border"><i class="bi bi-people-fill text-primary me-1"></i> ' . $cantidad . '</span>';
             })
             ->addColumn('action', function ($seccion) {
-                return view('secciones.partials.actions', compact('seccion'))->render();
+                // Botón directo para ir al "Nivel 3" (secciones.show)
+                $urlEntrar = route('secciones.show', $seccion->id_seccion);
+                $btnEntrar = '<a href="'.$urlEntrar.'" class="btn btn-sm btn-outline-primary shadow-sm me-1" title="Gestionar Estudiantes"><i class="bi bi-eye"></i></a>';
+                
+                // AQUÍ ESTÁ EL CAMBIO CLAVE: Apuntamos al nuevo archivo partials
+                $accionesExtra = view('estructura_academica.partials.actions_secciones', compact('seccion'))->render();
+                
+                return '<div class="d-flex justify-content-center align-items-center">' . $btnEntrar . $accionesExtra . '</div>';
             })
-            ->rawColumns(['profesores_lista', 'action'])
+            ->rawColumns(['profesores_lista', 'n_estudiantes', 'action'])
             ->setRowId('id_seccion');
     }
 
     public function query(Seccion $model): EloquentBuilder
     {
-        $query = $model->newQuery()->with([
-            'periodoAcademico.cohorte',
-            'pnf',
-            'profesores.user',
-            'inscripciones.persona.empresaPersona'
-        ]);
+        // 1. RESTRICCIÓN OBLIGATORIA: Filtramos estrictamente por el id_periodo inyectado en el Controlador
+        $query = $model->newQuery()
+            ->where('id_periodo', $this->id_periodo)
+            ->with([
+                'pnf',
+                'profesores.user',
+                'inscripciones'
+            ]);
 
-        // FILTRO AVANZADO: Por Profesor (Relación N:M)
+        // 2. FILTRO AVANZADO: Por Profesor
         if ($this->request()->filled('filtro_profesor')) {
             $profesorId = $this->request()->get('filtro_profesor');
             $query->whereHas('profesores', function ($q) use ($profesorId) {
@@ -45,20 +57,11 @@ class SeccionDataTable extends BaseDataTable
             });
         }
 
-        // FILTRO AVANZADO: Por Empresa (Si al menos un estudiante de la sección trabaja allí)
-        if ($this->request()->filled('filtro_empresa')) {
-            $empresaId = $this->request()->get('filtro_empresa');
-            $query->whereHas('inscripciones.persona.empresaPersona', function ($q) use ($empresaId) {
-                $q->where('id_empresa', $empresaId);
-            });
-        }
-
-        // FILTRO AVANZADO: Por Cohorte (Si al menos un estudiante de la sección pertenece a esta cohorte estática)
-        if ($this->request()->filled('filtro_cohorte')) {
-            $cohorteId = $this->request()->get('filtro_cohorte');
-            $query->whereHas('inscripciones.persona', function ($q) use ($cohorteId) {
-                $q->where('id_cohortes', $cohorteId);
-            });
+        // 3. FILTRO AVANZADO: Por PNF 
+        // Nota: en la Fase 3 aseguraremos que el select del frontend envíe el ID del PNF
+        if ($this->request()->filled('filtro_pnf')) {
+            $pnfId = $this->request()->get('filtro_pnf');
+            $query->where('id_pnf', $pnfId);
         }
 
         return $query;
@@ -71,20 +74,21 @@ class SeccionDataTable extends BaseDataTable
 
     public function html(): HtmlBuilder
     {
-        // Llamamos al constructor base que ya tiene los botones, DOM y el idioma local
         return $this->sharedHtmlBuilder()
                     ->minifiedAjax('', null, [
+                        // Capturamos los filtros de los Select2 que haremos en la Fase 3
                         'filtro_profesor' => '$("#filtro_profesor").val()',
-                        'filtro_empresa' => '$("#filtro_empresa").val()',
-                        'filtro_cohorte' => '$("#filtro_cohorte").val()'
+                        'filtro_pnf' => '$("#filtro_pnf").val()'
                     ]);
     }
 
     protected function getColumns(): array
     {
         return [
-            Column::make('nombre_seccion')->title('Sección')->addClass('text-center fw-bold')->width('40%'),
-            Column::make('profesores_lista')->title('Docentes Asignados')->addClass('text-center')->orderable(false)->width('35%'),
+            Column::make('nombre_seccion')->title('Sección')->addClass('text-center fw-bold')->width('25%'),
+            Column::make('pnf.nombre_pnf')->title('PNF')->addClass('text-center')->width('20%')->orderable(false),
+            Column::make('profesores_lista')->title('Docentes')->addClass('text-center')->orderable(false)->width('15%'),
+            Column::make('n_estudiantes')->title('Estudiantes')->addClass('text-center')->orderable(false)->width('15%'),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('25%')->addClass('text-center'),
         ];
     }

@@ -18,3 +18,12 @@
 // 4. Estilos de Select2 y su tema Bootstrap 5 (Locales vía npm)
 @import 'select2/dist/css/select2.min.css';
 @import 'select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css';
+
+/* ==========================================================================
+   5. Correcciones Globales de Interfaz y UI/UX
+   ========================================================================== */
+// Ocultar enlaces de accesibilidad (Skip Links) inyectados por AdminLTE
+body > a[href="#main"],
+body > a[href="#navigation"] {
+    display: none !important;
+}

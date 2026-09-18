@@ -709,7 +709,7 @@
                 this.createLiveRegion();
             }
             if (this.config.skipLinks) {
-                this.addSkipLinks();
+                // this.addSkipLinks();
             }
             if (this.config.focusManagement) {
                 this.initFocusManagement();

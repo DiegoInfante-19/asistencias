@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class Sesion extends Model
 {
@@ -25,6 +26,35 @@ class Sesion extends Model
     protected $casts = [
         'fecha_sesion' => 'datetime',
     ];
+
+    // ==========================================
+    // LÓGICA DE NEGOCIO: Límite de Edición
+    // ==========================================
+    
+    public function limiteEdicion(): Carbon
+    {
+        // El límite es 48 horas después de la fecha de la sesión
+        return Carbon::parse($this->fecha_sesion)->addHours(48);
+    }
+
+    public function estaCerrada(): bool
+    {
+        // Devuelve TRUE si la fecha actual ya superó el límite de edición
+        return now()->greaterThan($this->limiteEdicion());
+    }
+
+    public function horasRestantesEdicion(): int
+    {
+        $limite = $this->limiteEdicion();
+        $ahora = now();
+        
+        // Si ya pasó el tiempo devuelve 0, si no, devuelve la diferencia en horas
+        return $ahora->lessThan($limite) ? $ahora->diffInHours($limite) : 0;
+    }
+
+    // ==========================================
+    // RELACIONES
+    // ==========================================
 
     public function seccion(): BelongsTo
     {

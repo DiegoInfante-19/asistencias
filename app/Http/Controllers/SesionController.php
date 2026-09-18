@@ -54,7 +54,6 @@ class SesionController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Control perimetral de seguridad para profesores
         if (!$user->isAdmin() && !$user->isCoordinador()) {
             $profesorId = $user->profesor ? $user->profesor->id_profesor : -1;
             $tieneAcceso = $seccion->profesores()->where('profesor_seccion.id_profesor', $profesorId)->exists();
@@ -64,7 +63,6 @@ class SesionController extends Controller
             }
         }
 
-        // Interceptor AJAX para que Yajra reciba el JSON de la tabla de sesiones
         if (request()->ajax() || request()->wantsJson()) {
             return $dataTable->withIdSeccion($seccion->id_seccion)->ajax();
         }
@@ -127,28 +125,40 @@ class SesionController extends Controller
             ->pluck('estado_asistencia', 'id_inscripcion_seccion')
             ->toArray();
 
-        $puedeEditar = Auth::user()->can('update', $sesion);
+        // Evaluar si puede editar usando el método limpio del modelo
+        $user = Auth::user();
+        $puedeEditar = true;
+        
+        // Si no es admin y tampoco coordinador, verificamos el límite de tiempo
+        if (!$user->isAdmin() && !is_null($user->isCoordinador()) && !$user->isCoordinador()) {
+            $puedeEditar = !$sesion->estaCerrada();
+        }
 
-        // Interceptor AJAX para Yajra DataTables
+        $dataTable->withSesionData(
+            $sesion->id_sesiones,
+            $sesion->id_seccion,
+            $sesion->seccion->id_pnf,
+            $asistenciasRegistradas,
+            $puedeEditar
+        );
+
         if (request()->ajax() || request()->wantsJson()) {
-            return $dataTable->withSesionData(
-                $sesion->id_sesiones,
-                $sesion->id_seccion,
-                $asistenciasRegistradas,
-                $puedeEditar
-            )->ajax();
+            return $dataTable->ajax();
         }
 
         $totalInscritos = InscripcionSeccion::where('id_seccion', $sesion->id_seccion)
             ->where('estatus_inscripcion', 'Activo')
             ->count();
 
-        return $dataTable->withSesionData(
-            $sesion->id_sesiones,
-            $sesion->id_seccion,
-            $asistenciasRegistradas,
-            $puedeEditar
-        )->render('sesiones.show', compact('sesion', 'totalInscritos', 'puedeEditar'));
+        $inscripciones = InscripcionSeccion::with(['persona.cohorte', 'persona.titulacionPersona.titulacion'])
+            ->where('id_seccion', $sesion->id_seccion)
+            ->where('estatus_inscripcion', 'Activo')
+            ->get()
+            ->sortBy(function ($inscripcion) {
+                return $inscripcion->persona->nombre_completo ?? $inscripcion->persona->cedula_personas;
+            });
+
+        return view('sesiones.show', compact('sesion', 'inscripciones', 'asistenciasRegistradas', 'totalInscritos', 'puedeEditar', 'dataTable'));
     }
 
     public function destroy(Sesion $sesion)

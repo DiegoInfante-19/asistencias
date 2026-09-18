@@ -111,7 +111,7 @@
                 <!-- Botón de Reseteo de Filtros -->
                 <div class="row mt-3">
                     <div class="col-12 text-end">
-                        <button type="button" id="btnResetFiltros" class="btn btn-outline-secondary btn-sm fw-semibold shadow-sm">
+                        <button type="button" id="btnResetFiltros" class="btn btn-success shadow-sm">
                             <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar Filtros
                         </button>
                     </div>

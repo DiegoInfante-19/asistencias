@@ -16,31 +16,54 @@
     <!-- Carga de Estilos y Scripts (Bootstrap + AdminLTE vía Vite) -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @yield('styles')
+
+    <style>
+        /* 1. Ocultar enlaces de accesibilidad fantasma de AdminLTE */
+        body > a[href="#main"],
+        body > a[href="#navigation"],
+        .skip-link,
+        .visually-hidden-focusable {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            height: 0 !important;
+            width: 0 !important;
+            position: absolute !important;
+        }
+
+        /* 2. Degradado de fondo personalizado para reducir fatiga visual */
+        body {
+            background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* 3. Bordes personalizados y leves para el Navbar */
+        .navbar-custom-borders {
+            border-top: 14px solid #03396c !important;
+        }
+    </style>
 </head>
 
-<body class="d-flex flex-column min-vh-100 bg-body-tertiary antialiased">
+<body class="d-flex flex-column min-vh-100 antialiased">
 
-    <!-- NAVBAR MODERNO CON BOOTSTRAP 5 -->
-    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm sticky-top border-bottom">
-        <div class="container">
-            <!-- Logo y Marca -->
-            <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                <img src="{{ asset('images/upt_logo-modified.png') }}" alt="Logo UPT" height="32" class="me-2">
-                <span class="fw-bold text-primary">{{ config('app.name', 'SisControl') }}</span>
-            </a>
+    <!-- BANNER INSTITUCIONAL -->
+    <div class="w-100 p-0 m-0 overflow-hidden bg-white">
+        <img src="{{ asset('images/panel.png') }}" alt="Banner Institucional" class="img-fluid w-100 d-block" style="object-fit: cover; object-position: center; max-height: 140px;">
+    </div>
 
-            <!-- Botón del Menú Móvil (Hamburguesa) -->
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Abrir menú principal">
+    <!-- NAVBAR MODERNO CON BOOTSTRAP 5 (Se agregó navbar-custom-borders y se quitó border-bottom genérico) -->
+    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm sticky-top navbar-custom-borders">
+        <div class="container d-flex justify-content-end">
+            
+            <button class="navbar-toggler border-0 shadow-none ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Abrir menú principal">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <!-- Opciones del Navbar -->
             <div class="collapse navbar-collapse" id="navbarMain">
-                <!-- Espacio a la izquierda -->
-                <ul class="navbar-nav me-auto">
-                </ul>
-
-                <!-- Opciones a la derecha -->
                 <ul class="navbar-nav ms-auto align-items-center">
                     @guest
                         @if (Route::has('login'))
@@ -58,14 +81,12 @@
                         <!-- Menú de Usuario Autenticado -->
                         <li class="nav-item dropdown">
                             <a id="navbarUserDropdown" class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                <!-- Avatar dinámico circular -->
                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-2" style="width: 32px; height: 32px;">
                                     {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
                                 </div>
                                 <span class="fw-medium text-dark">{{ Auth::user()->name ?? 'Usuario' }}</span>
                             </a>
 
-                            <!-- Dropdown menu -->
                             <div class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="navbarUserDropdown">
                                 <div class="dropdown-item-text text-muted small">
                                     {{ Auth::user()->email ?? '' }}
@@ -87,68 +108,60 @@
     </nav>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <!-- flex-grow-1 asegura que el main ocupe el espacio disponible empujando el footer abajo -->
     <main class="flex-grow-1 d-flex flex-column">
         @yield('content')
     </main>
 
-    <!-- FOOTER INSTITUCIONAL -->
-    <footer class="bg-white border-top py-5 mt-auto">
+    <!-- FOOTER INSTITUCIONAL (Se comprimió el padding a py-3 y gy-3 para evitar scroll innecesario) -->
+    <footer class="bg-white border-top py-3 mt-auto shadow-sm">
         <div class="container">
-            <div class="row gy-4">
-                <!-- Columna 1: Branding -->
+            <div class="row gy-3">
                 <div class="col-12 col-md-5">
-                    <a href="{{ url('/') }}" class="d-flex align-items-center text-decoration-none mb-3">
-                        <img src="{{ asset('images/upt_logo-modified.png') }}" alt="Logo UPT" height="32" class="me-3">
-                        <span class="fs-5 fw-bold text-dark">SisControl</span>
+                    <a href="{{ url('/') }}" class="d-flex align-items-center text-decoration-none mb-2">
+                        <img src="{{ asset('images/upt_logo-modified.png') }}" alt="Logo UPT" height="28" class="me-3">
+                        <span class="fs-6 fw-bold text-dark">SisControl</span>
                     </a>
                     <p class="text-muted small mb-0 pe-md-5">
                         Sistema de Control de Asistencias y Acreditaciones de los Trabajadores para la Oficina de Vice Rectorado Académico.
                     </p>
                 </div>
 
-                <!-- Columna 2: Navegación -->
                 <div class="col-6 col-md-3">
-                    <h6 class="text-uppercase fw-bold mb-3 small text-dark">Navegación</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2"><a href="{{ url('/') }}" class="text-muted text-decoration-none text-primary-hover">Inicio</a></li>
-                        <li class="mb-2"><a href="{{ route('login') }}" class="text-muted text-decoration-none text-primary-hover">Iniciar Sesión</a></li>
+                    <h6 class="text-uppercase fw-bold mb-2 small text-dark" style="font-size: 0.75rem;">Navegación</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-1"><a href="{{ url('/') }}" class="text-muted text-decoration-none">Inicio</a></li>
+                        <li class="mb-1"><a href="{{ route('login') }}" class="text-muted text-decoration-none">Iniciar Sesión</a></li>
                     </ul>
                 </div>
 
-                <!-- Columna 3: Enlaces -->
                 <div class="col-6 col-md-2">
-                    <h6 class="text-uppercase fw-bold mb-3 small text-dark">Enlaces</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none text-primary-hover">Vicerrectorado</a></li>
-                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none text-primary-hover">Soporte Técnico</a></li>
+                    <h6 class="text-uppercase fw-bold mb-2 small text-dark" style="font-size: 0.75rem;">Enlaces</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-1"><a href="#" class="text-muted text-decoration-none">Vicerrectorado</a></li>
+                        <li class="mb-1"><a href="#" class="text-muted text-decoration-none">Soporte Técnico</a></li>
                     </ul>
                 </div>
 
-                <!-- Columna 4: Legal -->
                 <div class="col-12 col-md-2">
-                    <h6 class="text-uppercase fw-bold mb-3 small text-dark">Legal</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none text-primary-hover">Privacidad</a></li>
-                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none text-primary-hover">Términos</a></li>
+                    <h6 class="text-uppercase fw-bold mb-2 small text-dark" style="font-size: 0.75rem;">Legal</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-1"><a href="#" class="text-muted text-decoration-none">Privacidad</a></li>
+                        <li class="mb-1"><a href="#" class="text-muted text-decoration-none">Términos</a></li>
                     </ul>
                 </div>
             </div>
             
-            <hr class="my-4 border-secondary opacity-25">
+            <hr class="my-3 border-secondary opacity-25">
             
-            <!-- Derechos de autor -->
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center">
-                <span class="text-muted small text-center text-sm-start">
+                <span class="text-muted text-center text-sm-start" style="font-size: 0.8rem;">
                     © {{ date('Y') }} <a href="#" class="text-decoration-none text-muted fw-bold">Oficina de Vice Rectorado Académico</a>. Todos los derechos reservados.
                 </span>
             </div>
         </div>
     </footer>
 
-    <!-- Alertas globales -->
     @include('partials.alerts', ['default' => ''])
-
     @yield('scripts')
 </body>
 
