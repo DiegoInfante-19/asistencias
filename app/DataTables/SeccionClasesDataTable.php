@@ -6,6 +6,7 @@ use App\Models\Seccion;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
+use Yajra\DataTables\Html\Button; // <-- Importación necesaria para los botones
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Facades\Auth;
 
@@ -30,30 +31,50 @@ class SeccionClasesDataTable extends BaseDataTable
             ->addColumn('cohorte_num', function ($seccion) {
                 return $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'S/C';
             })
-            // Usamos editColumn para el campo sesiones_count proveniente de withCount()
-            ->editColumn('sesiones_count', function ($seccion) {
-                $total = $seccion->sesiones_count ?? 0;
-
-                if ($total > 0) {
-                    return '<span class="fw-bold text-primary fs-6">' . $total . '</span>';
-                }
-                
-                return '<span class="text-muted small fst-italic">Sin clases</span>';
+            // 1. Columna: Clases Vistas (Ya se pasó asistencia)
+            ->addColumn('clases_vistas', function ($seccion) {
+                $vistas = $seccion->clases_vistas ?? 0;
+                return $vistas > 0 
+                    ? '<span class="fw-bold text-primary fs-6">'.$vistas.'</span>' 
+                    : '<span class="text-muted small fst-italic">Sin clases</span>';
+            })
+            // 2. Columna: Clases Programadas (Pendientes de pasar asistencia)
+            ->addColumn('clases_programadas', function ($seccion) {
+                $prog = $seccion->clases_programadas ?? 0;
+                return $prog > 0 
+                    ? '<span class="fw-bold text-primary fs-6">'.$prog.'</span>' 
+                    : '<span class="text-muted small fst-italic">Sin clases</span>';
+            })
+            // 3. Columna: Total de Clases registradas
+            ->addColumn('clases_totales', function ($seccion) {
+                $total = $seccion->clases_totales ?? 0;
+                return $total > 0 
+                    ? '<span class="fw-bold text-primary fs-6">'.$total.'</span>' 
+                    : '<span class="text-muted small fst-italic">Sin clases</span>';
             })
             ->addColumn('action', function ($seccion) {
                 return view('sesiones.partials.actions_secciones', compact('seccion'))->render();
             })
-            ->rawColumns(['profesores_nombres', 'sesiones_count', 'action'])
+            // Habilitar la interpretación de HTML para las nuevas columnas
+            ->rawColumns(['profesores_nombres', 'clases_vistas', 'clases_programadas', 'clases_totales', 'action'])
             ->setRowId('id_seccion');
     }
 
     public function query(Seccion $model): EloquentBuilder
     {
-        // CORRECCIÓN A: Primero select('secciones.*') y luego withCount('sesiones')
         $query = $model->newQuery()
             ->select('secciones.*')
             ->with(['pnf', 'periodoAcademico.cohorte', 'profesores.user'])
-            ->withCount('sesiones');
+            // Aquí optimizamos la consulta para que devuelva los 3 conteos a la vez
+            ->withCount([
+                'sesiones as clases_totales',
+                'sesiones as clases_vistas' => function ($q) {
+                    $q->has('asistencias'); // Tienen asistencia
+                },
+                'sesiones as clases_programadas' => function ($q) {
+                    $q->doesntHave('asistencias'); // No tienen asistencia
+                }
+            ]);
 
         $query->activasParaAsignacion();
 
@@ -103,6 +124,14 @@ class SeccionClasesDataTable extends BaseDataTable
                     d.id_empresa = $("#filtro_empresa").val();
                     d.id_titulo = $("#filtro_titulo").val();
                 }'
+            ])
+            // Al quitar el "dom()" manual, DataTables recupera tu Buscador, Paginación y Contador originales.
+            // Y aquí configuramos la lista de botones completa, agregando los clásicos más el de columnas:
+            ->buttons([
+                Button::make('excel')->text('<i class="bi bi-file-earmark-excel"></i> Excel')->addClass('btn btn-success btn-sm shadow-sm'),
+                Button::make('pdf')->text('<i class="bi bi-file-earmark-pdf"></i> PDF')->addClass('btn btn-danger btn-sm shadow-sm'),
+                Button::make('print')->text('<i class="bi bi-printer"></i> Imprimir')->addClass('btn btn-secondary btn-sm shadow-sm'),
+                Button::make('colvis')->text('<i class="bi bi-layout-three-columns me-1"></i> Columnas')->addClass('btn btn-outline-secondary btn-sm shadow-sm')
             ]);
     }
 
@@ -113,7 +142,9 @@ class SeccionClasesDataTable extends BaseDataTable
             Column::make('nombre_seccion')->title('Sección')->width(140),
             Column::make('pnf_nombre')->title('PNF')->searchable(false),
             Column::make('profesores_nombres')->title('Profesor')->searchable(false),
-            Column::make('sesiones_count')->title('Clases')->searchable(false)->orderable(true)->addClass('text-center'),
+            Column::make('clases_vistas')->title('Vistas')->searchable(false)->orderable(true)->addClass('text-center align-middle'),
+            Column::make('clases_programadas')->title('Pendientes')->searchable(false)->orderable(true)->addClass('text-center align-middle'),
+            Column::make('clases_totales')->title('Total Clases')->searchable(false)->orderable(true)->addClass('text-center align-middle'),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->addClass('text-center'),
         ];
     }

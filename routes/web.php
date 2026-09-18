@@ -4,9 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+
 use App\Http\Controllers\ProfileController;
+
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SecuritySettingsController;
+
 use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\CargoController;
@@ -73,11 +76,11 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
     });
 
     // ---------------------------------------------------------------------
-    // BÓVEDA 2: ACCESO RESTRINGIDO (Solo Administrador y Coordinador)
+    // BÓVEDA 2: ACCESO RESTRINGIDO (So lo Administrador y Coordinador)
     // ---------------------------------------------------------------------
     Route::middleware(['role:Administrador,Coordinador'])->group(function () {
 
-        // Gestión de Usuarios y Profesores
+        // Gestión de Usuarios y Prof esores
         Route::resource('usuarios', UserController::class);
         Route::post('/usuarios/{usuario}/asignar-pnf', [UserController::class, 'asignarPnf'])->name('usuarios.asignar_pnf');
         Route::post('/usuarios/{usuario}/asignar-seccion', [UserController::class, 'asignarSeccion'])->name('usuarios.asignar_seccion');

@@ -18,7 +18,7 @@
             </h4>
             <p class="text-muted small mb-0">
                 <strong>PNF:</strong> {{ $seccion->pnf->nombre_pnf ?? 'N/D' }} | 
-                <strong>Cohorte Ref.:</strong> {{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }} | 
+                <strong> {{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }} </strong>| 
                 <strong>Estatus:</strong> <span class="badge bg-success">{{ $seccion->estatus_seccion }}</span>
             </p>
         </div>
@@ -38,11 +38,21 @@
 
     <!-- TARJETA PRINCIPAL CON DATATABLE -->
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
-                <i class="bi bi-calendar-check me-2 text-primary"></i>Clases Programadas en esta Sección
+        <div class="card-header bg-white py-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between border-bottom">
+            <h5 class="card-title text-dark mb-3 mb-md-0 fs-5" style="font-weight: 500;">
+                Clases Programadas en esta Sección
             </h5>
+            <!-- FILTRO DE ASISTENCIA -->
+            <div class="d-flex align-items-center" style="min-width: 250px;">
+                <label for="filtro_asistencia" class="form-label me-2 mb-0 fw-bold small text-muted text-nowrap">Filtrar por:</label>
+                <select id="filtro_asistencia" class="form-select form-select-sm shadow-sm border-secondary-subtle">
+                    <option value="">Todas las clases</option>
+                    <option value="registrada">Asistencia Registrada</option>
+                    <option value="pendiente">Asistencia Pendiente</option>
+                </select>
+            </div>
         </div>
+        
         <div class="card-body bg-white py-4">
             <div class="table-responsive">
                 {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
@@ -58,4 +68,18 @@
 
 @push('scripts')
 {!! $dataTable->scripts(null, ['type' => 'module']) !!}
+
+<script type="module">
+    $(document).ready(function() {
+        // Escuchar cambios en el selector de filtro
+        $('#filtro_asistencia').on('change', function() {
+            // Recargar el DataTable enviando el nuevo parámetro por AJAX
+            if (window.LaravelDataTables && window.LaravelDataTables['sesiones-seccion-table']) {
+                window.LaravelDataTables['sesiones-seccion-table'].draw();
+            } else if ($.fn.DataTable.isDataTable('#sesiones-seccion-table')) {
+                $('#sesiones-seccion-table').DataTable().draw();
+            }
+        });
+    });
+</script>
 @endpush

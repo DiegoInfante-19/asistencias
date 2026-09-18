@@ -63,9 +63,22 @@ class Persona extends Model
         return $this->hasOne(EmpresaPersona::class, 'id_personas', 'id_personas');
     }
 
+    /**
+     * MODIFICACIÓN FASE 3 (Paso 3.1): 
+     * Convertimos la relación principal en HasMany para soportar múltiples expedientes o cambios de PNF.
+     */
+    public function titulacionPersonas(): HasMany
+    {
+        return $this->hasMany(TitulacionPersona::class, 'id_personas', 'id_personas');
+    }
+
+    /**
+     * Método auxiliar de retrocompatibilidad (devuelve el primer expediente o el más reciente)
+     * para no afectar otros controladores que utilicen ->titulacionPersona de forma directa.
+     */
     public function titulacionPersona(): HasOne
     {
-        return $this->hasOne(TitulacionPersona::class, 'id_personas', 'id_personas');
+        return $this->hasOne(TitulacionPersona::class, 'id_personas', 'id_personas')->latest('id_titulacion_personas');
     }
 
     /**
@@ -118,13 +131,12 @@ class Persona extends Model
         return trim("{$this->primer_nombre_personas} {$this->primer_apellido_personas}");
     }
 
-    // CORREGIDO: Retorna el título específico por el que opta (Ej: "TSU EN INFORMÁTICA", "INGENIERO EN MECÁNICA")
+    // Retorna el título específico por el que opta
     public function getTituloBaseAttribute()
     {
         $titulacion = $this->titulacionPersona;
         if (!$titulacion) return 'SIN TÍTULO';
 
-        // Accedemos directamente a la relación "titulacion" que apunta al catálogo base de títulos
         return $titulacion->titulacion->nombre_titulo_base ?? 'TÍTULO NO ESPECIFICADO';
     }
 }

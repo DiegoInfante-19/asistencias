@@ -25,6 +25,11 @@ import 'datatables.net-buttons/js/buttons.colVis.mjs';
 import 'datatables.net-buttons/js/buttons.html5.mjs';
 import 'datatables.net-buttons/js/buttons.print.mjs';
 
+// 3.1 IMPORTAR LA EXTENSIÓN RESPONSIVE Y SUS ESTILOS CSS
+import 'datatables.net-responsive';
+import 'datatables.net-responsive-bs5';
+import 'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css';
+
 // 4. Dependencias para exportación corregidas para Vite
 import jszip from 'jszip';
 import * as pdfMake from 'pdfmake/build/pdfmake';
