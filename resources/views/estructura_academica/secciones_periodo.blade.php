@@ -54,7 +54,7 @@
                     </label>
                     <select id="filtro_pnf" class="form-select select2-filtro">
                         <option value="">Todos los PNF...</option>
-                        @foreach($pnfs as$pnf)
+                        @foreach($pnfs as $pnf)
                             <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
                         @endforeach
                     </select>
@@ -67,7 +67,7 @@
                     </label>
                     <select id="filtro_profesor" class="form-select select2-filtro">
                         <option value="">Cualquier docente...</option>
-                        @foreach($profesores as$profesor)
+                        @foreach($profesores as $profesor)
                             @if($profesor->user)
                                 <option value="{{ $profesor->id_profesor }}">
                                     {{ $profesor->user->name_users }} {{$profesor->user->last_name_users }}
