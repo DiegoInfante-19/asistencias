@@ -39,7 +39,7 @@ class InscripcionSeccionDataTable extends BaseDataTable
                 <form action="{$url}" method="POST" class="d-inline" onsubmit="return confirm('¿Retirar a este estudiante de la sección?');">
                     {$csrf}
                     {$method}
-                    <button type="submit" class="btn btn-danger btn-sm">Retirar</button>
+                    <button type="submit" class="btn btn-danger btn-sm shadow-sm">Remover</button>
                 </form>
 HTML;
             })

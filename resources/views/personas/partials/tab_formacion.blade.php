@@ -3,7 +3,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3 fw-bold text-dark">
-                <i class="bi bi-plus-circle me-1 text-primary"></i> Agregar Formación Previa
+                Agregar Formación Previa
             </div>
             <div class="card-body bg-white py-4">
 
@@ -77,10 +77,10 @@
                     <div class="alert alert-danger py-1 small mb-3">{{ $message }}</div>
                     @enderror
 
-                    <!-- Observación -->
+                    <!-- Observación (Textarea con diseño gris y sombreado unificado) -->
                     <div class="mb-3 mt-2">
                         <label for="observacion_formacion_academica" class="form-label fw-bold small text-muted">Observación</label>
-                        <textarea class="form-control @error('observacion_formacion_academica') is-invalid @enderror"
+                        <textarea class="form-control bg-light border-secondary-subtle shadow-sm @error('observacion_formacion_academica') is-invalid @enderror"
                             id="observacion_formacion_academica" name="observacion_formacion_academica"
                             rows="3" placeholder="Detalles adicionales (opcional)...">{{ old('observacion_formacion_academica') }}</textarea>
                         @error('observacion_formacion_academica')
@@ -88,9 +88,9 @@
                         @enderror
                     </div>
 
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
-                            <i class="bi bi-save me-1"></i> Guardar Formación
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                             <i class="bi bi-save-fill me-1"></i> Guardar Formación
                         </button>
                     </div>
                 </form>
@@ -104,7 +104,7 @@
     <!-- COLUMNA DERECHA: TABLA DE FORMACIÓN REGISTRADA -->
     <div class="col-md-8">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white py-3 fw-bold text-dark"><i class="bi bi-award-fill me-1 text-primary"></i> Grado de Instrucción del Estudiante</div>
+            <div class="card-header bg-white py-3 fw-bold text-dark">Grado de Instrucción del Estudiante</div>
             <div class="card-body bg-white p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0 align-middle">
@@ -122,9 +122,9 @@
                                 <td>
                                     <div class="d-flex flex-column">
                                         @if($formacion->origen_formacion === 'Interno')
-                                        <span class="badge bg-primary mb-1"><i class="bi bi-house-door-fill me-1"></i> Interno</span>
+                                        <h5><span class="badge bg-primary mb-1"><i class="bi bi-house-door-fill me-1"></i> Interno</span></h5>
                                         @else
-                                        <span class="badge bg-secondary mb-1"><i class="bi bi-building me-1"></i> Externo</span>
+                                        <h5><span class="badge bg-secondary mb-1"><i class="bi bi-building me-1"></i> Externo</span></h5>
                                         @endif
                                     </div>
                                 </td>
@@ -150,8 +150,8 @@
                                     <form action="{{ route('personas.formacion.destroy', ['persona' => $persona->id_personas, 'formacion' => $formacion->id_persona_formacion_academica]) }}" method="POST" class="form-delete">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar registro">
-                                            <i class="bi bi-trash3-fill"></i>
+                                        <button type="submit" class="btn btn-danger shadow-sm" title="Eliminar registro">
+                                            Remover
                                         </button>
                                     </form>
                                 </td>
@@ -175,6 +175,25 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+    /* Estilo unificado para los selects de Select2 */
+    .select2-container--bootstrap-5 .select2-selection {
+        background-color: #f8f9fa !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        border-radius: 0.375rem !important;
+        min-height: calc(1.5em + 0.75rem + 2px);
+        padding: 0.375rem 0.75rem;
+    }
+    .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        background-color: #ffffff !important;
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>

@@ -126,7 +126,7 @@
 
         <div class="card-header bg-white py-3 d-flex align-items-center">
             <h4 class="card-title text-dark mb-0 fw-bold fs-6">
-                <i class="bi bi-people-fill text-primary me-2"></i> Personal y Profesores Registrados
+                Personal y Profesores Registrados
             </h4>
             <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#createUserModal">
                 <i class="bi bi-person-plus-fill me-1" style="font-weight: 500;"></i> Añadir Profesor

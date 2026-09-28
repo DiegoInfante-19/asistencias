@@ -3,7 +3,6 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3 fw-bold text-dark">
-                <i class="bi bi-briefcase-fill me-1 text-primary"></i>
                 {{ $persona->empresaPersona ? 'Actualizar' : 'Añadir' }} Experiencia Laboral
             </div>
             <div class="card-body bg-white py-4">
@@ -45,9 +44,9 @@
                         @enderror
                     </div>
 
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
-                            <i class="bi bi-save me-1"></i> {{ $persona->empresaPersona ? 'Actualizar' : 'Guardar' }} Perfil Laboral
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save-fill me-1"></i>  {{ $persona->empresaPersona ? 'Actualizar' : 'Guardar' }} Perfil Laboral
                         </button>
                     </div>
                 </form>
@@ -96,8 +95,8 @@
                             <form action="{{ route('personas.empresas.destroy', ['persona' => $persona->id_personas, 'empresa' => $persona->empresaPersona->id_empresa_personas]) }}" method="POST" class="form-delete">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger w-75" title="Eliminar registro laboral">
-                                    <i class="bi bi-trash3-fill me-1"></i> Eliminar
+                                <button type="submit" class="btn btn-danger shadow-sm" title="Eliminar registro laboral">
+                                    Remover
                                 </button>
                             </form>
                         </div>

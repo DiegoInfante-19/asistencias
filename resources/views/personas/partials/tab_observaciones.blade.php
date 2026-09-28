@@ -2,7 +2,7 @@
     <div class="col-md-8 offset-md-2">
         <div class="card shadow-sm">
             <div class="card-header bg-white py-3 fw-bold text-dark">
-                <i class="bi bi-journal-text me-1 text-primary"></i> Observaciones Especiales (Salud / Generales)
+                Observaciones Especiales (Salud / Generales)
             </div>
             <div class="card-body bg-white py-4">
                 

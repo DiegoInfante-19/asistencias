@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="fw-bold text-dark mb-0">Títulos de Pregrado y Postgrado Vinculados</h5>
-    <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-toggle="modal" data-bs-target="#vincularTituloModal">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vincularTituloModal">
         <i class="bi bi-plus-circle me-1"></i> Vincular Nuevo Título
     </button>
 </div>
@@ -20,8 +20,8 @@
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td class="text-start">
-                    <span class="badge bg-secondary me-2">{{ $vinculo->titulo->nivel_academico }}</span>
-                    {{ $vinculo->titulo->nombre_titulo_base }}
+                    <h5><span class="badge bg-secondary me-2">{{ $vinculo->titulo->nivel_academico }}</span></h5>
+                    <h5><span class="badge bg-success me-2">{{ $vinculo->titulo->nombre_titulo_base }}</span></h5>
                 </td>
                 <td class="text-start fw-semibold text-primary">{{ $vinculo->nombre_titulo_pnf }}</td>
                 <td>
@@ -29,8 +29,8 @@
                         @csrf
                         @method('DELETE')
                         <!-- Botón Original Restaurado -->
-                        <button type="submit" class="btn btn-accion-desvinculacion btn-outline-secondary" title="Retirar Título del PNF">
-                            <b>Desvincular</b>
+                        <button type="submit" class="btn btn-accion-desvinculacion btn-danger shadow-sm btn-sm" title="Retirar Título del PNF">
+                            Remover
                         </button>
                     </form>
                 </td>

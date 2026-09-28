@@ -3,7 +3,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100" id="card_inscripcion_container">
             <div class="card-header bg-white py-3 fw-bold text-dark">
-                <i class="bi bi-calendar-plus me-1 text-primary"></i> Inscribir en Sección Académica
+                Inscribir en Sección Académica
             </div>
             <div class="card-body bg-white py-4">
 
@@ -20,7 +20,7 @@
                     <div class="text-center py-4">
                         <i class="bi bi-person-check-fill text-success mb-3" style="font-size: 3.5rem;"></i>
                         <h5 class="fw-bold text-dark">Matrícula Activa</h5>
-                        <p class="text-muted small px-2">Este estudiante ya se encuentra cursando estudios en una sección. Un estudiante no puede estar inscrito enสอง secciones simultáneamente.</p>
+                        <p class="text-muted small px-2">Este estudiante ya se encuentra cursando estudios en una sección. Un estudiante no puede estar inscrito en dos secciones simultáneamente.</p>
                         
                         <div class="alert alert-success border-0 shadow-sm text-start mt-3">
                             <span class="d-block small text-muted fw-bold">Sección Actual:</span>
@@ -48,11 +48,11 @@
                         @csrf
                         <input type="hidden" name="id_personas" value="{{ $persona->id_personas }}">
 
-                        <!-- Select: Sección (Sin clase select2-buscador para evitar conflictos con elementos deshabilitados) -->
+                        <!-- Select: Sección -->
                         <div class="mb-3">
                             <label for="select_seccion" class="form-label fw-bold small text-muted">Sección Académica <span class="text-danger">*</span></label>
                             
-                            <select id="select_seccion" class="form-select" required {{ $seccionesFiltradas->isEmpty() ? 'disabled' : '' }}>
+                            <select id="select_seccion" class="form-select bg-light border-secondary-subtle shadow-sm" required {{ $seccionesFiltradas->isEmpty() ? 'disabled' : '' }}>
                                 <option value="" selected disabled>
                                     {{ $seccionesFiltradas->isNotEmpty() ? 'Seleccione una sección...' : 'No hay secciones activas para este PNF' }}
                                 </option>
@@ -72,20 +72,20 @@
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
 
-                        <!-- Fecha de Inscripción -->
+                        <!-- Fecha de Inscripción (Estilo gris y sombreado añadido) -->
                         <div class="mb-3 mt-3">
                             <label for="fecha_inscripcion" class="form-label fw-bold small text-muted">Fecha de Inscripción <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control @error('fecha_inscripcion') is-invalid @enderror" 
+                            <input type="date" class="form-control bg-light border-secondary-subtle shadow-sm @error('fecha_inscripcion') is-invalid @enderror" 
                                    id="fecha_inscripcion" name="fecha_inscripcion" value="{{ old('fecha_inscripcion', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
                             @error('fecha_inscripcion')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <!-- Estatus Inicial -->
+                        <!-- Estatus Inicial (Estilo gris y sombreado añadido) -->
                         <div class="mb-4">
                             <label for="estatus_inscripcion" class="form-label fw-bold small text-muted">Estatus Inicial <span class="text-danger">*</span></label>
-                            <select class="form-select @error('estatus_inscripcion') is-invalid @enderror" id="estatus_inscripcion" name="estatus_inscripcion" required>
+                            <select class="form-select bg-light border-secondary-subtle shadow-sm @error('estatus_inscripcion') is-invalid @enderror" id="estatus_inscripcion" name="estatus_inscripcion" required>
                                 <option value="Activo" selected>Activo</option>
                                 <option value="Retirado">Retirado</option>
                             </select>
@@ -94,9 +94,9 @@
                             @enderror
                         </div>
 
-                        <div class="d-grid">
-                            <button type="submit" id="btn_inscribir" class="btn btn-primary btn-sm fw-bold" disabled>
-                                <i class="bi bi-save me-1"></i> Registrar Inscripción
+                        <div>
+                            <button type="submit" id="btn_inscribir" class="btn btn-primary" disabled>
+                                <i class="bi bi-save-fill me-1"></i> Registrar Inscripción
                             </button>
                         </div>
                     </form>
@@ -112,7 +112,7 @@
     <div class="col-md-8">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3 fw-bold text-dark">
-                <i class="bi bi-calendar-check-fill me-1 text-primary"></i> Historial Académico del Estudiante
+                Historial Académico del Estudiante
             </div>
             <div class="card-body bg-white p-0">
                 <div class="table-responsive">
@@ -140,19 +140,19 @@
                                     <td>{{ \Carbon\Carbon::parse($inscripcion->fecha_inscripcion)->format('d/m/Y') }}</td>
                                     <td class="text-center">
                                         @if($inscripcion->estatus_inscripcion == 'Activo')
-                                            <span class="badge bg-success px-2 py-1">Activo</span>
+                                            <h5><span class="badge bg-success px-2 py-1">Activo</span></h5>
                                         @elseif($inscripcion->estatus_inscripcion == 'Retirado')
-                                            <span class="badge bg-danger px-2 py-1">Retirado</span>
+                                            <h5><span class="badge bg-danger px-2 py-1">Retirado</span></h5>
                                         @else
-                                            <span class="badge bg-secondary px-2 py-1">{{ $inscripcion->estatus_inscripcion }}</span>
+                                            <h5><span class="badge bg-secondary px-2 py-1">{{ $inscripcion->estatus_inscripcion }}</span></h5>
                                         @endif
                                     </td>
                                     <td class="text-center">
                                         <form action="{{ route('personas.inscripciones.destroy', ['persona' => $persona->id_personas, 'inscripcion' => $inscripcion->id_inscripcion_seccion]) }}" method="POST" class="form-delete">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Anular Inscripción">
-                                                <i class="bi bi-trash3-fill"></i>
+                                            <button type="submit" class="btn btn-danger shadow-sm" title="Anular Inscripción">
+                                                Remover
                                             </button>
                                         </form>
                                     </td>
@@ -177,6 +177,25 @@
     </div>
 </div>
 
+@push('styles')
+<style>
+    /* Estilo unificado para que Select2 refleje el fondo gris y la sombra en la sección */
+    .select2-container--bootstrap-5 .select2-selection {
+        background-color: #f8f9fa !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        border-radius: 0.375rem !important;
+        min-height: calc(1.5em + 0.75rem + 2px);
+        padding: 0.375rem 0.75rem;
+    }
+    .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        background-color: #ffffff !important;
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
+</style>
+@endpush
+
 @if($persona->titulacionPersona && !$persona->inscripcionActiva)
 @push('scripts')
 <script>
@@ -194,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Inicialización con el tema de Bootstrap 5 y control de contenedor
             $selectSeccion.select2({
                 width: '100%',
-                theme: 'bootstrap-5', // <--- Aplica los estilos y bordes nativos de Bootstrap
+                theme: 'bootstrap-5',
                 placeholder: 'Seleccione una sección...',
                 dropdownParent: $('#card_inscripcion_container')
             });

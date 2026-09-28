@@ -33,7 +33,7 @@
                         </p>
                     </div>
                     <div class="mt-3">
-                        <a href="{{ route('estructura.index') }}" class="btn btn-outline-secondary fw-semibold shadow-sm">
+                        <a href="{{ route('estructura.periodos.secciones', $seccion->id_periodo) }}" class="btn btn-secondary fw-semibold shadow-sm">
                             <i class="bi bi-arrow-left me-1"></i> Volver al Listado
                         </a>
                     </div>
@@ -193,9 +193,9 @@
     <!-- 2. TARJETA CONTENEDORA DE PESTAÑAS (TABS) RESTAURADA -->
     <div class="card shadow-sm">
         <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h5 class="card-title text-dark mb-0 fw-bold fs-6 me-auto">
+            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
                  Gestión de la Sección Académica
-            </h5>
+            </h4>
         </div>
 
         <div class="card-header bg-light pt-2 pb-0 border-top border-bottom">

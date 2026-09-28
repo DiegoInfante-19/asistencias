@@ -4,13 +4,13 @@
 <div class="content pt-4" style="margin: 20px;">
     
     <!-- Tarjeta Principal del Nivel 1 (Cohortes y Períodos) -->
-    <div class="card ecosystem-card rounded overflow-hidden shadow-sm">
+    <div class="card shadow-sm ecosystem-card">
         
         <!-- HEADER DE LA TARJETA -->
-        <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h5 class="card-title text-dark mb-0 fw-bold fs-6">
-                <i class="bi bi-diagram-3-fill me-2 text-primary"></i> Estructura Académica General: Cohortes y Períodos
-            </h5>
+        <div class="card-header bg-white py-3 d-flex align-items-center border-bottom">
+            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
+                Estructura Académica General: Cohortes y Períodos
+            </h4>
             <button type="button" class="btn btn-primary fw-bold ms-auto shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCohorte">
                 <i class="bi bi-plus-lg me-1"></i> Nueva Cohorte y Período
             </button>
@@ -38,12 +38,28 @@
 @section('styles')
 <style>
     /* ---------------------------------------------------
-       ESTÉTICA UNIFICADA DEL ECOSISTEMA DE TARJETAS
+        ESTÉTICA UNIFICADA DEL ECOSISTEMA DE TARJETAS
     ----------------------------------------------------- */
     .ecosystem-card {
-        border: 1px solid #dee2e6 !important;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
         background-color: #ffffff !important;
+        border-radius: 0.5rem !important;
+        overflow: hidden !important;
+    }
+
+    .ecosystem-card .card-header {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        border-top-left-radius: 0.5rem !important;
+        border-top-right-radius: 0.5rem !important;
+    }
+
+    .ecosystem-card .card-footer {
+        background-color: #f8f9fa !important;
+        border-top: 1px solid #e2e8f0 !important;
+        border-bottom-left-radius: 0.5rem !important;
+        border-bottom-right-radius: 0.5rem !important;
     }
 </style>
 @endsection
@@ -120,7 +136,7 @@
         }
 
         // ==========================================
-        // RELLENO DINÁMICO MODAL EDITAR COHORTE (Corregido y Asegurado)
+        // RELLENO DINÁMICO MODAL EDITAR COHORTE
         // ==========================================
         const modalEditarCohorte = document.getElementById('modalEditarCohorte');
         if (modalEditarCohorte) {
@@ -140,7 +156,6 @@
                 document.getElementById('edit_fecha_inicio').value = fechaInicio || '';
                 document.getElementById('edit_fecha_fin').value = fechaFin || '';
 
-                // Asignar la ruta correcta de actualización
                 document.getElementById('formEditarCohorte').action = `/cohortes/${id}`;
             });
         }

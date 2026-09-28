@@ -10,9 +10,9 @@
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
 
-    <!-- TARJETA DE CABECERA DEL PNF -->
-    <div class="card mb-4 border-0 shadow-sm">
-        <div class="card-body p-4 bg-white rounded">
+    <!-- TARJETA DE CABECERA DEL PNF (Ecosystem Card) -->
+    <div class="card mb-4 shadow-sm ecosystem-card">
+        <div class="card-body p-4 bg-white">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
 
                 <div class="flex-grow-1">
@@ -24,10 +24,10 @@
                 </div>
 
                 <div class="mt-3 mt-md-0 d-flex gap-2 flex-shrink-0">
-                    <a href="{{ route('pnfs.index') }}" class="btn btn-outline-secondary fw-semibold">
+                    <a href="{{ route('pnfs.index') }}" class="btn btn-secondary shadow-sm">
                         <i class="bi bi-arrow-left me-1"></i> Volver al Catálogo
                     </a>
-                    <button type="button" class="btn btn-warning fw-bold text-dark shadow-sm"
+                    <button type="button" class="btn btn-primary shadow-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#UpdatePnfModal"
                         data-url="{{ route('pnfs.update', $pnf->id_pnf) }}"
@@ -42,22 +42,32 @@
         </div>
     </div>
 
-    <!-- TARJETA CONTENEDORA DE PESTAÑAS (TÍTULOS Y EMPRESAS) -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-0 pt-3">
+    <!-- TARJETA CONTENEDORA DE PESTAÑAS (Ecosystem Card) -->
+    <div class="card shadow-sm ecosystem-card">
+        <!-- Encabezado de la tarjeta -->
+        <div class="card-header bg-white py-3 d-flex align-items-center">
+            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
+                 Detalles y Vinculaciones del PNF
+            </h4>
+        </div>
+        
+        <!-- Navegación de pestañas unificada -->
+        <div class="card-header bg-light pt-2 pb-0 border-top border-bottom">
             <ul class="nav nav-tabs nav-fill card-header-tabs" id="pnfDashboardTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fw-bold py-3 text-secondary" id="titulos-tab" data-bs-toggle="tab" data-bs-target="#titulos-pane" type="button" role="tab" aria-controls="titulos-pane" aria-selected="true">
-                        <i class="bi bi-mortarboard fs-5 me-2 text-primary"></i> Títulos Ofertados ({{ $pnf->titulosPnf->count() }})
+                        Títulos Ofertados ({{ $pnf->titulosPnf->count() }})
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link fw-bold py-3 text-secondary" id="empresas-tab" data-bs-toggle="tab" data-bs-target="#empresas-pane" type="button" role="tab" aria-controls="empresas-pane" aria-selected="false">
-                        <i class="bi bi-building fs-5 me-2 text-primary"></i> Empresas Aliadas / Convenios ({{ $pnf->empresasPnf->count() }})
+                        Empresas Aliadas / Convenios ({{ $pnf->empresasPnf->count() }})
                     </button>
                 </li>
             </ul>
         </div>
+        
+        <!-- Contenido de las pestañas -->
         <div class="card-body bg-white p-4">
             <div class="tab-content" id="pnfDashboardTabsContent">
                 <div class="tab-pane fade show active" id="titulos-pane" role="tabpanel" aria-labelledby="titulos-tab" tabindex="0">
@@ -69,7 +79,9 @@
                 </div>
             </div>
         </div>
-        <div class="card-footer bg-light py-2 text-muted small">
+        
+        <!-- Footer unificado -->
+        <div class="card-footer bg-light py-2 text-muted small border-top">
             Secciones operativas del expediente del PNF.
         </div>
     </div>
@@ -78,6 +90,76 @@
 <!-- Incluimos los modales externos para no duplicar código -->
 @include('pnfs.partials.modals')
 
+@endsection
+
+@section('styles')
+<style>
+    /* ---------------------------------------------------
+        ESTÉTICA UNIFICADA DEL ECOSISTEMA DE TARJETAS
+    ----------------------------------------------------- */
+    .ecosystem-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
+        background-color: #ffffff !important;
+        border-radius: 0.5rem !important;
+        overflow: hidden !important;
+    }
+
+    .ecosystem-card .card-header.bg-white {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    .ecosystem-card .card-footer {
+        background-color: #f8f9fa !important;
+        border-top: 1px solid #e2e8f0 !important;
+        border-bottom-left-radius: 0.5rem !important;
+        border-bottom-right-radius: 0.5rem !important;
+    }
+
+    /* Estética unificada para las pestañas y corrección del solapamiento */
+    .card-header-tabs {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        margin-bottom: -1px !important;
+    }
+
+    .card-header-tabs .nav-link {
+        border-top-left-radius: 0.375rem;
+        border-top-right-radius: 0.375rem;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: 0.75rem 1rem;
+    }
+
+    .card-header-tabs .nav-link:hover {
+        border-color: #e9ecef #e9ecef #dee2e6;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .card-header-tabs .nav-link.active {
+        color: #0d6efd !important;
+        background-color: #ffffff !important;
+        border-color: #dee2e6 #dee2e6 #ffffff !important;
+    }
+
+    /* Blindaje visual para tarjetas internas en los tabs (Partial views) */
+    .tab-content .card {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        background-color: #ffffff !important;
+    }
+
+    .tab-content .card .card-header {
+        background-color: #f8f9fa !important;
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+
+    .tab-content .card .card-footer {
+        background-color: #f8f9fa !important;
+        border-top: 1px solid #dee2e6 !important;
+    }
+</style>
 @endsection
 
 @push('scripts')

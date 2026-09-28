@@ -3,7 +3,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3 fw-bold text-dark">
-                <i class="bi bi-plus-circle me-1 text-primary"></i> Agregar Teléfono
+                Agregar Teléfono
             </div>
             <div class="card-body bg-white py-4">
 
@@ -17,9 +17,9 @@
 
                     <div class="mb-3">
                         <label for="numero_telefono_personas" class="form-label fw-bold small text-muted">Número <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('numero_telefono_personas') is-invalid @enderror"
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('numero_telefono_personas') is-invalid @enderror"
                             id="numero_telefono_personas" name="numero_telefono_personas"
-                            value="{{ old('numero_telefono_personas') }}" placeholder="Ej: 04141234567" required>
+                            value="{{ old('numero_telefono_personas') }}" placeholder="Ej: 04141234567" required autocomplete="off">
                         @error('numero_telefono_personas')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
@@ -27,7 +27,7 @@
 
                     <div class="mb-4">
                         <label for="tipo_telefono" class="form-label fw-bold small text-muted">Tipo <span class="text-danger">*</span></label>
-                        <select class="form-select @error('tipo_telefono') is-invalid @enderror" id="tipo_telefono" name="tipo_telefono" required>
+                        <select class="form-select bg-light border-secondary-subtle shadow-sm @error('tipo_telefono') is-invalid @enderror" id="tipo_telefono" name="tipo_telefono" required>
                             <option value="" selected disabled>Seleccione un tipo...</option>
                             <option value="Móvil" {{ old('tipo_telefono') == 'Móvil' ? 'selected' : '' }}>Móvil</option>
                             <option value="Fijo" {{ old('tipo_telefono') == 'Fijo' ? 'selected' : '' }}>Fijo (Casa)</option>
@@ -56,7 +56,7 @@
     <div class="col-md-8">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3 fw-bold text-dark">
-                <i class="bi bi-list-check me-1 text-primary"></i> Teléfonos Registrados
+                Teléfonos Registrados
             </div>
             <div class="card-body bg-white p-0">
                 <div class="table-responsive">
@@ -101,8 +101,8 @@
                                     <form action="{{ route('personas.telefonos.destroy', ['persona' => $persona->id_personas, 'telefono' => $telefono->id_telefonos_personas]) }}" method="POST" class="form-delete">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar Teléfono">
-                                            <i class="bi bi-trash3-fill"></i>
+                                        <button type="submit" class="btn btn-danger btn-sm shadow-sm" title="Eliminar Teléfono">
+                                            Remover
                                         </button>
                                     </form>
                                 </td>

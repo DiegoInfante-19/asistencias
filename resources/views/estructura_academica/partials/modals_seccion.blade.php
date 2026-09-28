@@ -13,8 +13,8 @@
             <div class="modal-body bg-white p-4">
                 <form action="{{ route('secciones.store') }}" method="POST" id="createSeccionForm">
                     @csrf
-                    <!-- INYECCIÓN DIRECTA DEL PERÍODO ACTUAL (Nivel 2) -->
-                    <input type="hidden" name="id_periodo" value="{{ $periodo->id_periodo ?? '' }}">
+                    <!-- ID CORREGIDO: Coincide perfectamente con el script -->
+                    <input type="hidden" name="id_periodo" id="id_periodo_hidden">
                     
                     <!-- SELECT PNF -->
                     <div class="form-group mb-3">
@@ -32,7 +32,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label class="form-label fw-bold small text-muted">Número <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control bg-light border-secondary-subtle shadow-sm text-center fw-bold" id="numero_correlativo_seccion" min="1" placeholder="Ej: 1" required>
+                                <input type="number" class="form-control bg-light border-secondary-subtle shadow-sm text-center fw-bold" id="numero_correlativo_seccion" min="1" placeholder="Ej: 1" required autocomplete="off">
                             </div>
                         </div>
                         <div class="col-md-8">

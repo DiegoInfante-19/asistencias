@@ -2,64 +2,73 @@
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    <div class="card border-0 shadow-sm">
+    <!-- Tarjeta Principal con diseño unificado (Ecosystem Card) -->
+    <div class="card shadow-sm ecosystem-card">
         
-        <!-- Cabecera Principal -->
-        <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
-                Registro de Localidades
-            </h5>
-        </div>
+        <!-- Cabecera Principal y Navegación de Pestañas Integradas -->
+        <div class="card-header bg-white pt-3 pb-0 px-0 border-bottom-0">
+            <!-- Título -->
+            <div class="d-flex align-items-center px-4 pb-3">
+                <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
+                    Registro de Localidades
+                </h5>
+            </div>
 
-        <!-- Navegación de Pestañas con estilo unificado -->
-        <div class="card-header bg-light pt-2 pb-0 border-top border-bottom">
-            <ul class="nav nav-tabs card-header-tabs" id="localidadTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active text-dark" data-bs-toggle="tab" data-bs-target="#tab-estados" type="button" role="tab" style="font-weight: 500;">
-                        Estados
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link text-dark" data-bs-toggle="tab" data-bs-target="#tab-ciudades" type="button" role="tab" style="font-weight: 500;">
-                        Ciudades
-                    </button>
-                </li>
-            </ul>
+            <!-- Navegación de Pestañas unida a la cabecera -->
+            <div class="bg-light px-4 pt-2 border-top border-bottom">
+                <ul class="nav nav-tabs card-header-tabs" id="localidadTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active text-dark" data-bs-toggle="tab" data-bs-target="#tab-estados" type="button" role="tab" style="font-weight: 500;">
+                            Estados
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link text-dark" data-bs-toggle="tab" data-bs-target="#tab-ciudades" type="button" role="tab" style="font-weight: 500;">
+                            Ciudades
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <!-- Cuerpo con fondo blanco puro -->
-        <div class="card-body bg-white py-4">
+        <div class="card-body bg-white p-4">
             <div class="tab-content" id="localidadTabContent">
                 
                 <!-- TAB ESTADOS -->
                 <div class="tab-pane fade show active" id="tab-estados" role="tabpanel">
-                    <div class="d-flex justify-content-between align-items-center mb-4" >
-                        <h6 class="text-secondary mb-0 " style="font-weight: 500;">Directorio de Estados</h6>
-                        <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#createEstateModal">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="text-secondary mb-0" style="font-weight: 500;">Directorio de Estados</h6>
+                        <button type="button" class="btn btn-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#createEstateModal">
                             <i class="bi bi-plus-circle me-1"></i> Añadir Estado
                         </button>
                     </div>
 
                     <div class="table-responsive">
-                        {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
+                        {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100 border', 'style' => 'width:100%;']) !!}
                     </div>
                 </div>
 
                 <!-- TAB CIUDADES -->
                 <div class="tab-pane fade" id="tab-ciudades" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h6 class="text-secondary mb-0 " style="font-weight: 500;">Directorio de Ciudades</h6>
-                        <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#createCiudadModal">
+                        <h6 class="text-secondary mb-0" style="font-weight: 500;">Directorio de Ciudades</h6>
+                        <button type="button" class="btn btn-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#createCiudadModal">
                             <i class="bi bi-plus-circle me-1"></i> Añadir Ciudad
                         </button>
                     </div>
 
                     <div class="table-responsive">
-                        {!! $ciudadesTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
+                        {!! $ciudadesTable->table(['class' => 'table table-striped table-hover align-middle w-100 border', 'style' => 'width:100%;']) !!}
                     </div>
                 </div>
 
             </div>
+        </div>
+        
+        <!-- Footer añadido para cerrar el diseño de la tarjeta -->
+        <div class="card-footer bg-light py-2 text-muted small border-top">
+            Gestión geográfica de estados y ciudades.
         </div>
     </div>
 </div>
@@ -69,6 +78,30 @@
 
 @section('styles')
 <style>
+    /* ---------------------------------------------------
+        ESTÉTICA UNIFICADA DEL ECOSISTEMA DE TARJETAS
+    ----------------------------------------------------- */
+    .ecosystem-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
+        background-color: #ffffff !important;
+        border-radius: 0.5rem !important;
+        overflow: hidden !important;
+    }
+
+    .ecosystem-card .card-header {
+        background-color: #ffffff !important;
+        border-top-left-radius: 0.5rem !important;
+        border-top-right-radius: 0.5rem !important;
+    }
+
+    .ecosystem-card .card-footer {
+        background-color: #f8f9fa !important;
+        border-top: 1px solid #e2e8f0 !important;
+        border-bottom-left-radius: 0.5rem !important;
+        border-bottom-right-radius: 0.5rem !important;
+    }
+
     /* Estética limpia para las pestañas y corrección del solapamiento */
     .card-header-tabs {
         margin-right: 0 !important;

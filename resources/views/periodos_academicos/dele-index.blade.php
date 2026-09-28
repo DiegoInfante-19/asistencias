@@ -10,7 +10,7 @@
         
         <!-- COLUMNA 1: HEADER DE NAVEGACIÓN Y CONTEXTO (DRILL-DOWN) -->
         <div class="col-lg-6">
-            <div class="card h-100 shadow-sm ecosystem-card">
+            <div class="card h-100 ecosystem-card">
                 <div class="card-body p-4 bg-white d-flex flex-column justify-content-between">
                     <div>
                         <nav aria-label="breadcrumb">
@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="mt-4 pt-2 border-top">
-                        <a href="{{ route('estructura.index') }}" class="btn btn-secondary shadow-sm">
+                        <a href="{{ route('estructura.index') }}" class="btn btn-outline-secondary fw-semibold shadow-sm">
                             <i class="bi bi-arrow-left me-1"></i> Volver a Cohortes
                         </a>
                     </div>
@@ -51,8 +51,8 @@
 
         <!-- COLUMNA 2: PANEL DE FILTROS RÁPIDOS (AJAX DATATABLES) -->
         <div class="col-lg-6">
-            <div class="card h-100 shadow-sm ecosystem-card overflow-hidden">
-                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
+            <div class="card h-100 ecosystem-card">
+                <div class="card-header bg-white py-3 border-bottom">
                     <h5 class="card-title text-dark mb-0 fs-6 fw-bold">
                         <i class="bi bi-funnel-fill me-2 text-muted"></i> Filtros de Búsqueda para Secciones
                     </h5>
@@ -68,7 +68,7 @@
                             </label>
                             <select id="filtro_pnf" class="form-select select2-filtro">
                                 <option value="">Todos los PNF...</option>
-                                @foreach($pnfs as $pnf)
+                                @foreach($pnfs as$pnf)
                                     <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
                                 @endforeach
                             </select>
@@ -81,7 +81,7 @@
                             </label>
                             <select id="filtro_profesor" class="form-select select2-filtro">
                                 <option value="">Cualquier docente...</option>
-                                @foreach($profesores as $profesor)
+                                @foreach($profesores as$profesor)
                                     @if($profesor->user)
                                         <option value="{{ $profesor->id_profesor }}">
                                             {{ $profesor->user->name_users }} {{$profesor->user->last_name_users }}
@@ -95,7 +95,7 @@
 
                     <!-- BOTÓN LIMPIAR FILTROS AL PIE -->
                     <div class="mt-4 pt-2 border-top">
-                        <button type="button" id="btn-limpiar-filtros" class="btn btn-success shadow-sm">
+                        <button type="button" id="btn-limpiar-filtros" class="btn btn-success shadow-sm w-100">
                             <i class="bi bi-x-circle me-1"></i> Limpiar Filtros
                         </button>
                     </div>
@@ -108,9 +108,9 @@
     <!-- ========================================== -->
     <!-- TARJETA PRINCIPAL CON LA TABLA YAJRA       -->
     <!-- ========================================== -->
-    <div class="card shadow-sm ecosystem-card">
-        <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
+    <div class="card ecosystem-card">
+        <div class="card-header bg-white py-3 d-flex align-items-center border-bottom">
+            <h4 class="card-title text-dark mb-0 fs-6 fw-bold">
                 Listado de Secciones Académicas
             </h4>
             <button type="button" class="btn btn-primary fw-bold shadow-sm ms-auto" data-bs-toggle="modal" data-bs-target="#modalSeccion" data-periodo-id="{{ $periodo->id_periodo }}">
@@ -138,7 +138,7 @@
 
 @section('styles')
 <style>
-    /* Estética unificada y blindaje de esquinas idéntico a show.blade.php */
+    /* Estilos unificados con la clase ecosystem-card forzando bordes y sombras */
     .ecosystem-card {
         border: 1px solid #cbd5e1 !important;
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
@@ -170,16 +170,6 @@
         background-color: #ffffff !important;
         border-color: #86b7fe !important;
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-
-    /* Botón limpiar */
-    .btn-limpiar-filtros-dt {
-        background-color: #f8f9fa !important;
-        border-color: #cbd5e1 !important;
-    }
-    .btn-limpiar-filtros-dt:hover {
-        background-color: #e9ecef !important;
-        border-color: #94a3b8 !important;
     }
 </style>
 @endsection
@@ -282,5 +272,5 @@
 </script>
 
 <!-- Renderizado del script Yajra DataTable de Secciones -->
-{!! $dataTable->scripts(null, ['type' => 'module']) !!}
+{!! $dataTable->scripts(null, ['type' => 'module']) fulfils ?? '' !!}
 @endpush

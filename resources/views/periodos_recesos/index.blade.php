@@ -1,17 +1,15 @@
 @extends('layouts.admin')
 
-
-
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    <!-- Tarjeta Principal con diseño limpio -->
-    <div class="card border-0 shadow-sm">
+    <!-- Tarjeta Principal con diseño limpio y estilo unificado ecosystem-card -->
+    <div class="card ecosystem-card">
 
         <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h5 class="card-title text-dark mb-0  fs-5" style="font-weight: 500;">
+            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
                 Registro de Eventos y Periodos 
             </h5>
-            <button type="button" class="btn btn-primary  ms-auto" data-bs-toggle="modal" data-bs-target="#createPeriodoModal">
+            <button type="button" class="btn btn-primary ms-auto shadow-sm" data-bs-toggle="modal" data-bs-target="#createPeriodoModal">
                 <i class="bi bi-calendar-plus me-1"></i> Añadir Periodo
             </button>
         </div>
@@ -22,10 +20,44 @@
                 {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
             </div>
         </div>
+
+        <!-- Footer opcional para mantener la coherencia visual del ecosistema -->
+        <div class="card-footer bg-light py-2 text-muted small border-top">
+            Gestión de eventos y periodos académicos registrados en el sistema.
+        </div>
     </div>
 </div>
 
 @include('periodos_recesos.partials.modals')
+@endsection
+
+@section('styles')
+<style>
+    /* ---------------------------------------------------
+        ESTÉTICA UNIFICADA DEL ECOSISTEMA DE TARJETAS
+    ----------------------------------------------------- */
+    .ecosystem-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
+        background-color: #ffffff !important;
+        border-radius: 0.5rem !important;
+        overflow: hidden !important;
+    }
+
+    .ecosystem-card .card-header {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        border-top-left-radius: 0.5rem !important;
+        border-top-right-radius: 0.5rem !important;
+    }
+
+    .ecosystem-card .card-footer {
+        background-color: #f8f9fa !important;
+        border-top: 1px solid #e2e8f0 !important;
+        border-bottom-left-radius: 0.5rem !important;
+        border-bottom-right-radius: 0.5rem !important;
+    }
+</style>
 @endsection
 
 @push('scripts')

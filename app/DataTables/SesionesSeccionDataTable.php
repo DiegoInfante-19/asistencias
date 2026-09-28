@@ -33,12 +33,12 @@ class SesionesSeccionDataTable extends BaseDataTable
             ->addColumn('estado_asistencia', function ($sesion) {
                 // 1. Verificamos si ya guardó alumnos
                 if ($sesion->asistencias_count == 0) {
-                    return '<span class="badge bg-danger shadow-sm"><i class="bi bi-exclamation-octagon me-1"></i> Pendiente</span>';
+                    return '<h5><span class="badge bg-danger shadow-sm"> Pendiente</span></h5>';
                 }
 
                 // 2. Si ya pasó el tiempo (Modo Lectura)
                 if ($sesion->estaCerrada()) {
-                    return '<span class="badge bg-secondary shadow-sm"><i class="bi bi-lock-fill me-1"></i> Registrada (Cerrada)</span>';
+                    return '<h5><span class="badge bg-secondary shadow-sm"> Registrada (Cerrada)</span></h5>';
                 }
 
                 // 3. Si guardó y todavía hay tiempo de editar

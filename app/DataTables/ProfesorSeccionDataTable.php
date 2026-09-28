@@ -29,7 +29,7 @@ class ProfesorSeccionDataTable extends BaseDataTable
                 // Si tu Enum es backed (ej. string/int), usa ->value o caséalo a string. 
                 // Si es un Enum nativo de PHP, puedes usar $profesor->nivel_asignado->value o ->name.
                 $nivel = $profesor->nivel_asignado?->value ?? $profesor->nivel_asignado ?? 'N/D';
-                return '<span class="badge bg-info text-dark">' . $nivel . '</span>';
+                return '<h5><span class="badge bg-primary text-dark">' . $nivel . '</span></h5>';
             })
             ->addColumn('pnf_base', function ($profesor) {
                 return $profesor->pnf->nombre_pnf ?? 'Sin PNF';
@@ -45,7 +45,7 @@ class ProfesorSeccionDataTable extends BaseDataTable
                 <form action="{$url}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de remover a este docente de la sección?');">
                     {$csrf}
                     {$method}
-                    <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+                    <button type="submit" class="btn btn-danger btn-sm shadow-sm">Remover</button>
                 </form>
 HTML;
             })

@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="fw-bold text-dark mb-0">Empresas Aliadas con Convenio Vigente</h5>
-    <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-toggle="modal" data-bs-target="#vincularEmpresaModal">
+    <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#vincularEmpresaModal">
         <i class="bi bi-plus-circle me-1"></i> Registrar Convenio / Alianza
     </button>
 </div>
@@ -10,7 +10,7 @@
         <thead class="table-light">
             <tr>
                 <th style="width: 60px;">#</th>
-                <th class="text-start">Empresa Alianza</th>
+                <th class="text-start">Empresa Alianda</th>
                 <th>Tipo de Relación Académica</th>
                 <th class="text-start">Observación del Convenio</th>
                 <th style="width: 100px;">Acción</th>
@@ -21,7 +21,7 @@
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td class="text-start fw-bold text-dark">
-                    <i class="bi bi-building me-2 text-muted"></i>{{ $vinculo->empresa->nombre_empresa }}
+                    {{ $vinculo->empresa->nombre_empresa }}
                 </td>
                 <td>
                     <span class="text-dark">
@@ -36,8 +36,8 @@
                         @csrf
                         @method('DELETE')
                         <!-- Botón Original Restaurado -->
-                        <button type="submit" class="btn-accion-desvinculacion btn btn-outline-secondary" title="Romper Convenio con Empresa">
-                            Desvincular
+                        <button type="submit" class="btn-accion-desvinculacion btn btn-danger shadow-sm btn-sm" title="Romper Convenio con Empresa">
+                            Remover
                         </button>
                     </form>
                 </td>

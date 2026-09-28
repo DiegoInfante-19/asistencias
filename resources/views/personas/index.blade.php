@@ -50,7 +50,7 @@
     <!-- PANEL DE FILTROS AVANZADOS -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white py-3">
-            <h4 class="card-title text-dark mb-0 fs-6" style="font-weight: 500;">
+            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
                 Filtros de Búsqueda
             </h4>
         </div>
@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="filtro_pnf" class="form-label fw-bold small text-muted">PNF</label>
+                    <label for="filtro_pnf" class="form-label fw-bold small text-muted">Programa Nacional de Formación</label>
                     <select id="filtro_pnf" class="form-select select2-buscador">
                         <option value="">Todos...</option>
                         @foreach(\App\Models\Pnf::orderBy('nombre_pnf')->get() as $pnf)
@@ -90,7 +90,7 @@
             <!-- Fila 2: Filtros Laborales y Demográficos -->
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                    <label for="filtro_empresa" class="form-label fw-bold small text-muted">Empresa Aliada</label>
+                    <label for="filtro_empresa" class="form-label fw-bold small text-muted">Empresa</label>
                     <select id="filtro_empresa" class="form-select select2-buscador">
                         <option value="">Todas...</option>
                         @foreach(\App\Models\Empresa::orderBy('nombre_empresa')->get() as $empresa)
@@ -110,7 +110,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="filtro_estado" class="form-label fw-bold small text-muted">Estado Origen (Nacimiento)</label>
+                    <label for="filtro_estado" class="form-label fw-bold small text-muted">Estado de Origen (Nacimiento)</label>
                     <select id="filtro_estado" class="form-select select2-buscador">
                         <option value="">Todos...</option>
                         @foreach(\App\Models\Estado::orderBy('nombre_estado')->get() as $estado)
@@ -123,8 +123,8 @@
             <!-- Fila 3: Nuevos Filtros Excluyentes (Profesor y Sección) -->
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                    <label for="filtro_profesor" class="form-label fw-bold small text-primary">
-                        <i class="bi bi-person-badge me-1"></i> Filtrar por Profesor (Excluyente con Sección)
+                    <label for="filtro_profesor" class="form-label fw-bold small text-muted">
+                        Filtrar por Profesor (Excluyente con Sección)
                     </label>
                     <select id="filtro_profesor" class="form-select select2-buscador">
                         <option value="">Cualquier profesor...</option>
@@ -139,8 +139,8 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="filtro_seccion" class="form-label fw-bold small text-success">
-                        <i class="bi bi-grid-3x3 me-1"></i> Filtrar por Sección (Excluyente con Profesor)
+                    <label for="filtro_seccion" class="form-label fw-bold small text-muted">
+                        Filtrar por Sección (Excluyente con Profesor)
                     </label>
                     <select id="filtro_seccion" class="form-select select2-buscador">
                         <option value="">Cualquier sección...</option>

@@ -3,7 +3,6 @@
     <div class="col-md-5">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3 fw-bold text-dark">
-                <i class="bi bi-mortarboard-fill me-1 text-primary"></i>
                 {{ $persona->titulacionPersona ? 'Actualizar' : 'Asignar' }} Expediente Académico
             </div>
             <div class="card-body bg-white py-4">
@@ -64,8 +63,8 @@
                         </div>
                     </div>
 
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
                             <i class="bi bi-save-fill me-1"></i>
                             {{ $persona->titulacionPersona ? 'Actualizar Expediente' : 'Guardar Expediente' }}
                         </button>
@@ -83,7 +82,7 @@
     <div class="col-md-7">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3 fw-bold text-dark">
-                <i class="bi bi-folder-check me-1 text-primary"></i> Estado del Expediente Académico
+                Estado del Expediente Académico
             </div>
             <div class="card-body bg-white d-flex flex-column justify-content-center py-4">
                 @if ($persona->titulacionPersona)
@@ -138,25 +137,46 @@
     </div>
 </div>
 
+@push('styles')
+<style>
+    /* Forzamos el estilo visual exacto (fondo gris claro, borde sutil y sombra) en el componente Select2 */
+    .select2-container--bootstrap-5 .select2-selection {
+        background-color: #f8f9fa !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        border-radius: 0.375rem !important;
+        min-height: calc(1.5em + 0.75rem + 2px);
+        padding: 0.375rem 0.75rem;
+    }
+    
+    /* Efecto al hacer clic / abrir el select de Select2 (fondo blanco y borde azul) */
+    .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        background-color: #ffffff !important;
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let preselectedTitulo = "{{ old('id_titulacion', $persona->titulacionPersona->id_titulacion ?? '') }}";
 
         function inicializarSelectsTitulacion() {
-            if (typeof window.$ !== 'undefined' && typeof window.$.fn.select2 !== 'undefined') {
-                let $pnfSelect = $('#id_pnf');
-                let $tituloSelect = $('#id_titulacion');
+            if (typeof window.$!== 'undefined' && typeof window.$.fn.select2 !== 'undefined') {
+                let $pnfSelect =$('#id_pnf');
+                let $tituloSelect =$('#id_titulacion');
 
                 function cargarTitulos(pnfId, tituloSeleccionado = "") {
                     if (!pnfId) {
                         $tituloSelect.empty().append('<option value="">Seleccione primero un PNF...</option>').prop('disabled', true);
-                        if ($tituloSelect.data('select2')) { $tituloSelect.trigger('change'); }
+                        if ($tituloSelect.data('select2')) {$tituloSelect.trigger('change'); }
                         return;
                     }
 
                     $tituloSelect.prop('disabled', true).html('<option value="">Cargando títulos...</option>');
-                    if ($tituloSelect.data('select2')) { $tituloSelect.trigger('change'); }
+                    if ($tituloSelect.data('select2')) {$tituloSelect.trigger('change'); }
 
                     $.ajax({
                         url: "{{ url('/titulos-por-pnf') }}/" + pnfId,
@@ -169,11 +189,11 @@
                             });
                             
                             $tituloSelect.prop('disabled', false);
-                            if ($tituloSelect.data('select2')) { $tituloSelect.trigger('change'); }
+                            if ($tituloSelect.data('select2')) {$tituloSelect.trigger('change'); }
                         },
                         error: function() {
                             $tituloSelect.empty().append('<option value="">Error al cargar los títulos</option>').prop('disabled', true);
-                            if ($tituloSelect.data('select2')) { $tituloSelect.trigger('change'); }
+                            if ($tituloSelect.data('select2')) {$tituloSelect.trigger('change'); }
                         }
                     });
                 }
