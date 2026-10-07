@@ -30,7 +30,7 @@ class SeccionClasesDataTable extends BaseDataTable
                     return $seccion->profesores->map(function ($profesor) {
                         $nombre = trim(($profesor->user->name_users ?? '') . ' ' . ($profesor->user->last_name_users ?? ''));
                         return '<span class="badge bg-light text-dark border shadow-sm mb-1">' . e($nombre) . '</span>';
-                    })->implode('<br>'); // <--- AQUÍ: Salto de línea para apilar verticalmente
+                    })->implode('<br>');
                 }
 
                 return '<span class="text-primary fw-bold">' . $cantidad . ' Profesores</span>';
@@ -66,7 +66,7 @@ class SeccionClasesDataTable extends BaseDataTable
     public function query(Seccion $model): EloquentBuilder
     {
         $query = $model->newQuery()
-            ->select('secciones.*') // Importante al usar withCount
+            ->select('secciones.*') // CORREGIDO: de 'sesiones.*' a 'secciones.*'
             ->with(['pnf', 'periodoAcademico.cohorte', 'profesores.user'])
             ->withCount([
                 'profesores as n_profesores',
@@ -100,14 +100,6 @@ class SeccionClasesDataTable extends BaseDataTable
             $query->porPnf($request->get('id_pnf'));
         }
 
-        if ($request->filled('id_empresa')) {
-            $query->porEmpresa($request->get('id_empresa'));
-        }
-
-        if ($request->filled('id_titulo')) {
-            $query->porTitulo($request->get('id_titulo'));
-        }
-
         return $query;
     }
 
@@ -124,8 +116,6 @@ class SeccionClasesDataTable extends BaseDataTable
                 'data' => 'function(d) {
                     d.id_pnf = $("#filtro_pnf").val();
                     d.id_profesor = $("#filtro_profesor").length ? $("#filtro_profesor").val() : null;
-                    d.id_empresa = $("#filtro_empresa").val();
-                    d.id_titulo = $("#filtro_titulo").val();
                 }'
             ])
             ->buttons([
@@ -138,8 +128,6 @@ class SeccionClasesDataTable extends BaseDataTable
 
     protected function getColumns(): array
     {
-        // El orderable es "true" por defecto, así que al quitar el "orderable(false)" todo se puede ordenar.
-        // Asignamos el name() correcto para que Yajra sepa en qué basar el orden.
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->addClass('text-center align-middle'),
             Column::make('nombre_seccion')->title('Sección')->width(140)->addClass('align-middle fw-bold'),

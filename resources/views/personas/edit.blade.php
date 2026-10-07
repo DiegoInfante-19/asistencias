@@ -2,72 +2,72 @@
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    <!-- Tarjeta con estilo AdminLTE unificado -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h3 class="card-title fw-bold text-dark mb-0">
+    <!-- Tarjeta Principal con diseño unificado (Ecosystem Card) -->
+    <div class="card shadow-sm ecosystem-card">
+        <div class="card-header bg-white py-3 d-flex align-items-center border-bottom">
+            <h3 class="card-title fw-bold text-dark mb-0 fs-5">
                 Editar Datos Básicos:
                 <span class="text-primary">{{ $persona->primer_nombre_personas }} {{ $persona->primer_apellido_personas }}</span>
             </h3>
-            <a href="{{ route('personas.show', $persona->id_personas) }}" class="btn btn-outline-secondary ms-auto">
-                <b>Revisar Expediente</b>
+            <a href="{{ route('personas.show', $persona->id_personas) }}" class="btn btn-success ms-auto shadow-sm">
+                <i class="bi bi-folder2-open me-1"></i><b>Revisar Expediente</b>
             </a>
         </div>
 
-        <div class="card-body bg-white py-4">
+        <div class="card-body bg-white p-4">
             <form action="{{ route('personas.update', $persona->id_personas) }}" method="POST" id="editPersonaForm">
                 @csrf
                 @method('PUT')
 
-                <div class="row g-3">
+                <div class="row g-4">
                     <!-- Cédula -->
                     <div class="col-md-4">
-                        <label for="cedula_personas" class="form-label fw-bold small text-muted">Cédula <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('cedula_personas') is-invalid @enderror"
+                        <label for="cedula_personas" class="form-label fw-bold small text-muted text-uppercase">Cédula <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('cedula_personas') is-invalid @enderror"
                             id="cedula_personas" name="cedula_personas" value="{{ old('cedula_personas', $persona->cedula_personas) }}"
                             autocomplete="off" required>
                         @error('cedula_personas')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback dynamic-feedback fw-bold">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <!-- Nombres -->
                     <div class="col-md-4">
-                        <label for="primer_nombre_personas" class="form-label fw-bold small text-muted">Primer Nombre <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('primer_nombre_personas') is-invalid @enderror"
+                        <label for="primer_nombre_personas" class="form-label fw-bold small text-muted text-uppercase">Primer Nombre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('primer_nombre_personas') is-invalid @enderror"
                             id="primer_nombre_personas" name="primer_nombre_personas" value="{{ old('primer_nombre_personas', $persona->primer_nombre_personas) }}"
                             autocomplete="off" required>
                         @error('primer_nombre_personas')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback dynamic-feedback fw-bold">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-4">
-                        <label for="segundo_nombre_personas" class="form-label fw-bold small text-muted">Segundo Nombre <span class="text-muted fw-normal">(Opcional)</span></label>
-                        <input type="text" class="form-control @error('segundo_nombre_personas') is-invalid @enderror"
+                        <label for="segundo_nombre_personas" class="form-label fw-bold small text-muted text-uppercase">Segundo Nombre <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('segundo_nombre_personas') is-invalid @enderror"
                             id="segundo_nombre_personas" name="segundo_nombre_personas" value="{{ old('segundo_nombre_personas', $persona->segundo_nombre_personas) }}"
                             autocomplete="off">
                     </div>
 
                     <!-- Apellidos -->
                     <div class="col-md-4">
-                        <label for="primer_apellido_personas" class="form-label fw-bold small text-muted">Primer Apellido <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('primer_apellido_personas') is-invalid @enderror"
+                        <label for="primer_apellido_personas" class="form-label fw-bold small text-muted text-uppercase">Primer Apellido <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('primer_apellido_personas') is-invalid @enderror"
                             id="primer_apellido_personas" name="primer_apellido_personas" value="{{ old('primer_apellido_personas', $persona->primer_apellido_personas) }}"
                             autocomplete="off" required>
                     </div>
 
                     <div class="col-md-4">
-                        <label for="segundo_apellido_personas" class="form-label fw-bold small text-muted">Segundo Apellido <span class="text-muted fw-normal">(Opcional)</span></label>
-                        <input type="text" class="form-control @error('segundo_apellido_personas') is-invalid @enderror"
+                        <label for="segundo_apellido_personas" class="form-label fw-bold small text-muted text-uppercase">Segundo Apellido <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('segundo_apellido_personas') is-invalid @enderror"
                             id="segundo_apellido_personas" name="segundo_apellido_personas" value="{{ old('segundo_apellido_personas', $persona->segundo_apellido_personas) }}"
                             autocomplete="off">
                     </div>
 
                     <!-- Sexo -->
                     <div class="col-md-4">
-                        <label for="sexo_personas" class="form-label fw-bold small text-muted">Sexo <span class="text-danger">*</span></label>
-                        <select class="form-select @error('sexo_personas') is-invalid @enderror" id="sexo_personas" name="sexo_personas" required>
+                        <label for="sexo_personas" class="form-label fw-bold small text-muted text-uppercase">Sexo <span class="text-danger">*</span></label>
+                        <select class="form-select bg-light border-secondary-subtle shadow-sm @error('sexo_personas') is-invalid @enderror" id="sexo_personas" name="sexo_personas" required>
                             <option value="">Seleccione...</option>
                             <option value="M" {{ old('sexo_personas', $persona->sexo_personas) == 'M' ? 'selected' : '' }}>Masculino</option>
                             <option value="F" {{ old('sexo_personas', $persona->sexo_personas) == 'F' ? 'selected' : '' }}>Femenino</option>
@@ -76,29 +76,29 @@
 
                     <!-- Fecha de Nacimiento -->
                     <div class="col-md-4">
-                        <label for="fecha_nacimiento_personas" class="form-label fw-bold small text-muted">Fecha de Nacimiento <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control @error('fecha_nacimiento_personas') is-invalid @enderror"
+                        <label for="fecha_nacimiento_personas" class="form-label fw-bold small text-muted text-uppercase">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control bg-light border-secondary-subtle shadow-sm @error('fecha_nacimiento_personas') is-invalid @enderror"
                             id="fecha_nacimiento_personas" name="fecha_nacimiento_personas" value="{{ old('fecha_nacimiento_personas', $persona->fecha_nacimiento_personas) }}" autocomplete="off" required>
                     </div>
 
                     <!-- Correo -->
                     <div class="col-md-4">
-                        <label for="email_personas" class="form-label fw-bold small text-muted">Correo Electrónico <span class="text-muted fw-normal">(Opcional)</span></label>
-                        <input type="email" class="form-control @error('email_personas') is-invalid @enderror"
-                            id="email_personas" name="email_personas" value="{{ old('email_personas', $persona->email_personas) }}" autocomplete="off">
+                        <label for="email_personas" class="form-label fw-bold small text-muted text-uppercase">Correo Electrónico <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control bg-light border-secondary-subtle shadow-sm @error('email_personas') is-invalid @enderror"
+                            id="email_personas" name="email_personas" value="{{ old('email_personas', $persona->email_personas) }}" autocomplete="off" required>
                     </div>
 
                     <div class="col-md-4">
-                        <label for="id_cohortes" class="form-label fw-bold small text-muted">Cohorte de Ingreso <span class="text-danger">*</span></label>
-                        <select class="form-select select2-buscador @error('id_cohortes') is-invalid @enderror" id="id_cohortes" name="id_cohortes" required>
+                        <label for="id_cohortes" class="form-label fw-bold small text-muted text-uppercase">Cohorte de Ingreso <span class="text-danger">*</span></label>
+                        <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_cohortes') is-invalid @enderror" id="id_cohortes" name="id_cohortes" required>
                             <option value="">Seleccione...</option>
                             @foreach($cohortes as $cohorte)
-                                <option value="{{ $cohorte->id_cohortes }}" {{ old('id_cohortes', $persona->id_cohortes) == $cohorte->id_cohortes ? 'selected' : '' }}>
-                                    {{ $cohorte->numero_cohorte }}
-                                </option>
+                            <option value="{{ $cohorte->id_cohortes }}" {{ old('id_cohortes', $persona->id_cohortes) == $cohorte->id_cohortes ? 'selected' : '' }}>
+                                {{ $cohorte->numero_cohorte }}
+                            </option>
                             @endforeach
                         </select>
-                        @error('id_cohortes') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        @error('id_cohortes') <div class="invalid-feedback dynamic-feedback fw-bold d-block">{{ $message }}</div> @enderror
                     </div>
 
                     <!-- LUGAR DE NACIMIENTO -->
@@ -107,15 +107,15 @@
                     </div>
 
                     @php
-                        $estadoActual = $persona->lugarNacimiento->ciudad->id_estado ?? '';
-                        $ciudadActual = $persona->lugarNacimiento->id_ciudad ?? '';
-                        $detallesActual = $persona->lugarNacimiento->detalles_adicionales ?? '';
+                    $estadoActual = $persona->lugarNacimiento->ciudad->id_estado ?? '';
+                    $ciudadActual = $persona->lugarNacimiento->id_ciudad ?? '';
+                    $detallesActual = $persona->lugarNacimiento->detalles_adicionales ?? '';
                     @endphp
 
                     <!-- Estado -->
                     <div class="col-md-4">
-                        <label for="id_estado" class="form-label fw-bold small text-muted">Estado <span class="text-danger">*</span></label>
-                        <select class="form-select select2-buscador @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado" required>
+                        <label for="id_estado" class="form-label fw-bold small text-muted text-uppercase">Estado <span class="text-danger">*</span></label>
+                        <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado" required>
                             <option value="">Seleccione...</option>
                             @foreach($estados as $estado)
                             <option value="{{ $estado->id_estado }}" {{ old('id_estado', $estadoActual) == $estado->id_estado ? 'selected' : '' }}>
@@ -123,29 +123,29 @@
                             </option>
                             @endforeach
                         </select>
-                        @error('id_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        @error('id_estado') <div class="invalid-feedback dynamic-feedback fw-bold d-block">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Ciudad corregida con distribución limpia -->
+                    <!-- Ciudad -->
                     <div class="col-md-4">
-                        <label for="id_ciudad" class="form-label fw-bold small text-muted">Ciudad <span class="text-danger">*</span></label>
+                        <label for="id_ciudad" class="form-label fw-bold small text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                         <div class="d-flex align-items-center gap-2">
                             <div class="flex-grow-1">
-                                <select class="form-select select2-buscador @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
+                                <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
                                     <option value="">Seleccione primero un estado...</option>
                                 </select>
                             </div>
-                            <button class="btn btn-outline-primary text-nowrap" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNuevaCiudad" aria-expanded="false" aria-controls="collapseNuevaCiudad" id="btnToggleCiudad" disabled>
+                            <button class="btn btn-outline-primary text-nowrap shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNuevaCiudad" aria-expanded="false" aria-controls="collapseNuevaCiudad" id="btnToggleCiudad" disabled>
                                 <i class="bi bi-plus-lg"></i> Nueva
                             </button>
                         </div>
-                        @error('id_ciudad') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        @error('id_ciudad') <div class="invalid-feedback dynamic-feedback fw-bold d-block">{{ $message }}</div> @enderror
                     </div>
 
                     <!-- Detalles Adicionales -->
                     <div class="col-md-4">
-                        <label for="detalles_adicionales" class="form-label fw-bold small text-muted">Detalles (Opcional)</label>
-                        <input type="text" class="form-control" id="detalles_adicionales" name="detalles_adicionales" value="{{ old('detalles_adicionales', $detallesActual) }}" placeholder="Ej: Hospital Ruiz y Páez">
+                        <label for="detalles_adicionales" class="form-label fw-bold small text-muted text-uppercase">Detalles (Opcional)</label>
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" id="detalles_adicionales" name="detalles_adicionales" value="{{ old('detalles_adicionales', $detallesActual) }}" placeholder="Ej: Hospital Ruiz y Páez">
                     </div>
 
                     <!-- PANEL COLAPSABLE: NUEVA CIUDAD -->
@@ -156,11 +156,11 @@
                                 <div class="row g-3 align-items-end">
                                     <div class="col-md-8">
                                         <label class="form-label fw-bold small text-muted text-uppercase">Nombre de la Ciudad</label>
-                                        <input type="text" class="form-control" id="nueva_nombre_ciudad" placeholder="Ej: Puerto Ordaz">
+                                        <input type="text" class="form-control bg-white border-secondary-subtle shadow-sm" id="nueva_nombre_ciudad" placeholder="Ej: Puerto Ordaz">
                                         <small class="text-muted">Se asociará automáticamente al Estado seleccionado arriba.</small>
                                     </div>
                                     <div class="col-md-4">
-                                        <button type="button" class="btn btn-primary w-100 fw-bold" id="btnGuardarCiudad">
+                                        <button type="button" class="btn btn-primary w-100 fw-bold shadow-sm" id="btnGuardarCiudad">
                                             <i class="bi bi-save me-1"></i> Guardar
                                         </button>
                                     </div>
@@ -174,11 +174,11 @@
         </div>
 
         <!-- FOOTER DE LA TARJETA -->
-        <div class="card-footer bg-white py-3 d-flex justify-content-end gap-2">
-            <a href="{{ route('personas.index') }}" class="btn btn-secondary">
+        <div class="card-footer bg-light py-3 d-flex justify-content-end gap-2 border-top">
+            <a href="{{ route('personas.index') }}" class="btn btn-secondary shadow-sm">
                 <i class="bi bi-x-circle me-1"></i> Cancelar
             </a>
-            <button type="submit" form="editPersonaForm" class="btn btn-warning text-dark fw-bold">
+            <button type="submit" form="editPersonaForm" class="btn btn-warning text-dark fw-bold shadow-sm">
                 <i class="bi bi-pencil-square me-1"></i> Actualizar Estudiante
             </button>
         </div>
@@ -188,25 +188,49 @@
 
 @section('styles')
 <style>
-    /* Estética unificada para inputs y selects en tarjetas blancas */
-    .card-body.bg-white .form-control,
-    .card-body.bg-white .form-select {
-        background-color: #f8f9fa !important;
-        border-color: #dee2e6 !important;
+    /* ---------------------------------------------------
+        ESTÉTICA UNIFICADA DEL ECOSISTEMA DE TARJETAS
+    ----------------------------------------------------- */
+    .ecosystem-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
+        background-color: #ffffff !important;
+        border-radius: 0.5rem !important;
+        overflow: hidden !important;
     }
 
-    .card-body.bg-white .select2-container--bootstrap-5 .select2-selection {
-        background-color: #f8f9fa !important;
-        border-color: #dee2e6 !important;
+    .ecosystem-card .card-header {
+        background-color: #ffffff !important;
+        border-top-left-radius: 0.5rem !important;
+        border-top-right-radius: 0.5rem !important;
     }
 
-    /* Efecto al hacer Focus */
-    .card-body.bg-white .form-control:focus,
-    .card-body.bg-white .form-select:focus,
-    .card-body.bg-white .select2-container--bootstrap-5.select2-container--open .select2-selection {
+    .ecosystem-card .card-footer {
+        background-color: #f8f9fa !important;
+        border-top: 1px solid #e2e8f0 !important;
+        border-bottom-left-radius: 0.5rem !important;
+        border-bottom-right-radius: 0.5rem !important;
+    }
+
+    /* ---------------------------------------------------
+        AJUSTES PARA SELECT2 (Igualar al diseño de inputs bg-light)
+    ----------------------------------------------------- */
+    .select2-container--bootstrap-5 .select2-selection {
+        background-color: #f8f9fa !important;
+        /* Equivalente a bg-light */
+        border-color: #e2e3e5 !important;
+        /* Equivalente a border-secondary-subtle */
+        box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+        /* Equivalente a shadow-sm */
+    }
+
+    /* Efecto al hacer Focus (Inputs y Select2) */
+    .form-control:focus,
+    .form-select:focus,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection {
         background-color: #ffffff !important;
         border-color: #86b7fe !important;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
 </style>
 @endsection
@@ -240,7 +264,7 @@
             if (!id_estado) {
                 ciudadSelect.prop('disabled', true).empty().append('<option value="">Seleccione primero un estado...</option>');
                 ciudadSelect.trigger('change.select2');
-                
+
                 btnToggleCiudad.prop('disabled', true);
                 collapseElement.collapse('hide');
                 return;
@@ -298,7 +322,7 @@
                 success: function(response) {
                     ciudadSelect.append('<option value="' + response.ciudad.id_ciudad + '" selected>' + response.ciudad.nombre_ciudad + '</option>');
                     ciudadSelect.trigger('change.select2');
-                    
+
                     inputNuevaCiudad.val('');
                     collapseElement.collapse('hide');
                     btnGuardarCiudad.prop('disabled', false).html('<i class="bi bi-save me-1"></i> Guardar');

@@ -63,13 +63,17 @@ class SesionController extends Controller
             }
         }
 
+        $seccion->load(['periodoAcademico.cohorte', 'pnf', 'profesores.user']);
+
+        $periodosRecesos = PeriodoReceso::where('suspension_actividades', 1)
+            ->select('fecha_inicio_periodo_receso', 'fecha_fin_periodo_receso')
+            ->get();
+
         if (request()->ajax() || request()->wantsJson()) {
             return $dataTable->withIdSeccion($seccion->id_seccion)->ajax();
         }
 
-        $seccion->load(['periodoAcademico.cohorte', 'pnf', 'profesores.user']);
-
-        return $dataTable->withIdSeccion($seccion->id_seccion)->render('sesiones.por_seccion', compact('seccion'));
+        return $dataTable->withIdSeccion($seccion->id_seccion)->render('sesiones.por_seccion', compact('seccion', 'periodosRecesos'));
     }
 
     public function create(Request $request)
@@ -93,26 +97,71 @@ class SesionController extends Controller
     {
         $this->authorize('create', Sesion::class);
 
-        $data = $request->validated();
         $user = Auth::user();
 
         if ($user->isProfesor()) {
-            $profesorValido = Profesor::where('id_profesor', $data['id_profesor'])
-                ->whereHas('secciones', function ($query) use ($data) {
-                    $query->where('secciones.id_seccion', $data['id_seccion']);
+            $profesorValido = Profesor::where('id_profesor', $request->id_profesor)
+                ->whereHas('secciones', function ($query) use ($request) {
+                    $query->where('secciones.id_seccion', $request->id_seccion);
                 })->exists();
 
             if (!$profesorValido) {
-                return back()->withErrors([
-                    'id_profesor' => 'El profesor seleccionado no está asignado como docente de esta sección académica.'
-                ])->withInput();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El profesor seleccionado no está asignado como docente de esta sección académica.'
+                ], 422);
             }
         }
 
-        Sesion::create($data);
+        try {
+            Sesion::create($request->validated());
 
-        return redirect()->route('clases.secciones.sesiones', $data['id_seccion'])
-            ->with('success', 'Sesión académica programada y registrada correctamente.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión académica programada y registrada correctamente.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al programar la sesión: ' . $e->getMessage()
+            ], 422);
+        }
+    }
+
+    public function update(StoreSesionRequest $request, $sesion)
+    {
+        $sesionItem = Sesion::findOrFail($sesion);
+
+        Gate::authorize('update', $sesionItem);
+
+        // BLINDAJE CRÍTICO: Si ya tiene asistencia, NUNCA se puede cambiar la fecha
+        if ($sesionItem->tieneAsistenciaRegistrada() && $request->fecha_sesion !== $sesionItem->fecha_sesion->toDateString()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se puede modificar la fecha de esta sesión porque ya cuenta con registros de asistencia de estudiantes.'
+            ], 422);
+        }
+
+        try {
+            $datosValidados = $request->validated();
+
+            // Si ya tiene asistencia, aseguramos mantener la fecha original independientemente de lo enviado
+            if ($sesionItem->tieneAsistenciaRegistrada()) {
+                $datosValidados['fecha_sesion'] = $sesionItem->fecha_sesion;
+            }
+
+            $sesionItem->update($datosValidados);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión de clase actualizada exitosamente.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar la sesión: ' . $e->getMessage()
+            ], 422);
+        }
     }
 
     public function show(Sesion $sesion, AsistenciaSesionDataTable $dataTable)
@@ -121,15 +170,20 @@ class SesionController extends Controller
 
         $sesion->load(['seccion.periodoAcademico.cohorte', 'seccion.pnf', 'profesor.user']);
 
+        // SOLUCIÓN: Mapeamos asegurando extraer el string plano ('presente', 'ausente', 'justificada')
         $asistenciasRegistradas = Asistencia::where('id_sesiones', $sesion->id_sesiones)
-            ->pluck('estado_asistencia', 'id_inscripcion_seccion')
+            ->get()
+            ->mapWithKeys(function ($asistencia) {
+                $estado = $asistencia->estado_asistencia;
+                $valorEstado = $estado instanceof \App\Enums\EstadoAsistencia ? $estado->value : strtolower($estado ?? 'presente');
+                
+                return [$asistencia->id_inscripcion_seccion => $valorEstado];
+            })
             ->toArray();
 
-        // Evaluar si puede editar usando el método limpio del modelo
         $user = Auth::user();
         $puedeEditar = true;
         
-        // Si no es admin y tampoco coordinador, verificamos el límite de tiempo
         if (!$user->isAdmin() && !is_null($user->isCoordinador()) && !$user->isCoordinador()) {
             $puedeEditar = !$sesion->estaCerrada();
         }
@@ -164,6 +218,10 @@ class SesionController extends Controller
     public function destroy(Sesion $sesion)
     {
         Gate::authorize('delete', $sesion);
+
+        if ($sesion->tieneAsistenciaRegistrada()) {
+            return redirect()->back()->with('error', 'No se puede eliminar esta sesión porque ya tiene asistencias registradas.');
+        }
 
         $idSeccion = $sesion->id_seccion;
         $sesion->delete();

@@ -61,14 +61,22 @@ class SesionesPorSeccionDataTable extends BaseDataTable
 
     public function query(Sesion $model): EloquentBuilder
     {
-        // CORRECCIÓN APLICADA: select() se ejecuta ANTES de withExists()
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
         $query = $model->newQuery()
             ->select('sesiones.*') 
             ->with(['profesor.user'])
             ->withExists('asistencias') 
             ->where('id_seccion', $this->idSeccion);
 
-        // LÓGICA DEL FILTRO
+        // RESTRICCIÓN DE ROL: Si es profesor, solo ve sus propias sesiones en la sección
+        if ($user && $user->isProfesor()) {
+            $profesorId = $user->profesor?->id_profesor ?? -1;
+            $query->where('sesiones.id_profesor', $profesorId);
+        }
+
+        // LÓGICA DEL FILTRO DE ASISTENCIA
         if ($this->request()->filled('filtro_asistencia')) {
             $estado = $this->request()->get('filtro_asistencia');
             

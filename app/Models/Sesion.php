@@ -25,31 +25,52 @@ class Sesion extends Model
 
     protected $casts = [
         'fecha_sesion' => 'datetime',
+        'id_profesor'  => 'integer', // <--- Soluciona el desfase de tipos
+        'id_seccion'   => 'integer', // <--- Recomendado para mantener integridad
     ];
+
+    public function tieneAsistenciaRegistrada(): bool
+    {
+        return $this->asistencias()->count() > 0;
+    }
 
     // ==========================================
     // LÓGICA DE NEGOCIO: Límite de Edición
     // ==========================================
-    
+
     public function limiteEdicion(): Carbon
     {
-        // El límite es 48 horas después de la fecha de la sesión
+        // El límite matemático es 48 horas (2 días) después de la fecha de la sesión
         return Carbon::parse($this->fecha_sesion)->addHours(48);
     }
 
-    public function estaCerrada(): bool
+    /**
+     * Indica si la ventana matemática de 48 horas ya se cerró.
+     * (Independientemente del usuario).
+     */
+    public function tiempoAgotado(): bool
     {
-        // Devuelve TRUE si la fecha actual ya superó el límite de edición
         return now()->greaterThan($this->limiteEdicion());
     }
 
+    /**
+     * Alias por compatibilidad con SesionesDataTable
+     */
+    public function estaCerrada(): bool
+    {
+        return $this->tiempoAgotado();
+    }
+
+    /**
+     * Devuelve las horas que faltan para que se cierre la ventana de 48 horas.
+     * Si ya pasó, devuelve 0.
+     */
     public function horasRestantesEdicion(): int
     {
         $limite = $this->limiteEdicion();
         $ahora = now();
-        
-        // Si ya pasó el tiempo devuelve 0, si no, devuelve la diferencia en horas
-        return $ahora->lessThan($limite) ? $ahora->diffInHours($limite) : 0;
+
+        return $ahora->lessThan($limite) ? (int) $ahora->diffInHours($limite) : 0;
     }
 
     // ==========================================

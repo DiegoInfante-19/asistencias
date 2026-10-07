@@ -117,12 +117,16 @@
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porExpediente = $seccion->inscripciones->groupBy(function($i) {
-                                        $titulacion = $i->persona->titulacionPersona->first();
-                                        if ($titulacion && $titulacion->id_estatus_expediente) {
-                                        $estExp = \App\Models\EstatusExpediente::find($titulacion->id_estatus_expediente);
-                                        return $estExp ? $estExp->nombre_estatus_expediente : 'Sin Estatus';
-                                        }
-                                        return 'Sin Expediente';
+                                            // Corrección: Soporte tanto si titulacionPersona es un Modelo (hasOne) o una Colección
+                                            $titulacion = $i->persona->titulacionPersona instanceof \Illuminate\Support\Collection 
+                                                          ? $i->persona->titulacionPersona->first() 
+                                                          : $i->persona->titulacionPersona;
+                                                          
+                                            if ($titulacion && $titulacion->id_estatus_expediente) {
+                                                $estExp = \App\Models\EstatusExpediente::find($titulacion->id_estatus_expediente);
+                                                return $estExp ? $estExp->nombre_estatus_expediente : 'Sin Estatus';
+                                            }
+                                            return 'Sin Expediente';
                                         });
                                         @endphp
                                         @foreach($porExpediente as $estatusExp => $items)
@@ -171,7 +175,16 @@
                                 <div class="accordion-body py-2 px-3 small bg-light overflow-y-auto" style="max-height: 250px;">
                                     <ul class="list-unstyled mb-0">
                                         @php
-                                        $porEmpresa = $seccion->inscripciones->groupBy(fn($i) => $i->persona->empresaPersona->first()?->empresa->nombre_empresa ?? 'Independiente');
+                                        $porEmpresa = $seccion->inscripciones->groupBy(function($i) {
+                                            // Corrección: Evitar llamar first() directamente y usar el operador null-safe
+                                            $empresaRel = $i->persona->empresaPersona;
+                                            
+                                            $empresaObj = $empresaRel instanceof \Illuminate\Support\Collection 
+                                                          ? $empresaRel->first() 
+                                                          : $empresaRel;
+                                        
+                                            return $empresaObj?->empresa->nombre_empresa ?? 'Independiente';
+                                        });
                                         @endphp
                                         @foreach($porEmpresa as $nombreEmpresa => $items)
                                         <li class="py-1 border-bottom-subtle">
@@ -194,7 +207,7 @@
     <div class="card shadow-sm">
         <div class="card-header bg-white py-3 d-flex align-items-center">
             <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
-                 Gestión de la Sección Académica
+                Gestión de la Sección Académica
             </h4>
         </div>
 

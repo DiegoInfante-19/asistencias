@@ -27,8 +27,6 @@ class StoreSesionRequest extends FormRequest
             'fecha_sesion' => [
                 'required',
                 'date',
-                // NOTA: Se removió 'before_or_equal:today' para dar flexibilidad a los encargados 
-                // de registrar clases pasadas (hojas de papel), la UI y la lógica de negocio controlan el pasado válido.
                 function ($attribute, $value, $fail) {
                     $fecha = Carbon::parse($value);
 
@@ -55,13 +53,20 @@ class StoreSesionRequest extends FormRequest
                     if ($idSeccion) {
                         $fechaSoloDia = Carbon::parse($value)->toDateString();
                         
-                        $sesionDuplicada = DB::table('sesiones')
+                        $query = DB::table('sesiones')
                             ->where('id_seccion', $idSeccion)
                             ->whereDate('fecha_sesion', '=', $fechaSoloDia)
-                            ->whereNull('deleted_at')
-                            ->exists();
+                            ->whereNull('deleted_at');
+
+                        // Si es actualización, excluimos la sesión actual para que no dé falso positivo de duplicado
+                        if ($this->isMethod('put') || $this->isMethod('patch')) {
+                            $idSesionActual = $this->route('sesione') ?? $this->route('sesion');
+                            if ($idSesionActual) {
+                                $query->where('id_sesiones', '!=', $idSesionActual);
+                            }
+                        }
                             
-                        if ($sesionDuplicada) {
+                        if ($query->exists()) {
                             $fail('Ya existe una sesión de clase registrada para esta sección en la fecha seleccionada.');
                         }
                     }
@@ -82,7 +87,6 @@ class StoreSesionRequest extends FormRequest
             'id_seccion.exists'      => 'La sección seleccionada no es válida en el sistema.',
             'id_profesor.required'   => 'Debe asignar un profesor responsable de la sesión.',
             'id_profesor.exists'     => 'El profesor seleccionado no es válido en el sistema.',
-            'id_profesor.required'   => 'Debe asignar un profesor responsable de la sesión.',
             'fecha_sesion.required'  => 'La fecha y hora de la sesión es obligatoria.',
             'fecha_sesion.date'      => 'El formato de fecha y hora no es válido.',
             'observacion_sesion.max' => 'Las observaciones no pueden exceder los 1000 caracteres.',

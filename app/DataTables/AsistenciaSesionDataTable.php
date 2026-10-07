@@ -56,9 +56,15 @@ class AsistenciaSesionDataTable extends BaseDataTable
                 return '<span class="text-dark">' . e($inscripcion->persona->cohorte->numero_cohorte ?? 'N/D') . '</span>';
             })
             ->addColumn('estado_asistencia', function ($inscripcion) {
-                $estadoActual = $this->asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? \App\Enums\EstadoAsistencia::PRESENTE;
+                $estadoRegistrado = $this->asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'presente';
+                
+                if ($estadoRegistrado instanceof \App\Enums\EstadoAsistencia) {
+                    $estadoActual = $estadoRegistrado->value;
+                } else {
+                    $estadoActual = strtolower($estadoRegistrado);
+                }
+
                 $puedeEditar = $this->puedeEditar;
-                // Calculamos si ya existen asistencias registradas
                 $tieneAsistencia = count($this->asistenciasRegistradas) > 0;
 
                 return view('sesiones.partials.estado_asistencia', compact('inscripcion', 'estadoActual', 'puedeEditar', 'tieneAsistencia'))->render();
@@ -91,9 +97,11 @@ class AsistenciaSesionDataTable extends BaseDataTable
             ])
             ->orderBy(2, 'asc')
             ->parameters([
+                'paging'     => false, // CORRECCIÓN: Desactivar paginación para enviar todo el lote visible
+                'info'       => false,
                 'responsive' => false,
-                'autoWidth' => false,
-                'scrollX' => true,
+                'autoWidth'  => false,
+                'scrollX'    => true,
             ]);
     }
 

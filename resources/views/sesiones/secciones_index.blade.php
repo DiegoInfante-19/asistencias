@@ -50,13 +50,8 @@
         border-color: #146c43 !important;
         color: #ffffff !important;
         font-weight: 700 !important;
-        /* Letra más gruesa */
-        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.4) !important;
-        /* Resplandor verde */
         transform: scale(1.02);
-        /* Ligero aumento de tamaño */
         z-index: 2;
-        /* Lo pone por encima de los otros bordes */
     }
 
     .btn-check:checked+.btn-asistencia-ausente {
@@ -64,8 +59,6 @@
         border-color: #b02a37 !important;
         color: #ffffff !important;
         font-weight: 700 !important;
-        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.4) !important;
-        /* Resplandor rojo */
         transform: scale(1.02);
         z-index: 2;
     }
@@ -75,8 +68,6 @@
         border-color: #cc9a06 !important;
         color: #000000 !important;
         font-weight: 700 !important;
-        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.4) !important;
-        /* Resplandor amarillo */
         transform: scale(1.02);
         z-index: 2;
     }
@@ -100,6 +91,67 @@
             white-space: nowrap;
         }
     }
+
+    /* ===================================================
+       ESTÉTICA UNIFICADA PARA INPUTS Y SELECT2 "SOFT"
+       =================================================== */
+    
+    /* 1. Entradas de texto y selects normales */
+    .card-body.bg-white .form-control,
+    .card-body.bg-white .form-select {
+        background-color: #f8f9fa !important;
+        border-color: #dee2e6 !important;
+    }
+
+    /* 2. Forzar a Select2 para que adopte el fondo gris, borde y sombra */
+    .card-body.bg-white .select2-container--bootstrap-5 .select2-selection {
+        background-color: #f8f9fa !important;
+        border-color: #dee2e6 !important;
+        min-height: calc(1.5em + .75rem + 2px);
+        padding: .375rem .75rem;
+        font-size: 0.9rem;
+    }
+
+    /* 3. Efecto Focus */
+    .card-body.bg-white .form-control:focus,
+    .card-body.bg-white .form-select:focus,
+    .card-body.bg-white .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        background-color: #ffffff !important;
+        border-color: #86b7fe !important;
+    }
+
+    /* 4. Estilos para el botón ColVis de DataTables */
+    .dt-buttons .btn.buttons-colvis {
+        background-color: #fff !important;
+        border: 1px solid #dee2e6 !important;
+        color: #495057 !important;
+        font-weight: 500;
+    }
+    .dt-buttons .btn.buttons-colvis:hover {
+        background-color: #f8f9fa !important;
+    }
+    .dt-button-collection {
+        padding: 0.5rem !important;
+        border-radius: 0.5rem !important;
+    }
+    .dt-button-collection .dt-button {
+        display: block;
+        width: 100%;
+        text-align: left;
+        border: none !important;
+        background: transparent !important;
+        padding: 0.375rem 1rem;
+        margin-bottom: 2px;
+        border-radius: 0.25rem;
+    }
+    .dt-button-collection .dt-button:hover {
+        background-color: #e9ecef !important;
+    }
+    .dt-button-collection .dt-button.active {
+        background-color: #e0f0ff !important;
+        color: #0d6efd !important;
+        font-weight: bold;
+    }
 </style>
 @endsection
 
@@ -107,19 +159,22 @@
 <div class="content pt-4" style="margin: 20px;">
 
     <!-- PANEL DE FILTROS AVANZADOS -->
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white py-3">
-            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
+    <div class="card shadow-sm mb-4">
+        <!-- Header estático y limpio -->
+        <div class="card-header bg-white py-3 border-bottom">
+            <h4 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
                 Filtros de Búsqueda
-            </h5>
+            </h4>
         </div>
+        
+        <!-- Body blanco -->
         <div class="card-body bg-white py-4">
             <div class="row g-3">
 
                 <!-- Filtro por PNF -->
-                <div class="col-md-3">
-                    <label for="filtro_pnf" class="form-label fw-bold small text-muted">Programa (PNF)</label>
-                    <select id="filtro_pnf" class="form-select select2-buscador">
+                <div class="col-md-6">
+                    <label for="filtro_pnf" class="form-label fw-bold small text-muted text-uppercase">Programa (PNF)</label>
+                    <select id="filtro_pnf" class="form-select select2-buscador bg-light border-secondary-subtle">
                         <option value="">Todos...</option>
                         @foreach($pnfs as $pnf)
                         <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
@@ -129,9 +184,9 @@
 
                 <!-- Filtro por Profesor (Solo si es Administrador o Coordinador) -->
                 @if(auth()->user()->isAdmin() || auth()->user()->isCoordinador())
-                <div class="col-md-3">
-                    <label for="filtro_profesor" class="form-label fw-bold small text-muted">Docente Asignado</label>
-                    <select id="filtro_profesor" class="form-select select2-buscador">
+                <div class="col-md-6">
+                    <label for="filtro_profesor" class="form-label fw-bold small text-muted text-uppercase">Docente Asignado</label>
+                    <select id="filtro_profesor" class="form-select select2-buscador bg-light border-secondary-subtle">
                         <option value="">Cualquiera...</option>
                         @foreach($profesores as $profesor)
                         @php
@@ -143,33 +198,12 @@
                 </div>
                 @endif
 
-                <!-- Filtro por Empresa de los Alumnos -->
-                <div class="col-md-3">
-                    <label for="filtro_empresa" class="form-label fw-bold small text-muted">Empresa de Alumnos</label>
-                    <select id="filtro_empresa" class="form-select select2-buscador">
-                        <option value="">Todas...</option>
-                        @foreach($empresas as $empresa)
-                        <option value="{{ $empresa->id_empresa }}">{{ $empresa->nombre_empresa }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Filtro por Título al que Opta -->
-                <div class="col-md-3">
-                    <label for="filtro_titulo" class="form-label fw-bold small text-muted">Título al que Opta</label>
-                    <select id="filtro_titulo" class="form-select select2-buscador">
-                        <option value="">Todos...</option>
-                        @foreach($titulos as $titulo)
-                        <option value="{{ $titulo->id_titulo }}">{{ $titulo->nombre_titulo }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
             </div>
         </div>
 
-        <div class="card-footer bg-white py-3 d-flex justify-content-end">
-            <button type="button" id="btn-limpiar-filtros" class="btn btn-success shadow-sm">
+        <!-- Footer BLANCO -->
+        <div class="card-footer bg-white py-3 d-flex justify-content-end border-top">
+            <button type="button" id="btn-limpiar-filtros" class="btn btn-success fw-bold shadow-sm">
                 <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar Filtros
             </button>
         </div>
@@ -203,8 +237,6 @@
         $('#secciones-clases-table').on('preXhr.dt', function(e, settings, data) {
             data.id_pnf = $('#filtro_pnf').val();
             data.id_profesor = $('#filtro_profesor').length ? $('#filtro_profesor').val() : null;
-            data.id_empresa = $('#filtro_empresa').val();
-            data.id_titulo = $('#filtro_titulo').val();
         });
 
         function triggerDatatableDraw() {
@@ -216,14 +248,14 @@
         }
 
         // 2. Disparar redibujado automático al cambiar cualquier select de filtro
-        const selectsFiltros = '#filtro_pnf, #filtro_profesor, #filtro_empresa, #filtro_titulo';
+        const selectsFiltros = '#filtro_pnf, #filtro_profesor';
         $(selectsFiltros).on('change', function() {
             triggerDatatableDraw();
         });
 
         // 3. Botón para limpiar filtros
         $('#btn-limpiar-filtros').on('click', function() {
-            $(selectsFiltros).val(null).trigger('change');
+            $(selectsFiltros).val(null).trigger('change.select2');
             triggerDatatableDraw();
         });
 

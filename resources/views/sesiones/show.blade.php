@@ -28,10 +28,14 @@
 <div class="content pt-4" style="margin: 20px;">
 
     @php
-    $tieneAsistencia = count($asistenciasRegistradas) > 0;
+        $tieneAsistencia = count($asistenciasRegistradas) > 0;
+        // Variables para la lógica visual
+        $esSuperUsuario = (method_exists(auth()->user(), 'isAdministrador') && auth()->user()->isAdministrador()) || 
+                          (method_exists(auth()->user(), 'isCoordinador') && auth()->user()->isCoordinador());
+        $tiempoAgotado = $sesion->tiempoAgotado();
     @endphp
 
-    <!-- ENCABEZADO Y DATOS DE LA CLASE (Diseño Unificado) -->
+    <!-- ENCABEZADO Y DATOS DE LA CLASE -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
             <h4 class="fw-bold text-dark mb-1">
@@ -57,16 +61,31 @@
         </div>
 
         <div class="d-flex flex-column align-items-md-end gap-2 text-md-end">
-            <!-- Badges de Estado -->
+            <!-- BADGES DE ESTADO INTELIGENTES -->
             <div class="mb-2 mb-md-0 d-flex flex-column align-items-md-end">
+                
                 @if(!$tieneAsistencia)
-                <span class="badge bg-danger shadow-sm p-2 fs-6"><i class="bi bi-exclamation-octagon me-1"></i> Asistencia Pendiente</span>
+                    <span class="badge bg-danger shadow-sm p-2 fs-6"><i class="bi bi-exclamation-octagon me-1"></i> Asistencia Pendiente</span>
+                    @if(!$tiempoAgotado)
+                        <span class="text-muted small fw-bold mt-1"><i class="bi bi-clock-history text-warning"></i> El profesor tiene {{ $sesion->horasRestantesEdicion() }}h para registrar</span>
+                    @endif
+                
                 @elseif($puedeEditar)
-                <span class="badge bg-success shadow-sm p-2 fs-6 mb-1"><i class="bi bi-check-circle-fill me-1"></i> Asistencia Registrada</span>
-                <span class="text-muted small fw-bold"><i class="bi bi-clock-history text-warning"></i> {{ $sesion->horasRestantesEdicion() }}h para editar</span>
+                    <span class="badge bg-success shadow-sm p-2 fs-6 mb-1"><i class="bi bi-check-circle-fill me-1"></i> Asistencia Registrada</span>
+                    
+                    @if(!$tiempoAgotado)
+                        <span class="text-muted small fw-bold"><i class="bi bi-clock-history text-warning"></i> Restan {{ $sesion->horasRestantesEdicion() }}h de edición para el profesor</span>
+                    @else
+                        <!-- Si el tiempo se agotó pero el usuario puede editar, significa que es un superusuario -->
+                        <span class="small fw-bold"><i class="bi bi-shield-lock-fill"></i> Tiempo cerrado para el profesor (Modo Privilegiado activo)</span>
+                    @endif
+                
                 @else
-                <span class="badge bg-secondary shadow-sm p-2 fs-6"><i class="bi bi-lock-fill me-1"></i> Registro Cerrado</span>
+                    <!-- Si llegó aquí, es un profesor y el tiempo se agotó -->
+                    <span class="badge bg-secondary shadow-sm p-2 fs-6"><i class="bi bi-lock-fill me-1"></i> Registro Cerrado</span>
+                    <span class="text-danger small fw-bold mt-1">Tiempo de 48h finalizado</span>
                 @endif
+
             </div>
 
             <!-- Botón de Volver Integrado -->
@@ -92,7 +111,7 @@
                 @can('update', $sesion)
                 @if($tieneAsistencia)
                 <button type="button" class="btn btn-warning btn-editar-asistencia fw-bold text-dark shadow-sm">
-                    <i class="bi bi-pencil-square me-1"></i> Actualizar Asistencia
+                    <i class="bi bi-pencil-square me-1"></i> {{ $tiempoAgotado ? 'Forzar Edición (Admin)' : 'Actualizar Asistencia' }}
                 </button>
                 <button type="button" class="btn btn-secondary btn-cancelar-edicion fw-bold shadow-sm d-none">
                     Cancelar
@@ -122,7 +141,6 @@
                     @forelse($inscripciones as $index => $inscripcion)
                     @php
                         $estadoRaw = $asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'presente';
-                        // Extraemos el string si es un Enum, de lo contrario lo pasamos a minúscula
                         $estadoNormalizado = $estadoRaw instanceof \App\Enums\EstadoAsistencia ? $estadoRaw->value : strtolower($estadoRaw);
 
                         $badgeClass = match($estadoNormalizado) {
@@ -199,7 +217,7 @@
                 @can('update', $sesion)
                 @if($tieneAsistencia)
                 <button type="button" class="btn btn-warning btn-editar-asistencia fw-bold text-dark shadow-sm btn-lg w-100">
-                    <i class="bi bi-pencil-square me-1"></i> Actualizar Asistencia
+                    <i class="bi bi-pencil-square me-1"></i> {{ $tiempoAgotado ? 'Forzar Edición (Admin)' : 'Actualizar Asistencia' }}
                 </button>
                 <button type="button" class="btn btn-secondary btn-cancelar-edicion fw-bold shadow-sm btn-lg w-100 d-none">
                     Cancelar Edición
@@ -226,7 +244,6 @@
                 <h5 class="modal-title fw-bold text-dark" id="modalObservacionLabel"><i class="bi bi-pencil text-primary me-2"></i>Editar Tema / Observación</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <!-- Ajusta esta ruta a tu controlador real de actualización -->
             <form action="{{ route('sesiones.update', $sesion->id_sesiones) }}" method="POST">
                 @csrf
                 @method('PUT')
@@ -255,22 +272,18 @@
 
         // 1. MANEJO DE ESTADOS LECTURA/EDICIÓN
         $('.btn-editar-asistencia').on('click', function() {
-            // Mostrar los radios, ocultar los badges
             $('.modo-lectura').addClass('d-none');
             $('.modo-edicion').removeClass('d-none').hide().fadeIn(300);
 
-            // Alternar botones
             $('.btn-editar-asistencia').addClass('d-none');
             $('.btn-cancelar-edicion').removeClass('d-none');
             $('.btn-procesar-asistencia').removeClass('d-none');
         });
 
         $('.btn-cancelar-edicion').on('click', function() {
-            // Revertir a modo lectura
             $('.modo-edicion').addClass('d-none');
             $('.modo-lectura').removeClass('d-none').hide().fadeIn(300);
 
-            // Alternar botones
             $('.btn-cancelar-edicion').addClass('d-none');
             $('.btn-procesar-asistencia').addClass('d-none');
             $('.btn-editar-asistencia').removeClass('d-none');
@@ -297,18 +310,20 @@
             let token = document.getElementById('csrf_token').value;
             let asistenciasMap = {};
 
-            // Mapeamos los datos. Al usar un objeto Map con la cédula/ID, prevenimos registros duplicados
-            // entre la tabla de Desktop y las tarjetas de Mobile si ambas conviven en el DOM.
+            // Recorremos las filas e ignoramos las ocultas
             let filas = document.querySelectorAll('.fila-estudiante');
             filas.forEach(function(fila) {
-                let idInscripcion = fila.getAttribute('data-inscripcion');
-                let radioSeleccionado = fila.querySelector('input[type="radio"]:checked');
-                let estadoSeleccionado = radioSeleccionado ? radioSeleccionado.value : 'presente';
-
-                asistenciasMap[idInscripcion] = {
-                    id_inscripcion_seccion: idInscripcion,
-                    estado: estadoSeleccionado
-                };
+                if (fila.offsetParent !== null) {
+                    let idInscripcion = fila.getAttribute('data-inscripcion');
+                    let radioSeleccionado = fila.querySelector('input[type="radio"]:checked');
+                    
+                    if (radioSeleccionado) {
+                        asistenciasMap[idInscripcion] = {
+                            id_inscripcion_seccion: idInscripcion,
+                            estado: radioSeleccionado.value
+                        };
+                    }
+                }
             });
 
             let payload = {
@@ -317,54 +332,53 @@
             };
 
             fetch("{{ route('asistencias.guardar_lote') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: '¡Asistencia Guardada!',
-                                text: 'El registro se actualizó correctamente.',
-                                confirmButtonText: 'Entendido',
-                                allowOutsideClick: false
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    // Recargamos para ver los Badges actualizados
-                                    window.location.reload();
-                                }
-                            });
-                        } else {
-                            alert('¡Asistencia Guardada correctamente!');
-                            window.location.reload();
-                        }
-                    } else {
-                        throw new Error(data.message || 'Error desconocido del servidor');
-                    }
-                })
-                .catch(error => {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Ocurrió un error al guardar la asistencia: ' + error.message,
+                            icon: 'success',
+                            title: '¡Asistencia Guardada!',
+                            text: 'El registro se actualizó correctamente.',
+                            confirmButtonText: 'Entendido',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload();
+                            }
                         });
                     } else {
-                        alert('Ocurrió un error al guardar: ' + error.message);
+                        alert('¡Asistencia Guardada correctamente!');
+                        window.location.reload();
                     }
-
-                    botonesProcesar.forEach(function(b) {
-                        b.disabled = false;
-                        b.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Intentar de nuevo';
+                } else {
+                    throw new Error(data.message || 'Error desconocido del servidor');
+                }
+            })
+            .catch(error => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un error al guardar la asistencia: ' + error.message,
                     });
+                } else {
+                    alert('Ocurrió un error al guardar: ' + error.message);
+                }
+
+                botonesProcesar.forEach(function(b) {
+                    b.disabled = false;
+                    b.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Intentar de nuevo';
                 });
+            });
         });
     });
 </script>

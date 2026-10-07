@@ -18,7 +18,7 @@
             </h4>
             <p class="text-muted small mb-0">
                 <strong>PNF:</strong> {{ $seccion->pnf->nombre_pnf ?? 'N/D' }} | 
-                <strong> {{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }} </strong>| 
+                <strong>{{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }}</strong> | 
                 <strong>Estatus:</strong> <span class="badge bg-success">{{ $seccion->estatus_seccion }}</span>
             </p>
         </div>
@@ -29,9 +29,9 @@
             </a>
 
             @can('create', App\Models\Sesion::class)
-            <a href="{{ route('sesiones.create', ['seccion_id' => $seccion->id_seccion]) }}" class="btn btn-primary fw-bold shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Programar Clase
-            </a>
+            <button type="button" class="btn btn-primary fw-bold shadow-sm" onclick="abrirModalCrear()">
+                <i class="bi bi-calendar-plus me-1"></i> Programar Clase
+            </button>
             @endcan
         </div>
     </div>
@@ -64,21 +64,189 @@
     </div>
 
 </div>
+
+<!-- Incluir el Modal Único de Sesión -->
+@include('sesiones.partials.modal_sesion')
+@endsection
+
+@section('styles')
+<style>
+    /* Estética unificada para Select2 dentro del modal */
+    .modal-body .select2-container--bootstrap-5 .select2-selection {
+        background-color: #f8f9fa !important;
+        border-color: #dee2e6 !important;
+        min-height: calc(1.5em + .75rem + 2px);
+        padding: .375rem .75rem;
+        font-size: 0.9rem;
+    }
+</style>
 @endsection
 
 @push('scripts')
 {!! $dataTable->scripts(null, ['type' => 'module']) !!}
 
 <script type="module">
+    let flatpickrInstance = null;
+
     $(document).ready(function() {
-        // Escuchar cambios en el selector de filtro
+        // Escuchar cambios en el selector de filtro de la tabla
         $('#filtro_asistencia').on('change', function() {
-            // Recargar el DataTable enviando el nuevo parámetro por AJAX
             if (window.LaravelDataTables && window.LaravelDataTables['sesiones-seccion-table']) {
                 window.LaravelDataTables['sesiones-seccion-table'].draw();
             } else if ($.fn.DataTable.isDataTable('#sesiones-seccion-table')) {
                 $('#sesiones-seccion-table').DataTable().draw();
             }
+        });
+
+        // Configuración de periodos de receso y bloqueo de días distintos al miércoles
+        const recesosDB = {!! json_encode($periodosRecesos ?? [], JSON_HEX_TAG) !!};
+        let bloqueosFlatpickr = recesosDB.map(receso => {
+            return {
+                from: receso.fecha_inicio_periodo_receso.split('T')[0], 
+                to: receso.fecha_fin_periodo_receso.split('T')[0]
+            };
+        });
+
+        bloqueosFlatpickr.push(function(date) {
+            return (date.getDay() !== 3); 
+        });
+
+        // Inicializar Flatpickr de manera local y segura
+        if (typeof window.flatpickr !== 'undefined') {
+            flatpickrInstance = window.flatpickr("#modal_fecha_sesion", {
+                locale: window.Spanish || "es", 
+                dateFormat: "Y-m-d", 
+                maxDate: "today", 
+                disable: bloqueosFlatpickr,
+                allowInput: false,
+                appendTo: document.getElementById('modalSesion')
+            });
+        }
+
+        // Inicializar Select2 en el modal cuando se abra (evita problemas de z-index y focus)
+        $('#modalSesion').on('shown.bs.modal', function () {
+            let $modal = $(this);$modal.find('.select2-buscador').each(function() {
+                if (!$(this).hasClass('select2-hidden-accessible')) {$(this).select2({
+                        theme: 'bootstrap-5',
+                        width: '100%',
+                        dropdownParent: $modal, // Vital para modales Bootstrap
+                        placeholder: 'Seleccione una opción...'
+                    });
+                }
+            });
+        });
+    });
+
+    window.abrirModalCrear = function() {
+        document.getElementById('modalSesionLabel').innerHTML = '<i class="bi bi-calendar-plus text-primary me-2"></i> Programar Sesión de Clase';
+        document.getElementById('btnText').innerText = 'Programar Clase';
+        document.getElementById('formSesion').reset();
+        document.getElementById('formMethod').value = 'POST';
+        document.getElementById('formSesion').action = "{{ route('sesiones.store') }}";
+        
+        // Limpiar Select2 al crear
+        $('#modal_id_profesor').val(null).trigger('change');
+
+        if(flatpickrInstance) {
+            flatpickrInstance.set('clickOpens', true);
+            flatpickrInstance.clear();
+        }
+        document.getElementById('modal_fecha_sesion').removeAttribute('readonly');
+        document.getElementById('alertaAsistenciaRegistrada').classList.add('d-none');
+        document.getElementById('ayuda_fecha').classList.remove('d-none');
+
+        var myModal = new bootstrap.Modal(document.getElementById('modalSesion'));
+        myModal.show();
+    }
+
+    window.abrirModalEditar = function(sesionData) {
+        let sesion = typeof sesionData === 'string' ? JSON.parse(sesionData) : sesionData;
+
+        document.getElementById('modalSesionLabel').innerHTML = '<i class="bi bi-pencil-square text-warning me-2"></i> Editar Sesión de Clase';
+        document.getElementById('btnText').innerText = 'Actualizar Clase';
+        document.getElementById('formMethod').value = 'PUT';
+        document.getElementById('formSesion').action = `/sesiones/${sesion.id_sesiones}`;
+
+        // Rellenar y disparar el evento change para que Select2 refleje el profesor seleccionado
+        $('#modal_id_profesor').val(sesion.id_profesor).trigger('change');
+        document.getElementById('modal_observacion_sesion').value = sesion.observacion_sesion || '';
+        
+        if(flatpickrInstance) {
+            flatpickrInstance.setDate(sesion.fecha_sesion, true);
+        } else {
+            document.getElementById('modal_fecha_sesion').value = sesion.fecha_sesion;
+        }
+
+        // Blindaje si ya tiene asistencias registradas
+        if (sesion.tiene_asistencia) {
+            if(flatpickrInstance) flatpickrInstance.set('clickOpens', false);
+            document.getElementById('modal_fecha_sesion').setAttribute('readonly', true);
+            document.getElementById('alertaAsistenciaRegistrada').classList.remove('d-none');
+            document.getElementById('ayuda_fecha').classList.add('d-none');
+        } else {
+            if(flatpickrInstance) flatpickrInstance.set('clickOpens', true);
+            document.getElementById('modal_fecha_sesion').removeAttribute('readonly');
+            document.getElementById('alertaAsistenciaRegistrada').classList.add('d-none');
+            document.getElementById('ayuda_fecha').classList.remove('d-none');
+        }
+
+        var myModal = new bootstrap.Modal(document.getElementById('modalSesion'));
+        myModal.show();
+    }
+
+    // Envío del formulario mediante AJAX
+    document.getElementById('formSesion').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+        const url = form.action;
+        const method = document.getElementById('formMethod').value;
+
+        let fetchOptions = {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        };
+
+        if(method === 'PUT') {
+            formData.append('_method', 'PUT');
+        }
+
+        fetch(url, fetchOptions)
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(res => {
+            if(res.status === 200 && res.body.success) {
+                bootstrap.Modal.getInstance(document.getElementById('modalSesion')).hide();
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: res.body.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    if (window.LaravelDataTables && window.LaravelDataTables['sesiones-seccion-table']) {
+                        window.LaravelDataTables['sesiones-seccion-table'].draw();
+                    } else {
+                        window.location.reload();
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Atención',
+                    text: res.body.message || 'Ocurrió un error de validación.'
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de servidor',
+                text: 'No se pudo procesar la solicitud.'
+            });
         });
     });
 </script>

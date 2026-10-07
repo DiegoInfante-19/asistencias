@@ -7,7 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- ¡FALTABA ESTA LÍNEA!
-use App\Enums\EstadoAsistencia; // IMPORTANTE: Importar el Enum
+use App\Enums\EstadoAsistencia;                       //      IMPORTANTE: Importar el Enum
 
 class Asistencia extends Model
 {

@@ -15,59 +15,93 @@ class StorePersonaRequest extends FormRequest
     {
         return [
             'cedula_personas' => [
-                'required', 'string', 'unique:personas,cedula_personas', 'regex:/^\d{6,8}$/'
+                'required',
+                'string',
+                'unique:personas,cedula_personas',
+                'regex:/^\d{6,8}$/'
             ],
             'primer_nombre_personas' => [
-                'required', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'
             ],
             'segundo_nombre_personas' => [
-                'nullable', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'
+                'nullable',
+                'string',
+                'max:50',
+                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'
             ],
             'primer_apellido_personas' => [
-                'required', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'
             ],
             'segundo_apellido_personas' => [
-                'nullable', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'
+                'nullable',
+                'string',
+                'max:50',
+                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'
             ],
             'sexo_personas' => [
-                'required', 'string', 'in:M,F'
+                'required',
+                'string',
+                'in:M,F'
             ],
             'fecha_nacimiento_personas' => [
-                'required', 'date', 'before:today'
+                'required',
+                'date',
+                'before:today'
             ],
             'email_personas' => [
-                'nullable', 'string', 'email:rfc,dns', 'max:255', 'unique:personas,email_personas',
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'unique:personas,email_personas',
                 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
             ],
-            
+
             // --- LÓGICA DE LUGAR DE NACIMIENTO 3NF ---
             'id_lugar_nacimiento' => [
-                'nullable', 'integer', 'exists:lugar_nacimiento_personas,id_lugar_nacimiento'
+                'nullable',
+                'integer',
+                'exists:lugar_nacimiento_personas,id_lugar_nacimiento'
             ],
             'id_estado' => [
-                'required', 'integer', 'exists:estados,id_estado'
+                'required',
+                'integer',
+                'exists:estados,id_estado'
             ],
             'id_ciudad' => [
-                'required', 'integer', 'exists:ciudades,id_ciudad'
+                'required',
+                'integer',
+                'exists:ciudades,id_ciudad'
             ],
             'detalles_adicionales' => [
-                'nullable', 'string', 'max:255'
+                'nullable',
+                'string',
+                'max:255'
             ],
 
             // --- LÓGICA DE COHORTE ---
             'id_cohortes' => [
-                'required', 'integer', 'exists:cohortes,id_cohortes'
+                'required',
+                'integer',
+                'exists:cohortes,id_cohortes'
             ],
         ];
     }
 
-    public function messages(){
+    public function messages()
+    {
         return [
             'required' => 'Este campo es obligatorio.',
             'cedula_personas.unique' => 'Esta cédula ya está registrada.',
             'email_personas.unique' => 'Este correo electrónico ya está registrado.',
             'sexo_personas.in' => 'El género seleccionado no es válido.',
-            
+
             'id_estado.required' => 'Debe seleccionar un estado.',
             'id_estado.exists' => 'El estado seleccionado no es válido.',
             'id_ciudad.required' => 'Debe seleccionar una ciudad.',

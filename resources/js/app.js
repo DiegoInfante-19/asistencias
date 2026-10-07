@@ -54,6 +54,15 @@ window.bootstrap = bootstrap;
 import Swal from 'sweetalert2';
 window.Swal = Swal;
 
+// 6.1 Importar Flatpickr y su idioma en español (Local)
+import flatpickr from "flatpickr";
+import { Spanish } from "flatpickr/dist/l10n/es.js";
+import "flatpickr/dist/flatpickr.min.css";
+// Opcional: Si quieres un tema limpio que combine con Bootstrap 5
+import "flatpickr/dist/themes/airbnb.css"; 
+
+window.flatpickr = flatpickr;
+
 // 7. Importar Select2 y enlazarlo explícitamente a jQuery (PASO CRÍTICO DE LA AUDITORÍA)
 import select2 from 'select2';
 select2(); 

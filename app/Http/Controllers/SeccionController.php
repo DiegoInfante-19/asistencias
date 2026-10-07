@@ -36,8 +36,11 @@ class SeccionController extends Controller
 
     public function store(StoreSeccionRequest $request): RedirectResponse
     {
-        Seccion::create($request->validated());
-        return redirect()->route('estructura.index')->with('success', 'Sección académica creada exitosamente.');
+        $seccion = Seccion::create($request->validated());
+        
+        // CORRECCIÓN: Redirigir a la vista de las secciones de ESE periodo
+        return redirect()->route('estructura.periodos.secciones', ['periodo' => $seccion->id_periodo])
+                         ->with('success', 'Sección académica creada exitosamente.');
     }
 
     public function show(
@@ -97,16 +100,42 @@ class SeccionController extends Controller
     public function update(UpdateSeccionRequest $request, Seccion $seccion): RedirectResponse
     {
         $seccion->update($request->validated());
-        return redirect()->route('estructura.index')->with('success', 'Sección actualizada correctamente.');
+        
+        // CORRECCIÓN: Redirigir a la vista de las secciones de ESE periodo
+        return redirect()->route('estructura.periodos.secciones', ['periodo' => $seccion->id_periodo])
+                         ->with('success', 'Sección actualizada correctamente.');
     }
 
     public function destroy(Seccion $seccion): RedirectResponse
     {
-        if ($seccion->inscripciones()->exists()) {
-            return redirect()->route('estructura.index')->withErrors(['error' => 'No se puede eliminar la sección porque cuenta con estudiantes inscritos.']);
+        $idPeriodo = $seccion->id_periodo;
+
+        // 1. Validar inscripciones INCLUYENDO a los estudiantes retirados (Soft Deletes)
+        if ($seccion->inscripciones()->withTrashed()->exists()) {
+            return redirect()->route('estructura.periodos.secciones', ['periodo' => $idPeriodo])
+                             ->with('error', 'No se puede eliminar la sección porque tiene un historial de estudiantes (incluso si fueron retirados).');
         }
-        $seccion->delete();
-        return redirect()->route('estructura.index')->with('success', 'Sección eliminada con éxito.');
+
+        // 2. Validar profesores asignados
+        if ($seccion->profesores()->exists()) {
+            return redirect()->route('estructura.periodos.secciones', ['periodo' => $idPeriodo])
+                             ->with('error', 'No se puede eliminar la sección porque tiene profesores asignados. Remuévalos primero.');
+        }
+
+        // 3. Validar historial de clases/sesiones INCLUYENDO las canceladas/eliminadas (Soft Deletes)
+        if ($seccion->sesiones()->withTrashed()->exists()) {
+            return redirect()->route('estructura.periodos.secciones', ['periodo' => $idPeriodo])
+                             ->with('error', 'No se puede eliminar la sección porque ya cuenta con un historial de sesiones de clase.');
+        }
+        
+        try {
+            $seccion->delete();
+            return redirect()->route('estructura.periodos.secciones', ['periodo' => $idPeriodo])
+                             ->with('success', 'Sección eliminada con éxito.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('estructura.periodos.secciones', ['periodo' => $idPeriodo])
+                             ->with('error', 'Error de base de datos: Esta sección tiene registros vinculados que impiden su eliminación.');
+        }
     }
 
     public function inscribirEstudiante(Request $request, Seccion $seccion): RedirectResponse

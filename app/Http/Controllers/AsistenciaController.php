@@ -17,7 +17,8 @@ class AsistenciaController extends Controller
             'id_sesiones'                            => 'required|exists:sesiones,id_sesiones',
             'asistencias'                            => 'required|array',
             'asistencias.*.id_inscripcion_seccion'   => 'required|exists:inscripciones_secciones,id_inscripcion_seccion|distinct',
-            'asistencias.*.estado'                   => 'required|in:presente,ausente,justificada',
+            // CORRECCIÓN: Agregar 'tarde' para evitar fallos de validación a futuro
+            'asistencias.*.estado'                   => 'required|in:presente,ausente,justificada,tarde',
             'asistencias.*.observacion'              => 'nullable|string|max:255',
         ]);
 

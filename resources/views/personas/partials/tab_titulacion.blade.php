@@ -12,7 +12,8 @@
                     Esta sección define el objetivo académico del estudiante en la institución.
                 </div>
 
-                <form action="{{ route('personas.titulacion.store', $persona->id_personas) }}" method="POST">
+                <!-- CORRECCIÓN: Agregamos id y data-pnf-original al formulario -->
+                <form id="form-titulacion" action="{{ route('personas.titulacion.store', $persona->id_personas) }}" method="POST" data-pnf-original="{{ $persona->titulacionPersona->id_pnf ?? '' }}">
                     @csrf
 
                     <!-- 1. Selección del PNF -->
@@ -213,6 +214,45 @@
         }
 
         inicializarSelectsTitulacion();
+
+        // =========================================================
+        // NUEVO: INTERCEPCIÓN DEL FORMULARIO CON SWEETALERT
+        // =========================================================
+        const formTitulacion = document.getElementById('form-titulacion');
+        
+        if (formTitulacion) {
+            formTitulacion.addEventListener('submit', function(e) {
+                const pnfOriginal = this.getAttribute('data-pnf-original');
+                const pnfNuevo = document.getElementById('id_pnf').value;
+
+                // Si hay un PNF previo registrado y es diferente al seleccionado actualmente
+                if (pnfOriginal !== '' && pnfOriginal !== pnfNuevo) {
+                    e.preventDefault(); // Detener el envío estándar
+
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: '<i class="bi bi-exclamation-triangle text-warning display-4"></i><br>¿Cambio de PNF Detectado?',
+                            html: "Estás a punto de cambiar el PNF del estudiante.<br><br>Si el estudiante tiene inscripciones activas en el <b>PNF anterior</b>, será <b>retirado automáticamente</b> de esas secciones para mantener la integridad académica.<br><br>¿Deseas proceder?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: '<i class="bi bi-check2-circle me-1"></i> Sí, cambiar y retirar',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                formTitulacion.submit(); // Proceder si acepta
+                            }
+                        });
+                    } else {
+                        // Fallback clásico si SweetAlert no carga
+                        if (confirm("Estás a punto de cambiar el PNF del estudiante. Será retirado de sus secciones anteriores. ¿Deseas proceder?")) {
+                            formTitulacion.submit();
+                        }
+                    }
+                }
+            });
+        }
     });
 </script>
 @endpush

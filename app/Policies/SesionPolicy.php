@@ -5,28 +5,26 @@ namespace App\Policies;
 use App\Models\Sesion;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
-use Carbon\Carbon;
 
 class SesionPolicy
 {
     /**
      * El Encargado / Administrador / Coordinador tiene superpoderes globales.
+     * Si retorna true, salta las demás validaciones.
      */
     public function before(User $user, string $ability): ?bool
     {
-        // Asumiendo que tus métodos de rol son isAdministrador() o isCoordinador()
         if (method_exists($user, 'isAdministrador') && $user->isAdministrador()) {
             return true;
         }
         if (method_exists($user, 'isCoordinador') && $user->isCoordinador()) {
             return true;
         }
-        // Compatibilidad con métodos alternativos por si usas isAdmin()
         if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
             return true;
         }
 
-        return null;
+        return null; // Si es profesor, continúa a evaluar los métodos de abajo
     }
 
     public function viewAny(User $user): bool
@@ -34,32 +32,44 @@ class SesionPolicy
         return true;
     }
 
-    public function view(User $user, Sesion $sesion): bool
+   public function view(User $user, Sesion $sesion): bool
     {
         if ($user->isProfesor()) {
-            return $user->profesor?->id_profesor === $sesion->id_profesor;
+            
+            // --- DEPURADOR TEMPORAL ---
+            dd([
+                'id_user_logueado' => $user->id,
+                'email' => $user->email,
+                'es_profesor_según_isProfesor' => $user->isProfesor(),
+                'relacion_profesor_objeto' => $user->profesor,
+                'id_profesor_del_usuario' => $user->profesor?->id_profesor,
+                'id_profesor_de_la_sesion' => $sesion->id_profesor,
+            ]);
+            // ---------------------------
+
+            return (int) $user->profesor?->id_profesor === (int) $sesion->id_profesor;
         }
         return true;
     }
 
     public function create(User $user): bool
     {
-        return $user->isProfesor() || $user->isAdministrador() || $user->isCoordinador();
+        return true; 
     }
 
     public function update(User $user, Sesion $sesion): Response|bool
     {
-        // Si es profesor, validamos propiedad y ventana de gracia de 48 horas
+        // Si el flujo llegó aquí, significa que ES UN PROFESOR
         if ($user->isProfesor()) {
-            if ($user->profesor?->id_profesor !== $sesion->id_profesor) {
+            
+            // 1. Validar Propiedad con casteo seguro
+            if ((int) $user->profesor?->id_profesor !== (int) $sesion->id_profesor) {
                 return Response::deny('No tiene autorización para modificar sesiones de otros profesores.');
             }
 
-            $horasPermitidas = 48;
-            $fechaLimite = Carbon::parse($sesion->fecha_sesion)->addHours($horasPermitidas);
-
-            if (Carbon::now()->greaterThan($fechaLimite)) {
-                return Response::deny("El tiempo límite de {$horasPermitidas} horas para modificar esta asistencia ha expirado. Contacte a su Coordinador.");
+            // 2. Validar Tiempo: ¿Pasaron las 48 horas?
+            if ($sesion->tiempoAgotado()) {
+                return Response::deny("El tiempo límite de 48 horas para modificar esta asistencia ha expirado. Contacte a su Coordinador.");
             }
         }
 
@@ -68,7 +78,7 @@ class SesionPolicy
 
     public function delete(User $user, Sesion $sesion): Response|bool
     {
-        // La anulación (Soft Delete) queda reservada exclusivamente para el Encargado por seguridad institucional
+        // La anulación (Soft Delete) queda reservada exclusivamente para el Encargado
         if ($user->isProfesor()) {
             return Response::deny('Los profesores no pueden anular sesiones. Contacte al encargado.');
         }

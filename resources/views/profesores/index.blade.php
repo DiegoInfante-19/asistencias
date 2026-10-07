@@ -4,120 +4,115 @@
 <div class="content pt-4" style="margin: 20px;">
     
     <!-- TARJETA DE FILTROS AVANZADOS -->
-    <div class="card border shadow-sm mb-4">
-        <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h5 class="card-title text-dark mb-0 fw-bold fs-6">
-                <i class="bi bi-funnel-fill text-primary me-2"></i> Filtros Avanzados de Búsqueda
-            </h5>
-            <button class="btn btn-sm btn-outline-secondary ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiltros" aria-expanded="true" aria-controls="collapseFiltros">
-                <i class="bi bi-chevron-down"></i> Ocultar / Mostrar
-            </button>
+    <div class="card shadow-sm ecosystem-card mb-4">
+        <!-- Header estático -->
+        <div class="card-header bg-white py-3 border-bottom">
+            <h4 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
+                Filtros Avanzados de Búsqueda
+            </h4>
         </div>
-        <div class="collapse show" id="collapseFiltros">
-            <div class="card-body bg-light p-4">
-                <div class="row g-3">
-                    
-                    <!-- 1. Filtro por PNF -->
-                    <div class="col-md-3">
-                        <label for="filtro_pnf" class="form-label fw-bold small text-dark">PNF Asignado</label>
-                        <select id="filtro_pnf" class="form-select select2-buscador">
-                            <option value="" selected>Todos los PNF</option>
-                            @if(isset($pnfs))
-                                @foreach($pnfs as $pnf)
-                                    <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
-
-                    <!-- 2. Filtro por Sección -->
-                    <div class="col-md-3">
-                        <label for="filtro_seccion" class="form-label fw-bold small text-dark">Sección Específica</label>
-                        <select id="filtro_seccion" class="form-select select2-buscador">
-                            <option value="" selected>Todas las Secciones</option>
-                            @if(isset($secciones))
-                                @foreach($secciones as $seccion)
-                                    <option value="{{ $seccion->id_seccion }}">{{ $seccion->nombre_seccion }}</option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
-
-                    <!-- 3. Filtro por Rol -->
-                    <div class="col-md-3">
-                        <label for="filtro_rol" class="form-label fw-bold small text-dark">Rol de Usuario</label>
-                        <select id="filtro_rol" class="form-select select2-buscador">
-                            <option value="" selected>Todos los Roles</option>
-                            @if(isset($roles))
-                                @foreach($roles as $rol)
-                                    <option value="{{ $rol->id_rol }}">{{ $rol->nombre_rol ?? $rol->name_role ?? 'Rol #' . $rol->id_rol }}</option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
-
-                    <!-- 4. Filtro por Estatus -->
-                    <div class="col-md-3">
-                        <label for="filtro_estatus" class="form-label fw-bold small text-dark">Estatus del Usuario</label>
-                        <select id="filtro_estatus" class="form-select select2-buscador">
-                            <option value="" selected>Todos los Estatus</option>
-                            <option value="Activo">Activo</option>
-                            <option value="Inactivo">Inactivo</option>
-                        </select>
-                    </div>
-
-                    <!-- 5. Filtro por Sección Activa -->
-                    <div class="col-md-3">
-                        <label for="filtro_seccion_activa" class="form-label fw-bold small text-dark">Sección Activa</label>
-                        <select id="filtro_seccion_activa" class="form-select select2-buscador">
-                            <option value="" selected>Indiferente</option>
-                            <option value="1">Sí (En secciones activas)</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-
-                    <!-- 6. Filtro Booleano: Tiene Sección -->
-                    <div class="col-md-3">
-                        <label for="filtro_tiene_seccion" class="form-label fw-bold small text-dark">Asignación de Sección</label>
-                        <select id="filtro_tiene_seccion" class="form-select select2-buscador">
-                            <option value="" selected>Indiferente</option>
-                            <option value="1">Tiene Sección Asignada</option>
-                            <option value="0">No tiene Sección</option>
-                        </select>
-                    </div>
-
-                    <!-- 7. Filtro Booleano: Tiene PNF -->
-                    <div class="col-md-3">
-                        <label for="filtro_tiene_pnf" class="form-label fw-bold small text-dark">Asignación de PNF</label>
-                        <select id="filtro_tiene_pnf" class="form-select select2-buscador">
-                            <option value="" selected>Indiferente</option>
-                            <option value="1">Tiene PNF Asignado</option>
-                            <option value="0">No tiene PNF</option>
-                        </select>
-                    </div>
-
-                    <!-- 8. Filtro por Nivel Asignado -->
-                    <div class="col-md-3">
-                        <label for="filtro_nivel" class="form-label fw-bold small text-dark">Nivel Asignado</label>
-                        <select id="filtro_nivel" class="form-select select2-buscador">
-                            <option value="" selected>Todos los Niveles</option>
-                            <option value="TSU">TSU</option>
-                            <option value="Ingeniería">Ingeniería</option>
-                        </select>
-                    </div>
-
+        
+        <!-- Body blanco -->
+        <div class="card-body bg-white p-4">
+            <div class="row g-4">
+                
+                <!-- 1. Filtro por PNF -->
+                <div class="col-md-3">
+                    <label for="filtro_pnf" class="form-label fw-bold small text-muted text-uppercase">PNF Asignado</label>
+                    <select id="filtro_pnf" class="form-select select2-buscador">
+                        <option value="" selected>Todos los PNF...</option>
+                        @if(isset($pnfs))
+                            @foreach($pnfs as $pnf)
+                                <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
+                            @endforeach
+                        @endif
+                    </select>
                 </div>
 
-                <!-- Botón de Reseteo de Filtros -->
-                <div class="row mt-3">
-                    <div class="col-12 text-end">
-                        <button type="button" id="btnResetFiltros" class="btn btn-success shadow-sm">
-                            <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar Filtros
-                        </button>
-                    </div>
+                <!-- 2. Filtro por Sección -->
+                <div class="col-md-3">
+                    <label for="filtro_seccion" class="form-label fw-bold small text-muted text-uppercase">Sección Específica</label>
+                    <select id="filtro_seccion" class="form-select select2-buscador">
+                        <option value="" selected>Todas las Secciones...</option>
+                        @if(isset($secciones))
+                            @foreach($secciones as $seccion)
+                                <option value="{{ $seccion->id_seccion }}">{{ $seccion->nombre_seccion }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+
+                <!-- 3. Filtro por Rol -->
+                <div class="col-md-3">
+                    <label for="filtro_rol" class="form-label fw-bold small text-muted text-uppercase">Rol de Usuario</label>
+                    <select id="filtro_rol" class="form-select select2-buscador">
+                        <option value="" selected>Todos los Roles...</option>
+                        @if(isset($roles))
+                            @foreach($roles as $rol)
+                                <option value="{{ $rol->id_rol }}">{{ $rol->nombre_rol ?? $rol->name_role ?? 'Rol #' . $rol->id_rol }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+
+                <!-- 4. Filtro por Estatus -->
+                <div class="col-md-3">
+                    <label for="filtro_estatus" class="form-label fw-bold small text-muted text-uppercase">Estatus del Usuario</label>
+                    <select id="filtro_estatus" class="form-select select2-buscador">
+                        <option value="" selected>Todos los Estatus...</option>
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </div>
+
+                <!-- 5. Filtro por Sección Activa -->
+                <div class="col-md-3">
+                    <label for="filtro_seccion_activa" class="form-label fw-bold small text-muted text-uppercase">Sección Activa</label>
+                    <select id="filtro_seccion_activa" class="form-select select2-buscador">
+                        <option value="" selected>Indiferente...</option>
+                        <option value="1">Sí (En secciones activas)</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <!-- 6. Filtro Booleano: Tiene Sección -->
+                <div class="col-md-3">
+                    <label for="filtro_tiene_seccion" class="form-label fw-bold small text-muted text-uppercase">Asignación de Sección</label>
+                    <select id="filtro_tiene_seccion" class="form-select select2-buscador">
+                        <option value="" selected>Indiferente...</option>
+                        <option value="1">Tiene Sección Asignada</option>
+                        <option value="0">No tiene Sección</option>
+                    </select>
+                </div>
+
+                <!-- 7. Filtro Booleano: Tiene PNF -->
+                <div class="col-md-3">
+                    <label for="filtro_tiene_pnf" class="form-label fw-bold small text-muted text-uppercase">Asignación de PNF</label>
+                    <select id="filtro_tiene_pnf" class="form-select select2-buscador">
+                        <option value="" selected>Indiferente...</option>
+                        <option value="1">Tiene PNF Asignado</option>
+                        <option value="0">No tiene PNF</option>
+                    </select>
+                </div>
+
+                <!-- 8. Filtro por Nivel Asignado -->
+                <div class="col-md-3">
+                    <label for="filtro_nivel" class="form-label fw-bold small text-muted text-uppercase">Nivel Asignado</label>
+                    <select id="filtro_nivel" class="form-select select2-buscador">
+                        <option value="" selected>Todos los Niveles...</option>
+                        <option value="TSU">TSU</option>
+                        <option value="Ingeniería">Ingeniería</option>
+                    </select>
                 </div>
 
             </div>
+        </div>
+
+        <!-- Footer BLANCO con el botón Limpiar (Alineado a la derecha) -->
+        <div class="card-footer bg-white py-3 d-flex justify-content-end border-top">
+            <button type="button" id="btnResetFiltros" class="btn btn-success fw-bold shadow-sm">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar Filtros
+            </button>
         </div>
     </div>
 
@@ -125,10 +120,10 @@
     <div class="card border shadow-sm">
 
         <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h4 class="card-title text-dark mb-0 fw-bold fs-6">
+            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
                 Personal y Profesores Registrados
-            </h4>
-            <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#createUserModal">
+            </h5>
+            <button type="button" class="btn btn-primary shadow-sm ms-auto" data-bs-toggle="modal" data-bs-target="#createUserModal">
                 <i class="bi bi-person-plus-fill me-1" style="font-weight: 500;"></i> Añadir Profesor
             </button>
         </div>
@@ -152,11 +147,33 @@
 
 @section('styles')
 <style>
-    /* Asegurar que Select2 luzca perfectamente integrado con Bootstrap 5 */
-    .select2-container--bootstrap-5 .select2-selection {
+    /* ---------------------------------------------------
+       ESTÉTICA UNIFICADA PARA INPUTS Y SELECT2 "SOFT"
+    ----------------------------------------------------- */
+    
+    /* 1. Entradas de texto y selects normales */
+    .card-body.bg-white .form-control,
+    .card-body.bg-white .form-select {
+        background-color: #f8f9fa !important;
+        border-color: #dee2e6 !important;
+    }
+
+    /* 2. Forzar a Select2 para que adopte el fondo gris, borde y sombra */
+    .card-body.bg-white .select2-container--bootstrap-5 .select2-selection {
+        background-color: #f8f9fa !important;
+        border-color: #dee2e6 !important;
         min-height: calc(1.5em + .75rem + 2px);
         padding: .375rem .75rem;
         font-size: 0.9rem;
+    }
+
+    /* 3. Efecto Focus (Cuando haces clic para escribir/buscar) */
+    .card-body.bg-white .form-control:focus,
+    .card-body.bg-white .form-select:focus,
+    .card-body.bg-white .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        background-color: #ffffff !important;
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
     }
 </style>
 @endsection
@@ -173,7 +190,7 @@
             placeholder: 'Seleccione una opción...'
         });
 
-        // 2. REAJUSTE DE DATATABLES (Responsive seguro para evitar error de recalc)
+        // 2. REAJUSTE DE DATATABLES
         $(window).on('resize', function() {
             if ($.fn.DataTable.isDataTable('#users-table')) {
                 var table = $('#users-table').DataTable();
@@ -202,7 +219,8 @@
 
         // 5. BOTÓN PARA LIMPIAR / RESETEAR FILTROS
         $('#btnResetFiltros').on('click', function() {
-            $('.select2-buscador').val(null).trigger('change');
+            // Usamos .trigger('change.select2') para evitar múltiples redibujados, y luego un solo draw()
+            $('.select2-buscador').val(null).trigger('change.select2');
             window.LaravelDataTables['users-table'].draw();
         });
 

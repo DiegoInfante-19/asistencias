@@ -9,6 +9,7 @@ use App\Models\Pnf;
 use App\Models\Seccion;
 use App\Models\Profesor;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\DataTables\UsersDataTable;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
@@ -85,14 +86,51 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::where('id_users', $id)->firstOrFail();
+        $user = User::with('profesor.sesiones', 'profesor.secciones')->where('id_users', $id)->firstOrFail();
 
+        // 1. Evitar auto-eliminación
         if (auth()->user()->id_users === $user->id_users) {
             return redirect()->back()->with('error', 'No puedes eliminar tu propia cuenta mientras estás en sesión.');
         }
 
-        $user->delete();
-        return redirect()->back()->with('success', 'El usuario ha sido eliminado del sistema exitosamente.');
+        // 2. BLINDAJE ESTRICTO: Verificar si el usuario es profesor y tiene sesiones registradas indicando la sección
+        if ($user->profesor) {
+            // Buscamos las sesiones y unimos con la tabla secciones para obtener sus nombres únicos
+            $sesionesConSeccion = DB::table('sesiones')
+                ->join('secciones', 'sesiones.id_seccion', '=', 'secciones.id_seccion')
+                ->where('sesiones.id_profesor', $user->profesor->id_profesor)
+                ->select('secciones.nombre_seccion')
+                ->distinct()
+                ->pluck('nombre_seccion')
+                ->toArray();
+
+            if (!empty($sesionesConSeccion)) {
+                $nombresSecciones = implode(', ', $sesionesConSeccion);
+                return redirect()->back()->with('error', 'No se puede eliminar este profesor porque tiene sesiones de clases registradas con a la(s) sección(es): [' . $nombresSecciones . '].');
+            }
+        }
+
+        try {
+            DB::beginTransaction();
+
+            if ($user->profesor) {
+                // 3. Desvincular las secciones asignadas de la tabla pivote (profesor_seccion)
+                $user->profesor->secciones()->detach();
+
+                // 4. Eliminar el registro del profesor de forma segura
+                $user->profesor->delete();
+            }
+
+            // 5. Eliminar el usuario (Las preguntas secretas se eliminan en cascada por la BD)
+            $user->delete();
+
+            DB::commit();
+            return redirect()->back()->with('success', 'El usuario y su asignación de profesor han sido eliminados del sistema exitosamente.');
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Ocurrió un error al intentar eliminar el registro: ' . $e->getMessage());
+        }
     }
 
     public function show($id)

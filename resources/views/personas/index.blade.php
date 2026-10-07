@@ -3,20 +3,21 @@
 @section('styles')
 <style>
     /* 1. Azul Claro (#ADD8E6) para Masculino */
-    table.dataTable tbody tr.bg-masculino > td {
+    table.dataTable tbody tr.bg-masculino>td {
         background-color: #ADD8E6 !important;
     }
 
     /* 2. Rosa Claro (#FFB6C1) para Femenino */
-    table.dataTable tbody tr.bg-femenino > td {
+    table.dataTable tbody tr.bg-femenino>td {
         background-color: #FFB6C1 !important;
     }
-    
+
     /* 3. Tonos ligeramente más profundos y cómodos para el efecto Hover */
-    table.dataTable tbody tr.bg-masculino:hover > td {
+    table.dataTable tbody tr.bg-masculino:hover>td {
         background-color: #9ac2d9 !important;
     }
-    table.dataTable tbody tr.bg-femenino:hover > td {
+
+    table.dataTable tbody tr.bg-femenino:hover>td {
         background-color: #f29da9 !important;
     }
 
@@ -46,16 +47,15 @@
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    
+
     <!-- PANEL DE FILTROS AVANZADOS -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white py-3">
-            <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
-                Filtros de Búsqueda
+            <h4 class="card-title text-dark mb-0 fs-6" style="font-weight: 500;">
+                <i class="bi bi-funnel-fill text-primary me-2"></i> Filtros de Búsqueda
             </h4>
         </div>
         <div class="card-body bg-white py-4">
-            
             <!-- Fila 1: Filtros Académicos -->
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="filtro_pnf" class="form-label fw-bold small text-muted">Programa Nacional de Formación</label>
+                    <label for="filtro_pnf" class="form-label fw-bold small text-muted">PNF</label>
                     <select id="filtro_pnf" class="form-select select2-buscador">
                         <option value="">Todos...</option>
                         @foreach(\App\Models\Pnf::orderBy('nombre_pnf')->get() as $pnf)
@@ -90,7 +90,7 @@
             <!-- Fila 2: Filtros Laborales y Demográficos -->
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                    <label for="filtro_empresa" class="form-label fw-bold small text-muted">Empresa</label>
+                    <label for="filtro_empresa" class="form-label fw-bold small text-muted">Empresa Aliada</label>
                     <select id="filtro_empresa" class="form-select select2-buscador">
                         <option value="">Todas...</option>
                         @foreach(\App\Models\Empresa::orderBy('nombre_empresa')->get() as $empresa)
@@ -110,7 +110,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="filtro_estado" class="form-label fw-bold small text-muted">Estado de Origen (Nacimiento)</label>
+                    <label for="filtro_estado" class="form-label fw-bold small text-muted">Estado Origen (Nacimiento)</label>
                     <select id="filtro_estado" class="form-select select2-buscador">
                         <option value="">Todos...</option>
                         @foreach(\App\Models\Estado::orderBy('nombre_estado')->get() as $estado)
@@ -123,8 +123,8 @@
             <!-- Fila 3: Nuevos Filtros Excluyentes (Profesor y Sección) -->
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                    <label for="filtro_profesor" class="form-label fw-bold small text-muted">
-                        Filtrar por Profesor (Excluyente con Sección)
+                    <label for="filtro_profesor" class="form-label fw-bold small text-primary">
+                        <i class="bi bi-person-badge me-1"></i> Filtrar por Profesor (Excluyente con Sección)
                     </label>
                     <select id="filtro_profesor" class="form-select select2-buscador">
                         <option value="">Cualquier profesor...</option>
@@ -139,14 +139,14 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="filtro_seccion" class="form-label fw-bold small text-muted">
-                        Filtrar por Sección (Excluyente con Profesor)
+                    <label for="filtro_seccion" class="form-label fw-bold small text-success">
+                        <i class="bi bi-grid-3x3 me-1"></i> Filtrar por Sección (Excluyente con Profesor)
                     </label>
                     <select id="filtro_seccion" class="form-select select2-buscador">
                         <option value="">Cualquier sección...</option>
                         @foreach(\App\Models\Seccion::with('pnf')->orderBy('nombre_seccion')->get() as $seccion)
                             <option value="{{ $seccion->id_seccion }}">
-                                Sección: {{ $seccion->nombre_seccion }} ({{ $seccion->pnf->nombre_pnf ?? 'Sin PNF' }})
+                                Sección: {{ $seccion->nombre_seccion }} ({{$seccion->pnf->nombre_pnf ?? 'Sin PNF' }})
                             </option>
                         @endforeach
                     </select>
@@ -162,7 +162,6 @@
                     </select>
                 </div>
             </div>
-
         </div>
 
         <!-- FOOTER DE LA TARJETA DE FILTROS -->
@@ -204,15 +203,15 @@
 
         // 1. Adjuntar los filtros a la petición AJAX
         $('#personas-table').on('preXhr.dt', function(e, settings, data) {
-            data.filtro_cohorte   = $('#filtro_cohorte').val();
-            data.filtro_pnf       = $('#filtro_pnf').val();
-            data.filtro_titulo    = $('#filtro_titulo').val();
-            data.filtro_estatus   = $('#filtro_estatus').val();
-            data.filtro_empresa   = $('#filtro_empresa').val();
-            data.filtro_cargo     = $('#filtro_cargo').val();
-            data.filtro_estado    = $('#filtro_estado').val();
-            data.filtro_profesor  = $('#filtro_profesor').val();
-            data.filtro_seccion   = $('#filtro_seccion').val();
+            data.filtro_cohorte = $('#filtro_cohorte').val();
+            data.filtro_pnf = $('#filtro_pnf').val();
+            data.filtro_titulo = $('#filtro_titulo').val();
+            data.filtro_empresa = $('#filtro_empresa').val();
+            data.filtro_cargo = $('#filtro_cargo').val();
+            data.filtro_estado = $('#filtro_estado').val();
+            data.filtro_profesor = $('#filtro_profesor').val();
+            data.filtro_seccion = $('#filtro_seccion').val();
+            data.filtro_estatus = $('#filtro_estatus').val();
         });
 
         // 2. LÓGICA DE EXCLUSIÓN MUTUA (Profesor vs Sección)
@@ -247,16 +246,16 @@
         }
 
         // 3. LÓGICA EN CASCADA AJAX (PNF -> TÍTULO)
-        let $pnfSelect = $('#filtro_pnf');
-        let $tituloSelect = $('#filtro_titulo');
+        let $pnfSelect =$('#filtro_pnf');
+        let $tituloSelect =$('#filtro_titulo');
 
         $pnfSelect.on('change', function() {
             let pnfId = $(this).val();
 
             if (!pnfId) {
                 $tituloSelect.empty()
-                           .append('<option value="">Seleccione un PNF primero...</option>')
-                           .prop('disabled', true);
+                    .append('<option value="">Seleccione un PNF primero...</option>')
+                    .prop('disabled', true);
                 $tituloSelect.trigger('change.select2');
                 triggerDatatableDraw();
                 return;
@@ -273,9 +272,8 @@
                     $.each(data, function(key, item) {
                         $tituloSelect.append(`<option value="${item.id_titulo}">${item.nombre_titulo_pnf}</option>`);
                     });
-                    
-                    $tituloSelect.prop('disabled', false);
-                    $tituloSelect.trigger('change.select2');
+
+                    $tituloSelect.prop('disabled', false);$tituloSelect.trigger('change.select2');
                     triggerDatatableDraw();
                 },
                 error: function() {

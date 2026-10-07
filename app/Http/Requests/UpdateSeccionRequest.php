@@ -14,10 +14,18 @@ class UpdateSeccionRequest extends FormRequest
 
     public function rules(): array
     {
-        $seccionId = $this->route('seccion');
+        // Obtenemos el parámetro de la ruta (puede ser el Modelo completo o un ID numérico)
+        $seccionParam = $this->route('seccion');
 
-        // Si id_periodo o id_pnf no viajan en el request de actualización, los rescatamos del modelo actual para que la regla unique no falle
-        $seccionActual = \App\Models\Seccion::find($seccionId);
+        // Si es el modelo completo (Route Model Binding), lo usamos directamente. Si es un ID, lo buscamos.
+        $seccionActual = $seccionParam instanceof \App\Models\Seccion 
+                            ? $seccionParam 
+                            : \App\Models\Seccion::find($seccionParam);
+                            
+        // Obtenemos el ID explícito para ignorarlo en la regla unique
+        $seccionId = $seccionActual->id_seccion ?? $seccionParam;
+
+        // Si id_periodo o id_pnf no viajan en el request de actualización, los rescatamos del modelo actual
         $idPeriodo = $this->input('id_periodo', $seccionActual->id_periodo ?? null);
         $idPnf = $this->input('id_pnf', $seccionActual->id_pnf ?? null);
 
