@@ -9,7 +9,7 @@
         <!-- HEADER DE LA TARJETA -->
         <div class="card-header bg-white py-3 d-flex align-items-center border-bottom">
             <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
-                Estructura Académica General: Cohortes y Períodos
+                Registro de Periodos Académicos
             </h4>
             <button type="button" class="btn btn-primary fw-bold ms-auto shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCohorte">
                 <i class="bi bi-plus-lg me-1"></i> Nueva Cohorte y Período

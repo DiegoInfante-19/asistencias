@@ -24,12 +24,9 @@ class PersonasDataTable extends BaseDataTable
             })
             ->addColumn('titulo', function ($persona) {
                 if ($persona->titulacionPersona && $persona->titulacionPersona->id_titulacion) {
-                    $tituloEspecifico = DB::table('titulos_pnf')
-                        ->where('id_pnf', $persona->titulacionPersona->id_pnf)
-                        ->where('id_titulo', $persona->titulacionPersona->id_titulacion)
-                        ->value('nombre_titulo_pnf');
-
-                    $nombreMostrar = $tituloEspecifico ?? $persona->titulacionPersona->titulacion->nombre_titulo_base ?? 'Título Desconocido';
+                    // Ahora usamos nuestro Accessor que respeta estrictamente el PNF
+                    $tituloEspecifico = $persona->titulacionPersona->nombre_titulo_especifico;
+                    $nombreMostrar = $tituloEspecifico ?? optional($persona->titulacionPersona->titulacion)->nombre_titulo_base ?? 'Título Desconocido';
                     
                     return $nombreMostrar;
                 }
@@ -53,62 +50,72 @@ class PersonasDataTable extends BaseDataTable
                     $query->where('id_cohortes', request()->get('filtro_cohorte'));
                 }
 
-                // 2. Filtro por Empresa
+                // 2. Filtro por Empresa (Blindado al trabajo más reciente)
                 if (request()->has('filtro_empresa') && !empty(request()->get('filtro_empresa'))) {
                     $query->whereHas('empresaPersona', function ($q) {
-                        $q->where('id_empresa', request()->get('filtro_empresa'));
+                        $q->where('id_empresa', request()->get('filtro_empresa'))
+                          ->whereRaw('id_empresa_personas = (select max(id_empresa_personas) from empresa_personas as ep where ep.id_personas = personas.id_personas)');
                     });
                 }
                 
-                // 3. Filtro por Cargo
+                // 3. Filtro por Cargo (Blindado al trabajo más reciente)
                 if (request()->has('filtro_cargo') && !empty(request()->get('filtro_cargo'))) {
                     $query->whereHas('empresaPersona', function ($q) {
-                        $q->where('id_cargo', request()->get('filtro_cargo'));
+                        $q->where('id_cargo', request()->get('filtro_cargo'))
+                          ->whereRaw('id_empresa_personas = (select max(id_empresa_personas) from empresa_personas as ep where ep.id_personas = personas.id_personas)');
                     });
                 }
 
-                // 4. Filtro por PNF
+                // 4. Filtro por PNF (Blindado al expediente más reciente de la persona)
                 if (request()->has('filtro_pnf') && !empty(request()->get('filtro_pnf'))) {
-                    $query->whereHas('titulacionPersona', function ($q) {
-                        $q->where('id_pnf', request()->get('filtro_pnf'));
+                    $pnfId = request()->get('filtro_pnf');
+                    $query->whereHas('titulacionPersonas', function ($q) use ($pnfId) {
+                        $q->where('id_pnf', $pnfId)
+                          ->whereRaw('id_titulacion_personas = (select max(id_titulacion_personas) from titulacion_personas as tp where tp.id_personas = personas.id_personas)');
                     });
                 }
 
-                // 5. Filtro por Título a Optar
+                // 5. Filtro por Título a Optar (Corregido y Simplificado)
                 if (request()->has('filtro_titulo') && !empty(request()->get('filtro_titulo'))) {
-                    $query->whereHas('titulacionPersona', function ($q) {
-                        $q->where('id_titulacion', request()->get('filtro_titulo'));
+                    $tituloId = request()->get('filtro_titulo');
+                    $query->whereHas('titulacionPersonas', function ($q) use ($tituloId) {
+                        // Filtramos directo por la llave foránea real sin hacer cruces peligrosos
+                        $q->where('id_titulacion', $tituloId)
+                          ->whereRaw('id_titulacion_personas = (select max(id_titulacion_personas) from titulacion_personas as tp where tp.id_personas = personas.id_personas)');
                     });
                 }
 
-                // 6. Filtro por Estatus de Expediente
+                // 6. Filtro por Estatus de Expediente (Blindado al expediente más reciente de la persona)
                 if (request()->has('filtro_estatus') && !empty(request()->get('filtro_estatus'))) {
-                    $query->whereHas('titulacionPersona', function ($q) {
-                        $q->where('id_estatus_expediente', request()->get('filtro_estatus'));
+                    $estatusId = request()->get('filtro_estatus');
+                    $query->whereHas('titulacionPersonas', function ($q) use ($estatusId) {
+                        $q->where('id_estatus_expediente', $estatusId)
+                          ->whereRaw('id_titulacion_personas = (select max(id_titulacion_personas) from titulacion_personas as tp where tp.id_personas = personas.id_personas)');
                     });
                 }
 
-                // 7. Filtro por Estado de Nacimiento
+                // 7. Filtro por Estado de Nacimiento (Corregido para usar la relación anidada de ciudad)
                 if (request()->has('filtro_estado') && !empty(request()->get('filtro_estado'))) {
+                    // Usamos notación de punto para cruzar de lugarNacimiento -> ciudad
                     $query->whereHas('lugarNacimiento.ciudad', function ($q) {
                         $q->where('id_estado', request()->get('filtro_estado'));
                     });
                 }
 
-                // 8. NUEVO: Filtro por Profesor (A través de las inscripciones a secciones y la relación N:M de profesor_seccion)
+                // 8. Filtro por Profesor (Corrección: Uso de inscripcionActiva y profesores.id_profesor)
                 if (request()->has('filtro_profesor') && !empty(request()->get('filtro_profesor'))) {
                     $profesorId = request()->get('filtro_profesor');
-                    $query->whereHas('inscripcionesSecciones', function ($q) use ($profesorId) {
+                    $query->whereHas('inscripcionActiva', function ($q) use ($profesorId) {
                         $q->whereHas('seccion.profesores', function ($subq) use ($profesorId) {
                             $subq->where('profesores.id_profesor', $profesorId);
                         });
                     });
                 }
 
-                // 9. NUEVO: Filtro por Sección (A través de las inscripciones a secciones directas)
+                // 9. Filtro por Sección
                 if (request()->has('filtro_seccion') && !empty(request()->get('filtro_seccion'))) {
                     $seccionId = request()->get('filtro_seccion');
-                    $query->whereHas('inscripcionesSecciones', function ($q) use ($seccionId) {
+                    $query->whereHas('inscripcionActual', function ($q) use ($seccionId) {
                         $q->where('id_seccion', $seccionId);
                     });
                 }

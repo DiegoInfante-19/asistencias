@@ -1,6 +1,6 @@
 <!-- Modal Único de Sesión (Crear / Editar) -->
 <div class="modal fade" id="modalSesion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalSesionLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             
             <div class="modal-header bg-white border-bottom">

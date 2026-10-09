@@ -24,11 +24,11 @@
                         Permite registrar o transcribir asistencias de días miércoles pasados mediante control administrativo.
                     </div>
 
-                    <!-- 1. SELECCIÓN DE FECHA (MIÉRCOLES) -->
+                    <!-- 1. SELECCIÓN DE FECHA (FLATPICKR MIÉRCOLES) -->
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold small text-muted">Fecha de la Clase (Solo Miércoles) <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_sesion" id="admin_fecha_sesion" required>
-                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">El sistema validará automáticamente que corresponda a un día miércoles hábil.</small>
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_sesion" id="admin_fecha_sesion" placeholder="Seleccione un miércoles..." required autocomplete="off">
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Los días no hábiles o distintos al miércoles están bloqueados por calendario.</small>
                     </div>
 
                     <!-- 2. SELECCIÓN DE PROFESOR (TITULAR VS SUPLENTE) -->
@@ -81,39 +81,3 @@
         </div>
     </div>
 </div>
-
-<!-- Puedes agregar más modales aquí abajo en el futuro -->
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleSuplente = document.getElementById('toggleProfesorSuplente');
-        const selectTitular = document.getElementById('selectProfesorTitular');
-        const selectSuplente = document.getElementById('selectProfesorSuplente');
-
-        if (toggleSuplente) {
-            toggleSuplente.addEventListener('change', function() {
-                if (this.checked) {
-                    selectTitular.classList.add('d-none');
-                    selectTitular.removeAttribute('name');
-                    selectTitular.removeAttribute('required');
-                    
-                    selectSuplente.classList.remove('d-none');
-                    selectSuplente.setAttribute('name', 'id_profesor');
-                    selectSuplente.setAttribute('required', 'required');
-                    selectSuplente.removeAttribute('disabled');
-                } else {
-                    selectSuplente.classList.add('d-none');
-                    selectSuplente.removeAttribute('name');
-                    selectSuplente.removeAttribute('required');
-                    selectSuplente.setAttribute('disabled', 'disabled');
-
-                    selectTitular.classList.remove('d-none');
-                    selectTitular.setAttribute('name', 'id_profesor');
-                    selectTitular.setAttribute('required', 'required');
-                }
-            });
-        }
-    });
-</script>
-@endpush

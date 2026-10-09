@@ -31,9 +31,6 @@ class ProfesorSeccionDataTable extends BaseDataTable
                 $nivel = $profesor->nivel_asignado?->value ?? $profesor->nivel_asignado ?? 'N/D';
                 return '<h5><span class="badge bg-primary text-dark">' . $nivel . '</span></h5>';
             })
-            ->addColumn('pnf_base', function ($profesor) {
-                return $profesor->pnf->nombre_pnf ?? 'Sin PNF';
-            })
             ->addColumn('action', function ($profesor) {
                 $seccionId = $this->seccion->id_seccion;
                 $profesorId = $profesor->id_profesor;
@@ -45,18 +42,18 @@ class ProfesorSeccionDataTable extends BaseDataTable
                 <form action="{$url}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de remover a este docente de la sección?');">
                     {$csrf}
                     {$method}
-                    <button type="submit" class="btn btn-danger btn-sm shadow-sm">Remover</button>
+                    <button type="submit" class="btn btn-danger shadow-sm">Remover</button>
                 </form>
 HTML;
             })
-            ->rawColumns(['cedula', 'nombre_completo', 'nivel_asignado', 'pnf_base', 'action'])
+            ->rawColumns(['cedula', 'nombre_completo', 'nivel_asignado', 'action'])
             ->setRowId('id_profesor');
     }
 
     public function query(Profesor $model): EloquentBuilder
     {
         return $model->newQuery()
-            ->with(['user', 'pnf'])
+            ->with(['user'])
             ->whereHas('secciones', function ($q) {
                 $q->where('secciones.id_seccion', $this->seccion->id_seccion);
             });
@@ -81,11 +78,10 @@ HTML;
     {
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center'),
-            Column::make('cedula')->title('Cédula')->width('20%')->orderable(false),
-            Column::make('nombre_completo')->title('Nombre y Apellido')->width('30%')->orderable(false),
-            Column::make('nivel_asignado')->title('Nivel Académico')->width('15%')->addClass('text-center'),
-            Column::make('pnf_base')->title('PNF Base')->width('20%')->orderable(false),
-            Column::computed('action')->title('Acciones')->width('15%')->exportable(false)->printable(false)->addClass('text-center'),
+            Column::make('cedula')->title('Cédula')->width('15%')->orderable(false),
+            Column::make('nombre_completo')->title('Nombre y Apellido')->width('35%')->orderable(false),
+            Column::make('nivel_asignado')->title('Nivel Académico')->width('40%'),
+            Column::computed('action')->title('Acciones')->width('20%')->exportable(false)->printable(false)->addClass('text-center'),
         ];
     }
 }

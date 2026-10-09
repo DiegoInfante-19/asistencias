@@ -30,17 +30,20 @@
                 </div>
 
                 <!-- 2. Filtro por Sección -->
-                <div class="col-md-3">
-                    <label for="filtro_seccion" class="form-label fw-bold small text-muted text-uppercase">Sección Específica</label>
-                    <select id="filtro_seccion" class="form-select select2-buscador">
-                        <option value="" selected>Todas las Secciones...</option>
-                        @if(isset($secciones))
-                            @foreach($secciones as $seccion)
-                                <option value="{{ $seccion->id_seccion }}">{{ $seccion->nombre_seccion }}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                </div>
+<div class="col-md-3">
+    <label for="filtro_seccion" class="form-label fw-bold small text-muted text-uppercase">Sección Específica</label>
+    <select id="filtro_seccion" class="form-select select2-buscador">
+        <option value="" selected>Todas las Secciones...</option>
+        @if(isset($secciones))
+            <!-- CORRECCIÓN: Filtramos las secciones en vivo para mostrar solo las activas -->
+            @foreach(\App\Models\Seccion::with('pnf')->activasParaAsignacion()->orderBy('nombre_seccion')->get() as $seccion)
+                <option value="{{ $seccion->id_seccion }}">
+                    {{ $seccion->nombre_seccion }} ({{ $seccion->pnf->nombre_pnf ?? 'Sin PNF' }})
+                </option>
+            @endforeach
+        @endif
+    </select>
+</div>
 
                 <!-- 3. Filtro por Rol -->
                 <div class="col-md-3">

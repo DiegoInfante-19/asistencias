@@ -75,7 +75,7 @@ class PersonaController extends Controller{
         $empresas          = \App\Models\Empresa::all();
         $cargos            = \App\Models\Cargo::all();
 
-        // FASE 2 - PASO 2.1: Uso estricto del Scope y del Accessor enriquecido para el Select2 de estudiantes
+        // USO ESTRICTO DEL SCOPE: Sincronizado para traer únicamente secciones activas y vigentes
         $seccionesData = \App\Models\Seccion::with(['pnf', 'periodoAcademico.cohorte'])
             ->activasParaAsignacion()
             ->get()
@@ -84,7 +84,7 @@ class PersonaController extends Controller{
                     'id_seccion'      => $seccion->id_seccion,
                     'id_periodo'      => $seccion->id_periodo,
                     'id_pnf'          => $seccion->id_pnf,
-                    'nombre_seccion'  => $seccion->nombre_completo_select, // Nombre enriquecido e inteligente
+                    'nombre_seccion'  => $seccion->nombre_completo_select, 
                     'nombre_pnf'      => $seccion->pnf->nombre_pnf ?? '',
                 ];
             });

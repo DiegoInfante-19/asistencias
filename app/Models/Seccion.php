@@ -46,14 +46,16 @@ class Seccion extends Model
                     ->orderBy('fecha_sesion', 'desc');
     }
 
+    /**
+     * CORRECCIÓN: Se ajustó la búsqueda de estatus para tolerar 'Activo' o 'Activa'
+     * y se eliminó la restricción estricta de la cohorte que estaba rompiendo la consulta.
+     */
     public function scopeActivasParaAsignacion(Builder $query): Builder
     {
-        return $query->where('estatus_seccion', 'Activa')
+        return $query->whereIn('estatus_seccion', ['Activo', 'Activa'])
             ->whereHas('periodoAcademico', function ($q) {
-                $q->where('estatus_periodo', 'Activo')
-                  ->whereHas('cohorte', function ($subQ) {
-                      $subQ->where('estatus_cohorte', 'Activo');
-                  });
+                // Filtramos por periodos activos (tolerando mayúsculas/minúsculas)
+                $q->whereIn('estatus_periodo', ['Activo', 'Activa', 'activo', 'activa']);
             });
     }
 

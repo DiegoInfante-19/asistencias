@@ -118,8 +118,7 @@
                 dateFormat: "Y-m-d", 
                 maxDate: "today", 
                 disable: bloqueosFlatpickr,
-                allowInput: false,
-                appendTo: document.getElementById('modalSesion')
+                allowInput: false
             });
         }
 
@@ -138,7 +137,7 @@
     });
 
     window.abrirModalCrear = function() {
-        document.getElementById('modalSesionLabel').innerHTML = '<i class="bi bi-calendar-plus text-primary me-2"></i> Programar Sesión de Clase';
+        document.getElementById('modalSesionLabel').innerHTML = 'Programar Sesión de Clase';
         document.getElementById('btnText').innerText = 'Programar Clase';
         document.getElementById('formSesion').reset();
         document.getElementById('formMethod').value = 'POST';
@@ -162,7 +161,7 @@
     window.abrirModalEditar = function(sesionData) {
         let sesion = typeof sesionData === 'string' ? JSON.parse(sesionData) : sesionData;
 
-        document.getElementById('modalSesionLabel').innerHTML = '<i class="bi bi-pencil-square text-warning me-2"></i> Editar Sesión de Clase';
+        document.getElementById('modalSesionLabel').innerHTML = 'Editar Sesión de Clase';
         document.getElementById('btnText').innerText = 'Actualizar Clase';
         document.getElementById('formMethod').value = 'PUT';
         document.getElementById('formSesion').action = `/sesiones/${sesion.id_sesiones}`;

@@ -20,11 +20,6 @@ class InscripcionSeccionDataTable extends BaseDataTable
             ->addColumn('nombre_corto', function ($inscripcion) {
                 return $inscripcion->persona->nombre_corto ?? 'N/D';
             })
-            ->addColumn('cohorte', function ($inscripcion) {
-                $num = $inscripcion->persona->cohorte->numero_cohorte ?? 'Externa';
-                // Cambiado a texto grueso y color azul primario
-                return '<span class="fw-bold text-primary">' . $num . '</span>';
-            })
             ->addColumn('titulo_optar', function ($inscripcion) {
                 return $inscripcion->persona->titulo_base ?? 'N/D';
             })
@@ -39,11 +34,11 @@ class InscripcionSeccionDataTable extends BaseDataTable
                 <form action="{$url}" method="POST" class="d-inline" onsubmit="return confirm('¿Retirar a este estudiante de la sección?');">
                     {$csrf}
                     {$method}
-                    <button type="submit" class="btn btn-danger btn-sm shadow-sm">Remover</button>
+                    <button type="submit" class="btn btn-danger shadow-sm">Remover</button>
                 </form>
 HTML;
             })
-            ->rawColumns(['cedula', 'cohorte', 'action'])
+            ->rawColumns(['cedula', 'action'])
             ->setRowId('id_inscripcion_seccion');
     }
 
@@ -51,7 +46,6 @@ HTML;
     {
         return $model->newQuery()
             ->with([
-                'persona.cohorte',
                 'persona.titulacionPersona.titulacion',
                 'persona.titulacionPersona.pnf'
             ])
@@ -74,10 +68,9 @@ HTML;
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center'),
             Column::make('cedula')->title('Cédula')->width('15%'),
-            Column::make('nombre_corto')->title('Nombres y Apellidos')->width('35%'),
-            Column::make('cohorte')->title('Cohorte')->width('15%')->addClass('text-center'),
-            Column::make('titulo_optar')->title('Título a Optar')->width('20%'),
-            Column::computed('action')->title('Acciones')->width('15%')->exportable(false)->printable(false)->addClass('text-center'),
+            Column::make('nombre_corto')->title('Nombres y Apellidos')->width('25%'),
+            Column::make('titulo_optar')->title('Título a Optar')->width('49%'),
+            Column::computed('action')->title('Acciones')->width('20%')->exportable(false)->printable(false)->addClass('text-center'),
         ];
     }
 }

@@ -7,24 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TitulacionPersona extends Model
 {
-    // Configuración de tabla y llave primaria (Paso 5)
     protected $table = 'titulacion_personas';
     protected $primaryKey = 'id_titulacion_personas';
 
-    // Desactivar timestamps si no son necesarios (Paso 5)
     public $timestamps = false;
 
-    // Seguridad de Asignación Masiva (Paso 5)
     protected $fillable = [
         'id_personas', 
         'id_titulacion', 
         'id_pnf', 
         'id_estatus_expediente'
     ];
-
-    /**
-     * RELACIONES (Paso 6)
-     */
 
     public function persona(): BelongsTo
     {
@@ -44,5 +37,28 @@ class TitulacionPersona extends Model
     public function estatus(): BelongsTo
     {
         return $this->belongsTo(EstatusExpediente::class, 'id_estatus_expediente', 'id_estatus_expediente');
+    }
+
+    /**
+     * ACCESSOR INTELIGENTE Y OPTIMIZADO (Reemplaza a la vieja relación tituloPnf)
+     * Cruza matemáticamente el PNF y el Título para dar el nombre exacto (Ej: "Ingeniero en Mecánica")
+     */
+    public function getNombreTituloEspecificoAttribute()
+    {
+        // Caché estática en memoria para evitar el problema N+1 en DataTables.
+        // Carga el catálogo 1 sola vez sin importar si tienes 10 o 1000 estudiantes en la tabla.
+        static $titulosPnf = null;
+        
+        if ($titulosPnf === null) {
+            $titulosPnf = \App\Models\TituloPnf::all()->groupBy(function($item) {
+                return $item->id_pnf . '-' . $item->id_titulo;
+            });
+        }
+        
+        // Creamos la llave combinando el PNF y el Título del estudiante
+        $key = $this->id_pnf . '-' . $this->id_titulacion;
+        
+        // Retornamos el nombre específico si existe
+        return isset($titulosPnf[$key]) ? $titulosPnf[$key]->first()->nombre_titulo_pnf : null;
     }
 }

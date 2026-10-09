@@ -37,42 +37,41 @@
                     </div>
 
                     @php
-                        // Filtramos directamente en PHP de manera segura usando el ID del PNF del estudiante
+                        // CORRECCIÓN: Consultamos directamente desde la DB usando el modelo y su Scope
                         $pnfIdEstudiante = $persona->titulacionPersona->id_pnf;
-                        $seccionesFiltradas = collect($seccionesData ?? [])->filter(function($sec) use ($pnfIdEstudiante) {
-                            return $sec['id_pnf'] == $pnfIdEstudiante;
-                        });
+                        $seccionesFiltradas = \App\Models\Seccion::activasParaAsignacion()
+                                                ->where('id_pnf', $pnfIdEstudiante)
+                                                ->get();
                     @endphp
 
                     <form action="{{ route('personas.inscripciones.store', $persona->id_personas) }}" method="POST">
                         @csrf
                         <input type="hidden" name="id_personas" value="{{ $persona->id_personas }}">
 
-                        <!-- Select: Sección -->
+                        <!-- Select: Sección (Ahora sin input oculto y usando el name original) -->
                         <div class="mb-3">
                             <label for="select_seccion" class="form-label fw-bold small text-muted">Sección Académica <span class="text-danger">*</span></label>
                             
-                            <select id="select_seccion" class="form-select bg-light border-secondary-subtle shadow-sm" required {{ $seccionesFiltradas->isEmpty() ? 'disabled' : '' }}>
+                            <select id="select_seccion" name="id_seccion" class="form-select bg-light border-secondary-subtle shadow-sm" required {{ $seccionesFiltradas->isEmpty() ? 'disabled' : '' }}>
                                 <option value="" selected disabled>
                                     {{ $seccionesFiltradas->isNotEmpty() ? 'Seleccione una sección...' : 'No hay secciones activas para este PNF' }}
                                 </option>
                                 
                                 @foreach($seccionesFiltradas as $sec)
-                                    <option value="{{ $sec['id_seccion'] }}">
-                                        {{ $sec['nombre_seccion'] }}
+                                    <option value="{{ $sec->id_seccion }}">
+                                        {{ $sec->nombre_seccion }} 
                                     </option>
                                 @endforeach
                             </select>
                             
                             <small class="text-muted d-block mt-1">Solo se muestran secciones activas del PNF del estudiante.</small>
+                            
+                            @error('id_seccion')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <input type="hidden" name="id_seccion" id="id_seccion_hidden" value="">
-                        @error('id_seccion')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
-                        @enderror
-
-                        <!-- Fecha de Inscripción (Estilo gris y sombreado añadido) -->
+                        <!-- Fecha de Inscripción -->
                         <div class="mb-3 mt-3">
                             <label for="fecha_inscripcion" class="form-label fw-bold small text-muted">Fecha de Inscripción <span class="text-danger">*</span></label>
                             <input type="date" class="form-control bg-light border-secondary-subtle shadow-sm @error('fecha_inscripcion') is-invalid @enderror" 
@@ -82,7 +81,7 @@
                             @enderror
                         </div>
 
-                        <!-- Estatus Inicial (Estilo gris y sombreado añadido) -->
+                        <!-- Estatus Inicial -->
                         <div class="mb-4">
                             <label for="estatus_inscripcion" class="form-label fw-bold small text-muted">Estatus Inicial <span class="text-danger">*</span></label>
                             <select class="form-select bg-light border-secondary-subtle shadow-sm @error('estatus_inscripcion') is-invalid @enderror" id="estatus_inscripcion" name="estatus_inscripcion" required>
@@ -201,7 +200,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const $selectSeccion = $('#select_seccion');
-    const $inputSeccionHidden = $('#id_seccion_hidden');
     const $btnInscribir = $('#btn_inscribir');
 
     function inicializarSelectSeccionUnico() {
@@ -223,17 +221,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // Retardo prudente para asegurar el pintado correcto de Bootstrap Tabs
     setTimeout(inicializarSelectSeccionUnico, 200);
 
-    // Re-vincular al cambiar de pestaña
-    $('button[data-bs-toggle="tab"], a[data-bs-toggle="tab"], button[data-bs-toggle="pill"], a[data-bs-toggle="pill"]').on('shown.bs.tab shown.bs.pill', function () {
-        setTimeout(inicializarSelectSeccionUnico, 100);
+    // Re-vincular al cambiar de pestaña para evitar fallos de renderizado (0px width)
+    $('button[data-bs-toggle="tab"], a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        if ($(e.target).attr('data-bs-target') === '#inscripciones') {
+            setTimeout(inicializarSelectSeccionUnico, 100);
+        }
     });
 
-    // Evento change robusto para sincronizar el input oculto y habilitar el botón
+    // Evento change robusto para habilitar/deshabilitar el botón de submit
     $selectSeccion.on('change', function () {
-        const valor = $(this).val();
-        $inputSeccionHidden.val(valor);
-        
-        if (valor) {
+        if ($(this).val()) {
             $btnInscribir.prop('disabled', false);
         } else {
             $btnInscribir.prop('disabled', true);

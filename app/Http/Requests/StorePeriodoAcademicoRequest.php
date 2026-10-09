@@ -3,9 +3,12 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\PeriodoAcademico; // <-- Importamos el modelo
 
-class StorePeriodoAcademicoRequest extends FormRequest{
-    public function authorize(): bool{
+class StorePeriodoAcademicoRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
         return true;
     }
 
@@ -15,11 +18,22 @@ class StorePeriodoAcademicoRequest extends FormRequest{
             'id_cohortes'     => ['required', 'integer', 'exists:cohortes,id_cohortes'],
             'fecha_inicio'    => ['required', 'date'],
             'fecha_fin'       => ['required', 'date', 'after:fecha_inicio'],
-            'estatus_periodo' => ['required', 'string', 'max:50']
+            'estatus_periodo' => [
+                'required', 
+                'string', 
+                'max:50',
+                // REGLA PERSONALIZADA
+                function ($attribute, $value, $fail) {
+                    if (strtolower($value) === 'activo' && PeriodoAcademico::where('estatus_periodo', 'Activo')->exists()) {
+                        $fail('Ya existe un período académico activo. Debe finalizarlo antes de aperturar uno nuevo.');
+                    }
+                },
+            ]
         ];
     }
 
-    public function messages(): array{
+    public function messages(): array
+    {
         return [
             'id_cohortes.required'     => 'Debe asociar el período a una cohorte.',
             'id_cohortes.exists'       => 'La cohorte seleccionada no es válida.',

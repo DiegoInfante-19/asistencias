@@ -6,7 +6,7 @@
     <!-- 1. ENCABEZADO PRINCIPAL Y PANEL DE ESTADÍSTICAS FIJO -->
     <div class="row g-4 mb-4">
         
-        <!-- Tarjeta Principal de Información (Hereda el borde perfecto nativo) -->
+        <!-- Tarjeta Principal de Información -->
         <div class="col-lg-6">
             <div class="card h-100 shadow-sm">
                 <div class="card-body p-4 bg-white d-flex flex-column justify-content-between rounded">
@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <!-- Panel de Estadísticas Fijo (Hereda el borde perfecto nativo) -->
+        <!-- Panel de Estadísticas Fijo -->
         <div class="col-lg-6">
             <div class="card h-100 shadow-sm overflow-hidden">
                 <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom">
@@ -117,11 +117,10 @@
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porExpediente = $seccion->inscripciones->groupBy(function($i) {
-                                            // Corrección: Soporte tanto si titulacionPersona es un Modelo (hasOne) o una Colección
                                             $titulacion = $i->persona->titulacionPersona instanceof \Illuminate\Support\Collection 
-                                                          ? $i->persona->titulacionPersona->first() 
-                                                          : $i->persona->titulacionPersona;
-                                                          
+                                                        ? $i->persona->titulacionPersona->first() 
+                                                        : $i->persona->titulacionPersona;
+                                            
                                             if ($titulacion && $titulacion->id_estatus_expediente) {
                                                 $estExp = \App\Models\EstatusExpediente::find($titulacion->id_estatus_expediente);
                                                 return $estExp ? $estExp->nombre_estatus_expediente : 'Sin Estatus';
@@ -176,13 +175,10 @@
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porEmpresa = $seccion->inscripciones->groupBy(function($i) {
-                                            // Corrección: Evitar llamar first() directamente y usar el operador null-safe
                                             $empresaRel = $i->persona->empresaPersona;
-                                            
                                             $empresaObj = $empresaRel instanceof \Illuminate\Support\Collection 
-                                                          ? $empresaRel->first() 
-                                                          : $empresaRel;
-                                        
+                                                        ? $empresaRel->first() 
+                                                        : $empresaRel;
                                             return $empresaObj?->empresa->nombre_empresa ?? 'Independiente';
                                         });
                                         @endphp
@@ -263,13 +259,11 @@
 
 @section('styles')
 <style>
-    /* Estética unificada para las pestañas y corrección del solapamiento */
     .card-header-tabs {
         margin-right: 0 !important;
         margin-left: 0 !important;
         margin-bottom: -1px !important;
     }
-
     .card-header-tabs .nav-link {
         border-top-left-radius: 0.375rem;
         border-top-right-radius: 0.375rem;
@@ -277,30 +271,24 @@
         border: 1px solid transparent;
         padding: 0.75rem 1rem;
     }
-
     .card-header-tabs .nav-link:hover {
         border-color: #e9ecef #e9ecef #dee2e6;
         background-color: rgba(255, 255, 255, 0.5);
     }
-
     .card-header-tabs .nav-link.active {
         color: #0d6efd !important;
         background-color: #ffffff !important;
         border-color: #dee2e6 #dee2e6 #ffffff !important;
     }
-
-    /* Blindaje visual para tarjetas internas en los tabs */
     .tab-content .card {
         border: 1px solid #dee2e6 !important;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
         background-color: #ffffff !important;
     }
-
     .tab-content .card .card-header {
         background-color: #ffffff !important;
         border-bottom: 1px solid #dee2e6 !important;
     }
-
     .tab-content .card .card-footer {
         background-color: #f8f9fa !important;
         border-top: 1px solid #dee2e6 !important;
@@ -311,7 +299,6 @@
 @push('scripts')
 {{ $dataTable->html()->scripts() }}
 {{ $profesorDataTable->html()->scripts() }}
-<!-- IMPORTAMOS LOS SCRIPTS DE LA NUEVA TABLA DE SESIONES -->
 {{ $sesionesDataTable->html()->scripts() }}
 
 <script type="module">
@@ -331,6 +318,83 @@
             placeholder: 'Buscar profesor disponible (Cédula o Nombre)...',
             allowClear: true
         });
+
+        // ==========================================
+        // UX: MANTENER LA PESTAÑA ACTIVA AL RECARGAR
+        // ==========================================
+        let tabStorageKey = 'activeTab_Seccion_{{ $seccion->id_seccion }}';
+        let activeTab = localStorage.getItem(tabStorageKey);
+
+        if (activeTab) {
+            let triggerEl = document.querySelector('#seccionTab button[data-bs-target="' + activeTab + '"]');
+            if (triggerEl) {
+                let tabInstance = new bootstrap.Tab(triggerEl);
+                tabInstance.show();
+            }
+        }
+
+        $('#seccionTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            let currentTabTarget = $(e.target).attr('data-bs-target');
+            localStorage.setItem(tabStorageKey, currentTabTarget);
+        });
+
+        // ==========================================
+        // LÓGICA DE PROFESOR SUPLENTE (MÁQUINA DEL TIEMPO)
+        // ==========================================
+        const toggleSuplente = document.getElementById('toggleProfesorSuplente');
+        const selectTitular = document.getElementById('selectProfesorTitular');
+        const selectSuplente = document.getElementById('selectProfesorSuplente');
+
+        if (toggleSuplente) {
+            toggleSuplente.addEventListener('change', function() {
+                if (this.checked) {
+                    selectTitular.classList.add('d-none');
+                    selectTitular.removeAttribute('name');
+                    selectTitular.removeAttribute('required');
+                    
+                    selectSuplente.classList.remove('d-none');
+                    selectSuplente.setAttribute('name', 'id_profesor');
+                    selectSuplente.setAttribute('required', 'required');
+                    selectSuplente.removeAttribute('disabled');
+                } else {
+                    selectSuplente.classList.add('d-none');
+                    selectSuplente.removeAttribute('name');
+                    selectSuplente.removeAttribute('required');
+                    selectSuplente.setAttribute('disabled', 'disabled');
+
+                    selectTitular.classList.remove('d-none');
+                    selectTitular.setAttribute('name', 'id_profesor');
+                    selectTitular.setAttribute('required', 'required');
+                }
+            });
+        }
+
+        // ==========================================
+        // CONFIGURACIÓN DE FLATPICKR (MÁQUINA DEL TIEMPO)
+        // ==========================================
+        const recesosDB = {!! json_encode($periodosRecesos ?? [], JSON_HEX_TAG) !!};
+        let bloqueosFlatpickr = recesosDB.map(receso => {
+            return {
+                from: receso.fecha_inicio_periodo_receso.split('T')[0], 
+                to: receso.fecha_fin_periodo_receso.split('T')[0]
+            };
+        });
+
+        // Bloquear días diferentes al miércoles (getDay() !== 3)
+        bloqueosFlatpickr.push(function(date) {
+            return (date.getDay() !== 3); 
+        });
+
+        if (typeof window.flatpickr !== 'undefined') {
+            window.flatpickr("#admin_fecha_sesion", {
+                locale: window.Spanish || "es", 
+                dateFormat: "Y-m-d", 
+                maxDate: "today", 
+                disable: bloqueosFlatpickr,
+                allowInput: false
+                // Nota: Eliminamos 'appendTo' para que se posicione de manera natural sobre el input del modal
+            });
+        }
     });
 </script>
 @endpush

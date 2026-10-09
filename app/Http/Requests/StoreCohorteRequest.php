@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Cohorte; // <-- Importamos el modelo
 
 class StoreCohorteRequest extends FormRequest
 {
@@ -38,18 +39,16 @@ class StoreCohorteRequest extends FormRequest
             'estatus_cohorte' => [
                 'required', 
                 'string', 
-                'max:50'
+                'max:50',
+                // REGLA PERSONALIZADA: Evita dos cohortes activas
+                function ($attribute, $value, $fail) {
+                    if (strtolower($value) === 'activo' && Cohorte::where('estatus_cohorte', 'Activo')->exists()) {
+                        $fail('Ya existe una cohorte activa. Debe finalizarla antes de activar una nueva.');
+                    }
+                },
             ],
-            // Validaciones para el período académico asociado
-            'fecha_inicio' => [
-                'required',
-                'date'
-            ],
-            'fecha_fin' => [
-                'required',
-                'date',
-                'after_or_equal:fecha_inicio'
-            ],
+            'fecha_inicio' => ['required', 'date'],
+            'fecha_fin' => ['required', 'date', 'after_or_equal:fecha_inicio'],
         ];
     }
 

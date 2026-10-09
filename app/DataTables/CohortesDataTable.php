@@ -22,19 +22,6 @@ class CohortesDataTable extends BaseDataTable
                 }
                 return '<span class="text-muted small">Sin período</span>';
             })
-            ->addColumn('n_secciones', function ($cohorte) {
-                $periodo = $cohorte->periodosAcademicos->first();
-                $count = $periodo ? $periodo->secciones->count() : 0;
-                return $count > 0 
-                    ? '<span class="fw-bold text-primary fs-6">' . $count . '</span>' 
-                    : '<span class="text-muted small fst-italic">0</span>';
-            })
-            ->addColumn('n_estudiantes', function ($cohorte) {
-                $count = $cohorte->personas->count();
-                return $count > 0 
-                    ? '<span class="fw-bold text-primary fs-6">' . $count . '</span>' 
-                    : '<span class="text-muted small fst-italic">0</span>';
-            })
             ->editColumn('estatus_cohorte', function ($cohorte) {
                 $estatus = strtolower(trim($cohorte->estatus_cohorte));
                 switch ($estatus) {
@@ -53,17 +40,16 @@ class CohortesDataTable extends BaseDataTable
                 return '<span class="badge ' . $badgeClass . ' px-3 py-2 shadow-sm" style="font-weight: 500; font-size: 0.9rem;">' . ucfirst($cohorte->estatus_cohorte) . '</span>';
             })
             ->addColumn('action', function ($cohorte) {
-                // AQUÍ ESTÁ EL CAMBIO CLAVE: Apuntamos a la nueva ruta
                 return view('estructura_academica.partials.actions', compact('cohorte'))->render();
             })
-            ->rawColumns(['periodo', 'n_secciones', 'n_estudiantes', 'estatus_cohorte', 'action'])
+            ->rawColumns(['periodo', 'estatus_cohorte', 'action'])
             ->setRowId('id_cohortes');
     }
 
     public function query(Cohorte $model): EloquentBuilder
     {
         return $model->newQuery()
-            ->with(['periodosAcademicos.secciones', 'personas'])
+            ->with(['periodosAcademicos'])
             ->select([
                 'id_cohortes',
                 'numero_cohorte',
@@ -96,11 +82,9 @@ class CohortesDataTable extends BaseDataTable
     {
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center align-middle'),
-            Column::make('numero_cohorte')->title('Cohorte')->addClass('text-center fw-bold align-middle')->width('15%'),
-            Column::make('periodo')->title('Período')->addClass('text-center align-middle')->searchable(false)->width('15%'),
-            Column::make('estatus_cohorte')->title('Estatus')->addClass('text-center align-middle')->width('15%'),
-            Column::make('n_secciones')->title('N° Secciones')->addClass('text-center align-middle')->searchable(false)->orderable(false)->width('15%'),
-            Column::make('n_estudiantes')->title('N° Estudiantes')->addClass('text-center align-middle')->searchable(false)->orderable(false)->width('15%'),
+            Column::make('numero_cohorte')->title('Cohorte')->addClass('text-center fw-bold align-middle')->width('25%'),
+            Column::make('periodo')->title('Período')->addClass('text-center align-middle')->searchable(false)->width('25%'),
+            Column::make('estatus_cohorte')->title('Estatus')->addClass('text-center align-middle')->width('25%'),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('25%')->addClass('text-center align-middle'),
         ];
     }

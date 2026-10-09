@@ -34,15 +34,10 @@ class SeccionDataTable extends BaseDataTable
 
                 return '<span class="text-primary fw-bold">' . $cantidad . ' Profesores</span>';
             })
-            ->addColumn('n_estudiantes', function ($seccion) {
-                // Usamos el conteo de la DB para que el ordenamiento funcione
-                $cantidad = $seccion->n_estudiantes ?? $seccion->inscripciones->count();
-                return '<span class="text-primary fw-bold fs-6"> ' . $cantidad . '</span>';
-            })
             ->addColumn('action', function ($seccion) {
                 return view('estructura_academica.partials.actions_secciones', compact('seccion'))->render();
             })
-            ->rawColumns(['profesores_lista', 'n_estudiantes', 'action'])
+            ->rawColumns(['profesores_lista', 'action'])
             ->setRowId('id_seccion');
     }
 
@@ -53,12 +48,10 @@ class SeccionDataTable extends BaseDataTable
             ->where('id_periodo', $this->id_periodo)
             ->with([
                 'pnf',
-                'profesores.user',
-                'inscripciones'
+                'profesores.user'
             ])
             // Esto permite que el ordenamiento en las cabeceras funcione sin crashear
             ->withCount([
-                'inscripciones as n_estudiantes',
                 'profesores as n_profesores'
             ]);
 
@@ -97,11 +90,10 @@ class SeccionDataTable extends BaseDataTable
         // Se añadió el método name() para indicarle a Yajra cómo ordenar en la DB
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(50)->addClass('text-center align-middle'),
-            Column::make('nombre_seccion')->title('Sección')->addClass('align-middle fw-bold')->width('20%'),
-            Column::make('pnf_nombre')->name('pnf.nombre_pnf')->title('PNF')->addClass('align-middle')->width('20%'),
-            Column::make('profesores_lista')->name('n_profesores')->title('Docentes')->addClass('align-middle')->width('20%'),
-            Column::make('n_estudiantes')->name('n_estudiantes')->title('Estudiantes')->addClass('align-middle text-center')->width('15%'),
-            Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('20%')->addClass('text-center align-middle'),
+            Column::make('nombre_seccion')->title('Sección')->addClass('align-middle fw-bold')->width('25%'),
+            Column::make('pnf_nombre')->name('pnf.nombre_pnf')->title('PNF')->addClass('align-middle')->width('25%'),
+            Column::make('profesores_lista')->name('n_profesores')->title('Docentes')->addClass('align-middle')->width('25%'),
+            Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('25%')->addClass('text-center align-middle'),
         ];
     }
 }

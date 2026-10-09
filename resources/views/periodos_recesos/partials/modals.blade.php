@@ -8,7 +8,6 @@
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <!-- Cuerpo blanco con inputs de fondo gris claro -->
             <div class="modal-body bg-white p-4">
                 <form id="createPeriodoForm" method="POST" action="{{ route('periodos_recesos.store') }}">
                     @csrf
@@ -32,11 +31,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6 form-group">
                             <label class="form-label fw-bold small text-muted">Fecha de Inicio <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_inicio_periodo_receso" required>
+                            <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_inicio_periodo_receso" id="create-inicio-periodo" placeholder="Seleccione fecha..." required autocomplete="off">
                         </div>
                         <div class="col-md-6 form-group">
                             <label class="form-label fw-bold small text-muted">Fecha de Fin <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_fin_periodo_receso" required>
+                            <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_fin_periodo_receso" id="create-fin-periodo" placeholder="Seleccione fecha..." required autocomplete="off">
                         </div>
                     </div>
 
@@ -108,11 +107,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6 form-group">
                             <label class="form-label fw-bold small text-muted">Fecha de Inicio <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_inicio_periodo_receso" id="edit-inicio-periodo" required>
+                            <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_inicio_periodo_receso" id="edit-inicio-periodo" placeholder="Seleccione fecha..." required autocomplete="off">
                         </div>
                         <div class="col-md-6 form-group">
                             <label class="form-label fw-bold small text-muted">Fecha de Fin <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_fin_periodo_receso" id="edit-fin-periodo" required>
+                            <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" name="fecha_fin_periodo_receso" id="edit-fin-periodo" placeholder="Seleccione fecha..." required autocomplete="off">
                         </div>
                     </div>
 
@@ -150,10 +149,9 @@
         </div>
     </div>
 </div>
-
 <!-- MODAL: VER DETALLES (SHOW) -->
 <div class="modal fade" id="showPeriodoModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow">
             <div class="modal-header bg-white border-bottom" style="font-weight: 500;">
                 <h1 class="modal-title fs-5 text-dark">
@@ -169,19 +167,17 @@
                     </div>
                     <div class="col-md-4">
                         <p class="mb-1 fw-bold small text-muted">Tipo de Evento</p>
-                        <span id="show-nivel-periodo" class="badge bg-secondary px-3 py-2 fs-6"></span>
+                        <span id="show-nivel-periodo" class="badge px-3 py-2 fs-6"></span>
                     </div>
                 </div>
 
-                <div class="row mb-4 bg-light p-3 rounded border">
-                    <div class="col-md-6 border-end">
-                        <p class="mb-1 fw-bold small text-muted"><i class="bi bi-calendar-check me-1"></i> Fecha de Inicio</p>
-                        <p id="show-inicio-periodo" class="text-dark fw-semibold mb-0 fs-5"></p>
+                <!-- Bloque adaptado para mostrar el formato de fecha unificado o completo -->
+                <div class="mb-4 bg-light p-3 rounded border">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="bi bi-calendar-range text-primary me-2 fs-5"></i>
+                        <p class="mb-0 fw-bold small text-muted">Vigencia / Fecha del Evento</p>
                     </div>
-                    <div class="col-md-6 ps-md-4">
-                        <p class="mb-1 fw-bold small text-muted"><i class="bi bi-calendar-x me-1"></i> Fecha de Fin</p>
-                        <p id="show-fin-periodo" class="text-dark fw-semibold mb-0 fs-5"></p>
-                    </div>
+                    <p id="show-inicio-periodo" class="text-dark fw-semibold mb-0 fs-5 ps-4"></p>
                 </div>
 
                 <div class="mb-4">

@@ -5,18 +5,26 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up(): void {
+    public function up(): void
+    {
         Schema::create('empresa_personas', function (Blueprint $table) {
             $table->id('id_empresa_personas');
             $table->foreignId('id_personas')->constrained('personas', 'id_personas')->onDelete('cascade');
             $table->foreignId('id_empresa')->constrained('empresas', 'id_empresa')->onDelete('restrict');
             $table->foreignId('id_cargo')->constrained('cargos', 'id_cargo')->onDelete('restrict');
+
+            // ÍNDICES EXPLÍCITOS PARA ACELERAR FILTROS Y JOINS
+            $table->index('id_personas');
+            $table->index('id_empresa');
+            $table->index('id_cargo');
+
             $table->softDeletes();
             $table->timestamps();
         });
     }
 
-    public function down(): void {
+    public function down(): void
+    {
         Schema::dropIfExists('empresa_personas');
     }
 };

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Models\Cohorte; // <-- Importamos el modelo
 
 class UpdateCohorteRequest extends FormRequest
 {
@@ -23,8 +24,9 @@ class UpdateCohorteRequest extends FormRequest
 
     public function rules(): array
     {
-        // Nota: Asegúrate de que el parámetro de ruta en web.php coincida (ej. {cohorte})
-        $id = $this->route('cohorte');
+        // Obtenemos el ID de forma segura, ya sea que la ruta pase el objeto o el ID
+        $cohorteRoute = $this->route('cohorte');
+        $id = $cohorteRoute instanceof Cohorte ? $cohorteRoute->id_cohortes : $cohorteRoute;
 
         return [
             'numero_cohorte' => [
@@ -32,7 +34,7 @@ class UpdateCohorteRequest extends FormRequest
                 'string',
                 'max:20',
                 Rule::unique('cohortes', 'numero_cohorte')->ignore($id, 'id_cohortes'),
-                'regex:/^[A-Z0-9\s\-]+$/' // Permite letras mayúsculas, números, espacios y guiones
+                'regex:/^[A-Z0-9\s\-]+$/'
             ],
             'descripcion_cohorte' => [
                 'nullable', 
@@ -42,7 +44,13 @@ class UpdateCohorteRequest extends FormRequest
             'estatus_cohorte' => [
                 'required', 
                 'string', 
-                'max:50'
+                'max:50',
+                // REGLA PERSONALIZADA: Evita chocar con OTRA cohorte activa
+                function ($attribute, $value, $fail) use ($id) {
+                    if (strtolower($value) === 'activo' && Cohorte::where('estatus_cohorte', 'Activo')->where('id_cohortes', '!=', $id)->exists()) {
+                        $fail('Ya existe otra cohorte activa en el sistema. Debe finalizarla antes de activar esta.');
+                    }
+                },
             ],
         ];
     }

@@ -86,7 +86,8 @@ class PersonaTitulacionController extends Controller
         // Transformamos los datos para que el JS los entienda fácil
         $data = $titulos->map(function ($item) {
             return [
-                'id_titulo' => $item->id_titulo,
+                // REVERTIDO: Volvemos a usar el ID específico del título en el PNF
+                'id_titulo' => $item->id_titulo, 
                 'nombre_titulo_pnf' => $item->nombre_titulo_pnf
             ];
         });

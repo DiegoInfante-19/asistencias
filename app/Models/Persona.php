@@ -73,12 +73,12 @@ class Persona extends Model
     }
 
     /**
-     * Método auxiliar de retrocompatibilidad (devuelve el primer expediente o el más reciente)
-     * para no afectar otros controladores que utilicen ->titulacionPersona de forma directa.
+     * Método auxiliar de retrocompatibilidad optimizado con latestOfMany()
+     * para extraer de forma eficiente únicamente el expediente más reciente mediante subconsulta SQL.
      */
     public function titulacionPersona(): HasOne
     {
-        return $this->hasOne(TitulacionPersona::class, 'id_personas', 'id_personas')->latest('id_titulacion_personas');
+        return $this->hasOne(TitulacionPersona::class, 'id_personas', 'id_personas')->latestOfMany('id_titulacion_personas');
     }
 
     /**
@@ -103,7 +103,7 @@ class Persona extends Model
 
     public function inscripcionActual(): HasOne
     {
-        return $this->hasOne(InscripcionSeccion::class, 'id_personas', 'id_personas')->latestOfMany();
+        return $this->hasOne(InscripcionSeccion::class, 'id_personas', 'id_personas')->latestOfMany('id_inscripcion_seccion');
     }
 
     public function inscripcionActiva(): HasOne

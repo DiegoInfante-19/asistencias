@@ -53,9 +53,9 @@
         <div class="col-lg-6">
             <div class="card h-100 shadow-sm ecosystem-card overflow-hidden">
                 <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
-                    <h5 class="card-title text-dark mb-0 fs-6 fw-bold">
-                        <i class="bi bi-funnel-fill me-2 text-muted"></i> Filtros de Búsqueda para Secciones
-                    </h5>
+                    <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
+                        Filtros de Búsqueda para Secciones
+                    </h4>
                 </div>
                 
                 <div class="card-body p-4 bg-white d-flex flex-column justify-content-between">
@@ -111,7 +111,7 @@
     <div class="card shadow-sm ecosystem-card">
         <div class="card-header bg-white py-3 d-flex align-items-center">
             <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
-                Listado de Secciones Académicas
+                Registro de Secciones Académicas
             </h4>
             <button type="button" class="btn btn-primary fw-bold shadow-sm ms-auto" data-bs-toggle="modal" data-bs-target="#modalSeccion" data-periodo-id="{{ $periodo->id_periodo }}">
                 <i class="bi bi-plus-circle me-1"></i> Añadir Sección
