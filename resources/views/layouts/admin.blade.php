@@ -24,8 +24,8 @@
   <link rel="icon" type="image/png" href="{{ asset('images/upt_logo-modified.png') }}">
 
   <!-- 1. Cargar PRIMERO el framework base (AdminLTE) -->
-  <link rel="preload" href="{{ asset('dist/css/adminlte.css') }}" as="style" />
-  <link rel="stylesheet" href="{{ asset('dist/css/adminlte.css') }}" />
+  <!-- <link rel="preload" href="{{ asset('dist/css/adminlte.css') }}" as="style" /> -->
+  <!-- <link rel="stylesheet" href="{{ asset('dist/css/adminlte.css') }}" /> -->
 
   <!-- 2. Custom CSS -->
   <link href="{{ asset('css/custom-datatables.css') }}?v={{ time() }}" rel="stylesheet">

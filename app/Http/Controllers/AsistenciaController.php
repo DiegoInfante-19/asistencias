@@ -8,23 +8,29 @@ use App\Models\Sesion;
 use App\Models\InscripcionSeccion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class AsistenciaController extends Controller
 {
     public function guardarLote(Request $request)
     {
-        $request->validate([
-            'id_sesiones'                            => 'required|exists:sesiones,id_sesiones',
-            'asistencias'                            => 'required|array',
-            'asistencias.*.id_inscripcion_seccion'   => 'required|exists:inscripciones_secciones,id_inscripcion_seccion|distinct',
-            // CORRECCIÓN: Agregar 'tarde' para evitar fallos de validación a futuro
-            'asistencias.*.estado'                   => 'required|in:presente,ausente,justificada,tarde',
-            'asistencias.*.observacion'              => 'nullable|string|max:255',
-        ]);
-
         $sesion = Sesion::findOrFail($request->id_sesiones);
-
         Gate::authorize('update', $sesion);
+
+        $request->validate([
+            'id_sesiones' => 'required|exists:sesiones,id_sesiones',
+            'asistencias' => 'required|array|max:150', // BLINDAJE DoS: Máximo 150 alumnos por lote
+
+            // BLINDAJE CROSS-SECTION: El ID debe existir Y pertenecer obligatoriamente a la sección de esta sesión
+            'asistencias.*.id_inscripcion_seccion' => [
+                'required',
+                'distinct',
+                Rule::exists('inscripciones_secciones', 'id_inscripcion_seccion')
+                    ->where('id_seccion', $sesion->id_seccion)
+            ],
+            'asistencias.*.estado'      => 'required|in:presente,ausente,justificada,tarde',
+            'asistencias.*.observacion' => 'nullable|string|max:255',
+        ]);
 
         $totalAlumnosInscritos = InscripcionSeccion::where('id_seccion', $sesion->id_seccion)
             ->where('estatus_inscripcion', 'Activo')

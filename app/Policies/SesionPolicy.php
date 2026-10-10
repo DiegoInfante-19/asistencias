@@ -37,14 +37,14 @@ class SesionPolicy
         if ($user->isProfesor()) {
             
             // --- DEPURADOR TEMPORAL ---
-            dd([
-                'id_user_logueado' => $user->id,
-                'email' => $user->email,
-                'es_profesor_según_isProfesor' => $user->isProfesor(),
-                'relacion_profesor_objeto' => $user->profesor,
-                'id_profesor_del_usuario' => $user->profesor?->id_profesor,
-                'id_profesor_de_la_sesion' => $sesion->id_profesor,
-            ]);
+            // dd([
+            //     'id_user_logueado' => $user->id,
+            //     'email' => $user->email,
+            //     'es_profesor_según_isProfesor' => $user->isProfesor(),
+            //     'relacion_profesor_objeto' => $user->profesor,
+            //     'id_profesor_del_usuario' => $user->profesor?->id_profesor,
+            //     'id_profesor_de_la_sesion' => $sesion->id_profesor,
+            // ]);
             // ---------------------------
 
             return (int) $user->profesor?->id_profesor === (int) $sesion->id_profesor;

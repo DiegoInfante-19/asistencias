@@ -15,6 +15,9 @@
 // 3. Importar Bootstrap
 @import 'bootstrap/scss/bootstrap';
 
+// (Importa AdminLTE desde tus librerías seguras locales)
+@import 'admin-lte/dist/css/adminlte.css';
+
 // 4. Estilos de Select2 y su tema Bootstrap 5 (Locales vía npm)
 @import 'select2/dist/css/select2.min.css';
 @import 'select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css';

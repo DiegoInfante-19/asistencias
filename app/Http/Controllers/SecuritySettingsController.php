@@ -18,7 +18,12 @@ class SecuritySettingsController extends Controller
     {
         $user = Auth::user();
 
-        // REEMPLAZA 'password_users' con el nombre exacto de tu columna en la base de datos.
+        // 1. BLINDAJE: Verificar que la contraseña actual ingresada coincida con la de la BD
+        if (!Hash::check($request->current_password, $user->password_users)) {
+            return back()->withErrors(['current_password' => 'La contraseña actual ingresada no es correcta.'])->withInput();
+        }
+
+        // 2. Si pasa la prueba, procedemos al cambio seguro
         $user->update([
             'password_users' => Hash::make($request->password)
         ]);
