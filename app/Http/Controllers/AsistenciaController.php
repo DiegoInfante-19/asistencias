@@ -14,14 +14,22 @@ class AsistenciaController extends Controller
 {
     public function guardarLote(Request $request)
     {
-        $sesion = Sesion::findOrFail($request->id_sesiones);
+        $sesion = Sesion::with('seccion')->findOrFail($request->id_sesiones);
+
+        // BLINDAJE: Si la sección está inactiva, prohibir el registro o modificación de asistencias
+        if (!$sesion->seccion->estaActiva()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Acción denegada: La sección se encuentra inactiva. El registro de asistencia está bloqueado.'
+            ], 403);
+        }
+
         Gate::authorize('update', $sesion);
 
         $request->validate([
             'id_sesiones' => 'required|exists:sesiones,id_sesiones',
-            'asistencias' => 'required|array|max:150', // BLINDAJE DoS: Máximo 150 alumnos por lote
+            'asistencias' => 'required|array|max:150',
 
-            // BLINDAJE CROSS-SECTION: El ID debe existir Y pertenecer obligatoriamente a la sección de esta sesión
             'asistencias.*.id_inscripcion_seccion' => [
                 'required',
                 'distinct',

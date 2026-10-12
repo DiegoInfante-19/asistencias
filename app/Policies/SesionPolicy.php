@@ -52,22 +52,26 @@ class SesionPolicy
         return true;
     }
 
-    public function create(User $user): bool
+    public function create(User $user, ?Seccion $seccion = null): Response|bool
     {
-        return true; 
+        if ($seccion && !$seccion->estaActiva()) {
+            return Response::deny('La sección se encuentra inactiva; no se permiten nuevas sesiones.');
+        }
+        return true;
     }
 
     public function update(User $user, Sesion $sesion): Response|bool
     {
-        // Si el flujo llegó aquí, significa que ES UN PROFESOR
+        // BLINDAJE: Si la sección padre no está activa, se bloquea por completo la edición
+        if ($sesion->relationLoaded('seccion') ? $sesion->seccion && !$sesion->seccion->estaActiva() : !$sesion->seccion->estaActiva()) {
+            return Response::deny('Esta sesión pertenece a una sección inactiva y su histórico se encuentra bloqueado.');
+        }
+
         if ($user->isProfesor()) {
-            
-            // 1. Validar Propiedad con casteo seguro
             if ((int) $user->profesor?->id_profesor !== (int) $sesion->id_profesor) {
                 return Response::deny('No tiene autorización para modificar sesiones de otros profesores.');
             }
 
-            // 2. Validar Tiempo: ¿Pasaron las 48 horas?
             if ($sesion->tiempoAgotado()) {
                 return Response::deny("El tiempo límite de 48 horas para modificar esta asistencia ha expirado. Contacte a su Coordinador.");
             }

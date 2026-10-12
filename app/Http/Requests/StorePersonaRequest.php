@@ -3,12 +3,26 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class StorePersonaRequest extends FormRequest
 {
     public function authorize()
     {
         return true;
+    }
+
+    /**
+     * Prepara y sanitiza los datos antes de la validación.
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'primer_nombre_personas'    => $this->primer_nombre_personas ? Str::upper($this->primer_nombre_personas) : null,
+            'segundo_nombre_personas'   => $this->segundo_nombre_personas ? Str::upper($this->segundo_nombre_personas) : null,
+            'primer_apellido_personas'  => $this->primer_apellido_personas ? Str::upper($this->primer_apellido_personas) : null,
+            'segundo_apellido_personas' => $this->segundo_apellido_personas ? Str::upper($this->segundo_apellido_personas) : null,
+        ]);
     }
 
     public function rules()

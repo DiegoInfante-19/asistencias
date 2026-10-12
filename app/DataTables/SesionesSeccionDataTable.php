@@ -51,17 +51,27 @@ class SesionesSeccionDataTable extends BaseDataTable
                 ';
             })
             ->addColumn('action', function ($sesion) {
+                // BLINDAJE: Si la sección asociada está inactiva, bloqueamos las acciones de la sesión
+                if ($sesion->relationLoaded('seccion') && $sesion->seccion && !$sesion->seccion->estaActiva()) {
+                    return '<span class="badge bg-secondary">Bloqueado (Inactiva)</span>';
+                }
+                
+                // Si la relación seccion no está cargada, la consultamos de forma segura por el modelo
+                if (!$sesion->seccion->estaActiva()) {
+                    return '<span class="badge bg-secondary">Bloqueado (Inactiva)</span>';
+                }
+
                 return view('secciones.partials.actions_sesiones', compact('sesion'))->render();
             })
-            ->rawColumns(['fecha_sesion', 'estado_asistencia', 'action']) // Agregamos estado_asistencia al rawColumns
+            ->rawColumns(['fecha_sesion', 'estado_asistencia', 'action'])
             ->setRowId('id_sesiones');
     }
 
     public function query(Sesion $model): QueryBuilder
     {
         return $model->newQuery()
-            ->with(['profesor.user'])
-            ->withCount('asistencias') // <--- CLAVE PARA NO SOBRECARGAR LA BASE DE DATOS
+            ->with(['profesor.user', 'seccion']) // Incluimos 'seccion' para validar su estatus eficientemente
+            ->withCount('asistencias') 
             ->where('id_seccion', $this->id_seccion);
     }
 

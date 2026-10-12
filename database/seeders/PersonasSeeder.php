@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str; 
 use Faker\Factory as Faker;
 
 class PersonasSeeder extends Seeder
@@ -20,7 +21,7 @@ class PersonasSeeder extends Seeder
         $empresasIds = DB::table('empresas')->pluck('id_empresa')->toArray();
         $cargosIds = DB::table('cargos')->pluck('id_cargo')->toArray();
 
-        // NUEVO: Extraemos TODAS las combinaciones válidas (PNF + Título) ya establecidas
+        // Extraemos TODAS las combinaciones válidas (PNF + Título) ya establecidas
         $titulosPnfValidos = DB::table('titulos_pnf')->select('id_pnf', 'id_titulo')->get()->toArray();
 
         // Blindaje de seguridad básico
@@ -56,27 +57,27 @@ class PersonasSeeder extends Seeder
                 $regexFiltro = '/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/u';
 
                 $primerNombre = preg_replace($regexFiltro, '', $faker->firstName($sexo == 'M' ? 'male' : 'female'));
-
+                
                 $segundoNombreRaw = $faker->optional(0.5)->firstName($sexo == 'M' ? 'male' : 'female');
                 $segundoNombre = $segundoNombreRaw ? preg_replace($regexFiltro, '', $segundoNombreRaw) : null;
 
                 $primerApellido = preg_replace($regexFiltro, '', $faker->lastName());
-
+                
                 $segundoApellidoRaw = $faker->optional(0.5)->lastName();
                 $segundoApellido = $segundoApellidoRaw ? preg_replace($regexFiltro, '', $segundoApellidoRaw) : null;
 
-                // --- PASO C: INSERTAR PERSONA (Con su Cohorte) ---
+                // --- PASO C: INSERTAR PERSONA (Forzando Mayúsculas con Str::upper) ---
                 $idPersona = DB::table('personas')->insertGetId([
                     'cedula_personas'           => $cedula,
-                    'primer_nombre_personas'    => trim($primerNombre),
-                    'segundo_nombre_personas'   => $segundoNombre ? trim($segundoNombre) : null,
-                    'primer_apellido_personas'  => trim($primerApellido),
-                    'segundo_apellido_personas' => $segundoApellido ? trim($segundoApellido) : null,
+                    'primer_nombre_personas'    => Str::upper(trim($primerNombre)),
+                    'segundo_nombre_personas'   => $segundoNombre ? Str::upper(trim($segundoNombre)) : null,
+                    'primer_apellido_personas'  => Str::upper(trim($primerApellido)),
+                    'segundo_apellido_personas' => $segundoApellido ? Str::upper(trim($segundoApellido)) : null,
                     'sexo_personas'             => $sexo,
                     'fecha_nacimiento_personas' => $faker->dateTimeBetween('-30 years', '-17 years')->format('Y-m-d'),
                     'id_lugar_nacimiento'       => $idLugarNacimiento,
                     'id_cohortes'               => $faker->randomElement($cohortesIds),
-                    'email_personas'            => 'estudiante' . $cedula . '@universidad.edu.ve',
+                    'email_personas'            => Str::lower('estudiante' . $cedula . '@universidad.edu.ve'), // Correos siempre en minúsculas
                     'created_at'                => now(),
                     'updated_at'                => now(),
                 ]);
@@ -98,14 +99,12 @@ class PersonasSeeder extends Seeder
                 }
 
                 // =========================================================
-                // NUEVO: DATOS PARA PROBAR LOS FILTROS AVANZADOS (Corregido)
+                // DATOS PARA PROBAR LOS FILTROS AVANZADOS
                 // =========================================================
 
                 // --- PASO E: EXPEDIENTE DE TITULACIÓN ---
-                // Ahora usamos las combinaciones válidas de titulos_pnf
                 if ($faker->boolean(80) && !empty($titulosPnfValidos) && !empty($estatusExpedienteIds)) {
                     
-                    // Elegimos una combinación real al azar (Ej: Informática + TSU)
                     $combinacionRandom = $faker->randomElement($titulosPnfValidos);
 
                     DB::table('titulacion_personas')->insert([

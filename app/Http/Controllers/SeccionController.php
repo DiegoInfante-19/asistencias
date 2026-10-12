@@ -138,8 +138,12 @@ class SeccionController extends Controller
         }
     }
 
-    public function inscribirEstudiante(Request $request, Seccion $seccion): RedirectResponse
+   public function inscribirEstudiante(Request $request, Seccion $seccion): RedirectResponse
     {
+        if (!$seccion->estaActiva()) {
+            return back()->with('error', 'Acción denegada: Esta sección se encuentra inactiva y no admite nuevas inscripciones.');
+        }
+
         $request->validate([
             'id_personas' => 'required|exists:personas,id_personas'
         ]);
@@ -161,6 +165,10 @@ class SeccionController extends Controller
 
     public function retirarEstudiante(Seccion $seccion, $id_inscripcion): RedirectResponse
     {
+        if (!$seccion->estaActiva()) {
+            return back()->with('error', 'Acción denegada: Esta sección se encuentra inactiva; su histórico está protegido.');
+        }
+
         $inscripcion = $seccion->inscripciones()->findOrFail($id_inscripcion);
         $inscripcion->delete();
 
@@ -169,6 +177,10 @@ class SeccionController extends Controller
 
     public function asignarProfesor(Request $request, Seccion $seccion): RedirectResponse
     {
+        if (!$seccion->estaActiva()) {
+            return back()->with('error', 'Acción denegada: No se pueden asignar profesores a secciones inactivas.');
+        }
+
         $request->validate([
             'id_profesor' => 'required|exists:profesores,id_profesor'
         ]);
@@ -180,6 +192,10 @@ class SeccionController extends Controller
 
     public function removerProfesor(Seccion $seccion, $id_profesor): RedirectResponse
     {
+        if (!$seccion->estaActiva()) {
+            return back()->with('error', 'Acción denegada: La sección está inactiva y su carga docente está bloqueada.');
+        }
+
         $seccion->profesores()->detach($id_profesor);
 
         return back()->with('success', 'Profesor removido de la sección correctamente.');

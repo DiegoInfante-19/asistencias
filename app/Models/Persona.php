@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne; 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Casts\Attribute; // <-- Importado
+use Illuminate\Support\Str; // <-- Importado
 
 class Persona extends Model
 {
@@ -27,6 +29,39 @@ class Persona extends Model
         'email_personas',
         'id_cohortes'
     ];
+
+    /**
+     * ==========================================
+     * MUTADORES (Fuerzan las mayúsculas a nivel de BD)
+     * ==========================================
+     */
+    protected function primerNombrePersonas(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Str::upper($value) : null,
+        );
+    }
+
+    protected function segundoNombrePersonas(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Str::upper($value) : null,
+        );
+    }
+
+    protected function primerApellidoPersonas(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Str::upper($value) : null,
+        );
+    }
+
+    protected function segundoApellidoPersonas(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value ? Str::upper($value) : null,
+        );
+    }
 
     /**
      * ==========================================

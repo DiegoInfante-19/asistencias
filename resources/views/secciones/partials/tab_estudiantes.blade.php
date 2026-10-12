@@ -1,3 +1,4 @@
+@if($seccion->estaActiva())
 <div class="card border border-primary-subtle shadow-sm mb-4">
     <div class="card-body bg-light rounded d-flex flex-column flex-md-row align-items-md-end gap-3 p-3">
         <div class="flex-grow-1">
@@ -21,6 +22,15 @@
         </div>
     </div>
 </div>
+@else
+<div class="alert alert-secondary d-flex align-items-center mb-4 shadow-sm" role="alert">
+    <i class="bi bi-lock-fill fs-4 me-2"></i>
+    <div>
+        <strong>Sección Inactiva:</strong> El formulario de inscripción de estudiantes se encuentra bloqueado para preservar el histórico académico.
+    </div>
+</div>
+@endif
+
 <div class="card border shadow-sm">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0 fw-bold text-dark fs-6">Nómina Activa</h5>

@@ -5,7 +5,7 @@
 
     <!-- 1. ENCABEZADO PRINCIPAL Y PANEL DE ESTADÍSTICAS FIJO -->
     <div class="row g-4 mb-4">
-        
+
         <!-- Tarjeta Principal de Información -->
         <div class="col-lg-6">
             <div class="card h-100 shadow-sm">
@@ -17,6 +17,15 @@
                                 {{ $seccion->estatus_seccion }}
                             </span>
                         </div>
+
+                        @if(!$seccion->estaActiva())
+                        <div class="alert alert-secondary d-flex align-items-center mt-3 mb-3 py-2 px-3 shadow-sm" role="alert">
+                            <i class="bi bi-lock-fill fs-5 me-2 text-warning"></i>
+                            <div class="small">
+                                <strong>Sección Inactiva (Histórico Bloqueado):</strong> Las operaciones de modificación, inscripción y control de asistencia se encuentran en modo de solo lectura.
+                            </div>
+                        </div>
+                        @endif
                         <p class="text-muted mb-1">
                             Cohorte: <strong class="text-primary">{{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }}</strong>
                         </p>
@@ -117,15 +126,15 @@
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porExpediente = $seccion->inscripciones->groupBy(function($i) {
-                                            $titulacion = $i->persona->titulacionPersona instanceof \Illuminate\Support\Collection 
-                                                        ? $i->persona->titulacionPersona->first() 
-                                                        : $i->persona->titulacionPersona;
-                                            
-                                            if ($titulacion && $titulacion->id_estatus_expediente) {
-                                                $estExp = \App\Models\EstatusExpediente::find($titulacion->id_estatus_expediente);
-                                                return $estExp ? $estExp->nombre_estatus_expediente : 'Sin Estatus';
-                                            }
-                                            return 'Sin Expediente';
+                                        $titulacion = $i->persona->titulacionPersona instanceof \Illuminate\Support\Collection
+                                        ? $i->persona->titulacionPersona->first()
+                                        : $i->persona->titulacionPersona;
+
+                                        if ($titulacion && $titulacion->id_estatus_expediente) {
+                                        $estExp = \App\Models\EstatusExpediente::find($titulacion->id_estatus_expediente);
+                                        return $estExp ? $estExp->nombre_estatus_expediente : 'Sin Estatus';
+                                        }
+                                        return 'Sin Expediente';
                                         });
                                         @endphp
                                         @foreach($porExpediente as $estatusExp => $items)
@@ -175,11 +184,11 @@
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porEmpresa = $seccion->inscripciones->groupBy(function($i) {
-                                            $empresaRel = $i->persona->empresaPersona;
-                                            $empresaObj = $empresaRel instanceof \Illuminate\Support\Collection 
-                                                        ? $empresaRel->first() 
-                                                        : $empresaRel;
-                                            return $empresaObj?->empresa->nombre_empresa ?? 'Independiente';
+                                        $empresaRel = $i->persona->empresaPersona;
+                                        $empresaObj = $empresaRel instanceof \Illuminate\Support\Collection
+                                        ? $empresaRel->first()
+                                        : $empresaRel;
+                                        return $empresaObj?->empresa->nombre_empresa ?? 'Independiente';
                                         });
                                         @endphp
                                         @foreach($porEmpresa as $nombreEmpresa => $items)
@@ -264,6 +273,7 @@
         margin-left: 0 !important;
         margin-bottom: -1px !important;
     }
+
     .card-header-tabs .nav-link {
         border-top-left-radius: 0.375rem;
         border-top-right-radius: 0.375rem;
@@ -271,24 +281,29 @@
         border: 1px solid transparent;
         padding: 0.75rem 1rem;
     }
+
     .card-header-tabs .nav-link:hover {
         border-color: #e9ecef #e9ecef #dee2e6;
         background-color: rgba(255, 255, 255, 0.5);
     }
+
     .card-header-tabs .nav-link.active {
         color: #0d6efd !important;
         background-color: #ffffff !important;
         border-color: #dee2e6 #dee2e6 #ffffff !important;
     }
+
     .tab-content .card {
         border: 1px solid #dee2e6 !important;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
         background-color: #ffffff !important;
     }
+
     .tab-content .card .card-header {
         background-color: #ffffff !important;
         border-bottom: 1px solid #dee2e6 !important;
     }
+
     .tab-content .card .card-footer {
         background-color: #f8f9fa !important;
         border-top: 1px solid #dee2e6 !important;
@@ -333,7 +348,7 @@
             }
         }
 
-        $('#seccionTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        $('#seccionTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
             let currentTabTarget = $(e.target).attr('data-bs-target');
             localStorage.setItem(tabStorageKey, currentTabTarget);
         });
@@ -351,7 +366,7 @@
                     selectTitular.classList.add('d-none');
                     selectTitular.removeAttribute('name');
                     selectTitular.removeAttribute('required');
-                    
+
                     selectSuplente.classList.remove('d-none');
                     selectSuplente.setAttribute('name', 'id_profesor');
                     selectSuplente.setAttribute('required', 'required');
@@ -372,24 +387,26 @@
         // ==========================================
         // CONFIGURACIÓN DE FLATPICKR (MÁQUINA DEL TIEMPO)
         // ==========================================
-        const recesosDB = {!! json_encode($periodosRecesos ?? [], JSON_HEX_TAG) !!};
+        const recesosDB = {
+            !!json_encode($periodosRecesos ?? [], JSON_HEX_TAG) !!
+        };
         let bloqueosFlatpickr = recesosDB.map(receso => {
             return {
-                from: receso.fecha_inicio_periodo_receso.split('T')[0], 
+                from: receso.fecha_inicio_periodo_receso.split('T')[0],
                 to: receso.fecha_fin_periodo_receso.split('T')[0]
             };
         });
 
         // Bloquear días diferentes al miércoles (getDay() !== 3)
         bloqueosFlatpickr.push(function(date) {
-            return (date.getDay() !== 3); 
+            return (date.getDay() !== 3);
         });
 
         if (typeof window.flatpickr !== 'undefined') {
             window.flatpickr("#admin_fecha_sesion", {
-                locale: window.Spanish || "es", 
-                dateFormat: "Y-m-d", 
-                maxDate: "today", 
+                locale: window.Spanish || "es",
+                dateFormat: "Y-m-d",
+                maxDate: "today",
                 disable: bloqueosFlatpickr,
                 allowInput: false
                 // Nota: Eliminamos 'appendTo' para que se posicione de manera natural sobre el input del modal

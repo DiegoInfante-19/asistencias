@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Persona;
 use App\Models\PersonaFormacionAcademica;
-use Illuminate\Http\Request;
+use App\Http\Requests\StorePersonaFormacionAcademicaRequest;
+use Illuminate\Http\Request; 
 use Illuminate\Support\Facades\Log;
 
 class PersonaFormacionAcademicaController extends Controller
@@ -12,23 +13,11 @@ class PersonaFormacionAcademicaController extends Controller
     /**
      * Almacena un nuevo registro de formación académica previa.
      */
-    public function store(Request $request, Persona $persona)
+    public function store(StorePersonaFormacionAcademicaRequest $request, Persona $persona)
     {
         try {
-            // Se valida directamente aquí para forzar la inyección de origen_formacion
-            $validated = $request->validate([
-                'id_titulos'                      => 'nullable|exists:titulos,id_titulos',
-                'id_titulos_pnf'                  => 'nullable|exists:titulos_pnf,id_titulos_pnf',
-                'observacion_formacion_academica' => 'nullable|string',
-                'origen_formacion'                => 'required|in:Interno,Externo',
-            ]);
-
-            // Validación de regla de negocio: Debe traer al menos uno de los dos títulos
-            if (empty($validated['id_titulos']) && empty($validated['id_titulos_pnf'])) {
-                return redirect()->back()->with('error', 'Debe seleccionar un título base o un título PNF.');
-            }
-
-            $persona->formacionAcademica()->create($validated);
+            // El request ya viene validado e integra la protección contra duplicados
+            $persona->formacionAcademica()->create($request->validated());
 
             return redirect()->back()->with('success', 'Formación académica agregada exitosamente.');
             

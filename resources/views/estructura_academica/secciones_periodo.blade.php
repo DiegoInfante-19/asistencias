@@ -2,12 +2,12 @@
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    
+
     <!-- ========================================== -->
     <!-- FILA SUPERIOR: INFORMACIÓN Y FILTROS (2 COLUMNAS) -->
     <!-- ========================================== -->
     <div class="row g-4 mb-4">
-        
+
         <!-- COLUMNA 1: HEADER DE NAVEGACIÓN Y CONTEXTO (DRILL-DOWN) -->
         <div class="col-lg-6">
             <div class="card h-100 shadow-sm ecosystem-card">
@@ -20,7 +20,7 @@
                                 <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Gestión</li>
                             </ol>
                         </nav>
-                        
+
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <h4 class="mb-0 text-dark fw-bold fs-5">
                                 <i class="bi bi-calendar-range text-primary me-2"></i> Período: {{ $periodo->fecha_inicio?->format('Y') }} - {{$periodo->fecha_fin?->format('Y') }}
@@ -32,10 +32,10 @@
 
                         <p class="text-muted mb-0 small">
                             @if($periodo->fecha_inicio &&$periodo->fecha_fin)
-                                Inicia el {{ $periodo->fecha_inicio->format('d') }} de {{ \Carbon\Carbon::parse($periodo->fecha_inicio)->locale('es')->monthName }} del año {{ $periodo->fecha_inicio->format('Y') }}<br>
-                                y finaliza el {{ $periodo->fecha_fin->format('d') }} de {{ \Carbon\Carbon::parse($periodo->fecha_fin)->locale('es')->monthName }} del año {{ $periodo->fecha_fin->format('Y') }}.
+                            Inicia el {{ $periodo->fecha_inicio->format('d') }} de {{ \Carbon\Carbon::parse($periodo->fecha_inicio)->locale('es')->monthName }} del año {{ $periodo->fecha_inicio->format('Y') }}<br>
+                            y finaliza el {{ $periodo->fecha_fin->format('d') }} de {{ \Carbon\Carbon::parse($periodo->fecha_fin)->locale('es')->monthName }} del año {{ $periodo->fecha_fin->format('Y') }}.
                             @else
-                                Fechas de período no disponibles.
+                            Fechas de período no disponibles.
                             @endif
                         </p>
                     </div>
@@ -57,10 +57,10 @@
                         Filtros de Búsqueda para Secciones
                     </h4>
                 </div>
-                
+
                 <div class="card-body p-4 bg-white d-flex flex-column justify-content-between">
                     <div class="row g-3">
-                        
+
                         <!-- FILTRO POR PNF -->
                         <div class="col-12">
                             <label for="filtro_pnf" class="form-label small fw-bold text-muted mb-1">
@@ -69,7 +69,7 @@
                             <select id="filtro_pnf" class="form-select select2-filtro">
                                 <option value="">Todos los PNF...</option>
                                 @foreach($pnfs as $pnf)
-                                    <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
+                                <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -82,11 +82,11 @@
                             <select id="filtro_profesor" class="form-select select2-filtro">
                                 <option value="">Cualquier docente...</option>
                                 @foreach($profesores as $profesor)
-                                    @if($profesor->user)
-                                        <option value="{{ $profesor->id_profesor }}">
-                                            {{ $profesor->user->name_users }} {{$profesor->user->last_name_users }}
-                                        </option>
-                                    @endif
+                                @if($profesor->user)
+                                <option value="{{ $profesor->id_profesor }}">
+                                    {{ $profesor->user->name_users }} {{$profesor->user->last_name_users }}
+                                </option>
+                                @endif
                                 @endforeach
                             </select>
                         </div>
@@ -113,11 +113,18 @@
             <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
                 Registro de Secciones Académicas
             </h4>
+
+            @if($periodo->estatus_periodo === 'Activo')
             <button type="button" class="btn btn-primary fw-bold shadow-sm ms-auto" data-bs-toggle="modal" data-bs-target="#modalSeccion" data-periodo-id="{{ $periodo->id_periodo }}">
                 <i class="bi bi-plus-circle me-1"></i> Añadir Sección
             </button>
+            @else
+            <span class="badge bg-secondary ms-auto px-3 py-2 fs-6">
+                <i class="bi bi-lock-fill me-1"></i> Período Inactivo - Creación Bloqueada
+            </span>
+            @endif
         </div>
-        
+
         <div class="card-body bg-white p-4">
             <div class="table-responsive">
                 {!! $dataTable->table(['class' => 'table table-hover table-striped align-middle w-100 border', 'style' => 'width:100%;']) !!}
@@ -166,6 +173,7 @@
         background-color: #f8f9fa !important;
         border-color: #cbd5e1 !important;
     }
+
     .select2-container--bootstrap-5.select2-container--open .select2-selection {
         background-color: #ffffff !important;
         border-color: #86b7fe !important;
@@ -177,6 +185,7 @@
         background-color: #f8f9fa !important;
         border-color: #cbd5e1 !important;
     }
+
     .btn-limpiar-filtros-dt:hover {
         background-color: #e9ecef !important;
         border-color: #94a3b8 !important;
@@ -197,7 +206,7 @@
 
         // 2. Conectar los filtros personalizados al Yajra DataTable vía preXhr
         const tableName = 'secciones-table';
-        
+
         $('#' + tableName).on('preXhr.dt', function(e, settings, data) {
             data.filtro_pnf = $('#filtro_pnf').val();
             data.filtro_profesor = $('#filtro_profesor').val();
@@ -259,8 +268,8 @@
 
             modalSeccionObj.addEventListener('hidden.bs.modal', function() {
                 document.getElementById('createSeccionForm').reset();
-                if(inputNombreFinalSeccion) inputNombreFinalSeccion.value = '';
-                if(selectPnfSeccion) $(selectPnfSeccion).val(null).trigger('change');
+                if (inputNombreFinalSeccion) inputNombreFinalSeccion.value = '';
+                if (selectPnfSeccion) $(selectPnfSeccion).val(null).trigger('change');
             });
         }
 

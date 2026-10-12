@@ -4,12 +4,26 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class UpdatePersonaRequest extends FormRequest
 {
     public function authorize()
     {
         return true;
+    }
+
+    /**
+     * Prepara y sanitiza los datos antes de la validación.
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'primer_nombre_personas'    => $this->primer_nombre_personas ? Str::upper($this->primer_nombre_personas) : null,
+            'segundo_nombre_personas'   => $this->segundo_nombre_personas ? Str::upper($this->segundo_nombre_personas) : null,
+            'primer_apellido_personas'  => $this->primer_apellido_personas ? Str::upper($this->primer_apellido_personas) : null,
+            'segundo_apellido_personas' => $this->segundo_apellido_personas ? Str::upper($this->segundo_apellido_personas) : null,
+        ]);
     }
 
     public function rules()
@@ -57,12 +71,13 @@ class UpdatePersonaRequest extends FormRequest
                 'date',
                 'before:today'
             ],
+            // --- CORRECCIÓN APLICADA AQUÍ ---
             'email_personas' => [
                 'required',
                 'string',
                 'email',
                 'max:255',
-                'unique:personas,email_personas',
+                Rule::unique('personas', 'email_personas')->ignore($id, 'id_personas'),
                 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
             ],
 
@@ -100,26 +115,26 @@ class UpdatePersonaRequest extends FormRequest
     public function messages()
     {
         return [
-            'required' => 'Este campo es obligatorio.',
+            'required'               => 'Este campo es obligatorio.',
             'cedula_personas.unique' => 'Esta cédula ya está registrada en otro expediente.',
-            'email_personas.unique' => 'Este correo electrónico ya le pertenece a otro registro.',
-            'sexo_personas.in' => 'El género seleccionado no es válido.',
+            'email_personas.unique'  => 'Este correo electrónico ya le pertenece a otro registro.',
+            'sexo_personas.in'       => 'El género seleccionado no es válido.',
 
             'id_estado.required' => 'Debe seleccionar un estado.',
-            'id_estado.exists' => 'El estado seleccionado no es válido.',
+            'id_estado.exists'   => 'El estado seleccionado no es válido.',
             'id_ciudad.required' => 'Debe seleccionar una ciudad.',
-            'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
+            'id_ciudad.exists'   => 'La ciudad seleccionada no es válida.',
             'id_lugar_nacimiento.exists' => 'El lugar de nacimiento procesado no es válido.',
 
             'id_cohortes.required' => 'Debe asignar una cohorte de ingreso al estudiante.',
-            'id_cohortes.exists' => 'La cohorte seleccionada no es válida.',
+            'id_cohortes.exists'   => 'La cohorte seleccionada no es válida.',
 
-            'cedula_personas.regex' => 'La cédula debe tener entre 6 y 8 números exactos. Sin espacios ni puntos.',
-            'primer_nombre_personas.regex' => 'Solo se permiten letras y espacios.',
-            'segundo_nombre_personas.regex' => 'Solo se permiten letras y espacios.',
-            'primer_apellido_personas.regex' => 'Solo se permiten letras y espacios.',
-            'segundo_apellido_personas.regex' => 'Solo se permiten letras y espacios.',
-            'email_personas.regex' => 'Ingrese un correo electrónico válido.',
+            'cedula_personas.regex'            => 'La cédula debe tener entre 6 y 8 números exactos. Sin espacios ni puntos.',
+            'primer_nombre_personas.regex'     => 'Solo se permiten letras y espacios.',
+            'segundo_nombre_personas.regex'    => 'Solo se permiten letras y espacios.',
+            'primer_apellido_personas.regex'   => 'Solo se permiten letras y espacios.',
+            'segundo_apellido_personas.regex'  => 'Solo se permiten letras y espacios.',
+            'email_personas.regex'             => 'Ingrese un correo electrónico válido.',
             'fecha_nacimiento_personas.before' => 'La fecha de nacimiento no es válida.',
         ];
     }

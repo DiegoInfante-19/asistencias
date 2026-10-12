@@ -12,9 +12,12 @@ return new class extends Migration {
             $table->foreignId('id_titulos')->nullable()->constrained('titulos', 'id_titulos')->onDelete('set null');
             $table->text('observacion_formacion_academica')->nullable();
             
-            // NUEVO CAMPO AÑADIDO DESDE EL INICIO
             $table->string('origen_formacion', 50)->default('Externo')->comment('Interno o Externo');
             
+            // RESTRICCIONES DE INTEGRIDAD: Evita duplicar el mismo título base o PNF para la misma persona
+            $table->unique(['id_personas', 'id_titulos'], 'uq_persona_titulo_base');
+            $table->unique(['id_personas', 'id_titulos_pnf'], 'uq_persona_titulo_pnf');
+
             $table->softDeletes();
             $table->timestamps();
         });

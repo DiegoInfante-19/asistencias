@@ -23,9 +23,6 @@
 
   <link rel="icon" type="image/png" href="{{ asset('images/upt_logo-modified.png') }}">
 
-  <!-- 1. Cargar PRIMERO el framework base (AdminLTE) -->
-  <!-- <link rel="preload" href="{{ asset('dist/css/adminlte.css') }}" as="style" /> -->
-  <!-- <link rel="stylesheet" href="{{ asset('dist/css/adminlte.css') }}" /> -->
 
   <!-- 2. Custom CSS -->
   <link href="{{ asset('css/custom-datatables.css') }}?v={{ time() }}" rel="stylesheet">
@@ -61,10 +58,12 @@
           <span class="brand-text fw-light">Assis.UPT</span>
         </a>
       </div>
+
       <div class="sidebar-wrapper">
         <nav class="mt-2">
           <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" aria-label="Main navigation" data-accordion="false" id="navigation">
 
+            <!-- 1. Página de Inicio -->
             <li class="nav-item">
               <a href="{{ route('admin.index') }}" class="nav-link {{ request()->routeIs('admin.index') ? 'active' : '' }}">
                 <i class="bi bi-house-fill"></i>
@@ -73,7 +72,7 @@
             </li>
 
             @if(auth()->user()->isAdmin() || auth()->user()->isCoordinador())
-
+            <!-- 2. Estructura Académica (Acceso directo) -->
             <li class="nav-item">
               <a href="{{ route('estructura.index') }}" class="nav-link {{ request()->routeIs('estructura.*') ? 'active' : '' }}">
                 <i class="bi bi-diagram-3-fill"></i>
@@ -81,40 +80,39 @@
               </a>
             </li>
 
-            <li class="nav-item {{ request()->routeIs('periodos_recesos.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('periodos_recesos.*') ? 'active' : '' }}">
-                <i class="bi bi-calendar-range"></i>
-                <p>Calendario y Recesos<i class="nav-arrow bi bi-chevron-right"></i></p>
-              </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="{{ route('periodos_recesos.index') }}" class="nav-link {{ request()->routeIs('periodos_recesos.*') ? 'active' : '' }}">
-                    <i class="bi bi-calendar-event ms-3"></i>
-                    <p>Periodos de Recesos</p>
-                  </a>
-                </li>
-              </ul>
-            </li>
-
-            <li class="nav-item {{ request()->routeIs('personas.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('personas.*') ? 'active' : '' }}">
-                <i class="bi bi-people-fill"></i>
-                <p>Estudiantes<i class="nav-arrow bi bi-chevron-right"></i></p>
+            <!-- 3. Docencia y Clases (Agrupa Estudiantes, Profesores y Clases) -->
+            <li class="nav-item {{ request()->routeIs('personas.*', 'profesores.*', 'clases.secciones.*', 'sesiones.*') ? 'menu-open' : '' }}">
+              <a href="#" class="nav-link {{ request()->routeIs('personas.*', 'profesores.*', 'clases.secciones.*', 'sesiones.*') ? 'active' : '' }}">
+                <i class="bi bi-person-video3"></i>
+                <p>Docencia y Clases<i class="nav-arrow bi bi-chevron-right"></i></p>
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="{{ route('personas.index') }}" class="nav-link {{ request()->routeIs('personas.*') ? 'active' : '' }}">
-                    <i class="bi bi-person-badge-fill ms-3"></i>
-                    <p>Directorio General</p>
+                    <i class="bi bi-people-fill ms-3"></i>
+                    <p>Estudiantes</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{ route('profesores.index') }}" class="nav-link {{ request()->routeIs('profesores.*') ? 'active' : '' }}">
+                    <i class="bi bi-person-lines-fill ms-3"></i>
+                    <p>Profesores</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{ route('clases.secciones.index') }}" class="nav-link {{ request()->routeIs('clases.secciones.*', 'sesiones.*') ? 'active' : '' }}">
+                    <i class="bi bi-journal-check ms-3"></i>
+                    <p>Portal de Clases</p>
                   </a>
                 </li>
               </ul>
             </li>
 
-            <li class="nav-item {{ request()->routeIs('pnfs.*', 'titulos.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('pnfs.*', 'titulos.*') ? 'active' : '' }}">
-                <i class="bi bi-mortarboard-fill"></i>
-                <p>Titulaciones<i class="nav-arrow bi bi-chevron-right"></i></p>
+            <!-- 4. Catálogos (Agrupa todos los mantenedores secundarios) -->
+            <li class="nav-item {{ request()->routeIs('pnfs.*', 'titulos.*', 'empresas.*', 'cargos.*', 'periodos_recesos.*', 'localidades.*', 'estatus_expedientes.*') ? 'menu-open' : '' }}">
+              <a href="#" class="nav-link {{ request()->routeIs('pnfs.*', 'titulos.*', 'empresas.*', 'cargos.*', 'periodos_recesos.*', 'localidades.*', 'estatus_expedientes.*') ? 'active' : '' }}">
+                <i class="bi bi-grid-fill"></i>
+                <p>Catálogos<i class="nav-arrow bi bi-chevron-right"></i></p>
               </a>
               <ul class="nav nav-treeview">
                 <li class="nav-item">
@@ -129,40 +127,10 @@
                     <p>Títulos</p>
                   </a>
                 </li>
-              </ul>
-            </li>
-
-            <li class="nav-item {{ request()->routeIs('profesores.*', 'clases.secciones.*', 'sesiones.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('profesores.*', 'clases.secciones.*', 'sesiones.*') ? 'active' : '' }}">
-                <i class="bi bi-person-video3"></i>
-                <p>Docencia y Clases<i class="nav-arrow bi bi-chevron-right"></i></p>
-              </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="{{ route('profesores.index') }}" class="nav-link {{ request()->routeIs('profesores.*') ? 'active' : '' }}">
-                    <i class="bi bi-person-lines-fill ms-3"></i>
-                    <p>Listado Profesores</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="{{ route('clases.secciones.index') }}" class="nav-link {{ request()->routeIs('clases.secciones.*', 'sesiones.*') ? 'active' : '' }}">
-                    <i class="bi bi-journal-check ms-3"></i>
-                    <p>Portal de Clases</p>
-                  </a>
-                </li>
-              </ul>
-            </li>
-
-            <li class="nav-item {{ request()->routeIs('empresas.*', 'cargos.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('empresas.*', 'cargos.*') ? 'active' : '' }}">
-                <i class="bi bi-building-fill"></i>
-                <p>Empresas<i class="nav-arrow bi bi-chevron-right"></i></p>
-              </a>
-              <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="{{ route('empresas.index') }}" class="nav-link {{ request()->routeIs('empresas.*') ? 'active' : '' }}">
-                    <i class="bi bi-journals ms-3"></i>
-                    <p>Catálogo</p>
+                    <i class="bi bi-building-fill ms-3"></i>
+                    <p>Empresas</p>
                   </a>
                 </li>
                 <li class="nav-item">
@@ -171,40 +139,29 @@
                     <p>Cargos</p>
                   </a>
                 </li>
-              </ul>
-            </li>
-
-            <li class="nav-item {{ request()->routeIs('localidades.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('localidades.*') ? 'active' : '' }}">
-                <i class="bi bi-map-fill"></i>
-                <p>Localidades<i class="nav-arrow bi bi-chevron-right"></i></p>
-              </a>
-              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{{ route('periodos_recesos.index') }}" class="nav-link {{ request()->routeIs('periodos_recesos.*') ? 'active' : '' }}">
+                    <i class="bi bi-calendar-event ms-3"></i>
+                    <p>Periodos de Recesos</p>
+                  </a>
+                </li>
                 <li class="nav-item">
                   <a href="{{ route('localidades.index') }}" class="nav-link {{ request()->routeIs('localidades.*') ? 'active' : '' }}">
                     <i class="bi bi-geo-alt-fill ms-3"></i>
                     <p>Estados y Ciudades</p>
                   </a>
                 </li>
-              </ul>
-            </li>
-
-            <li class="nav-item {{ request()->routeIs('estatus_expedientes.*') ? 'menu-open' : '' }}">
-              <a href="#" class="nav-link {{ request()->routeIs('estatus_expedientes.*') ? 'active' : '' }}">
-                <i class="bi bi-file-earmark-bar-graph-fill"></i>
-                <p>Reportes<i class="nav-arrow bi bi-chevron-right"></i></p>
-              </a>
-              <ul class="nav nav-treeview">
                 <li class="nav-item">
                   <a href="{{ route('estatus_expedientes.index') }}" class="nav-link {{ request()->routeIs('estatus_expedientes.*') ? 'active' : '' }}">
                     <i class="bi bi-folder2-open ms-3"></i>
-                    <p>Estatus Expedientes</p>
+                    <p>Estatus de Expediente</p>
                   </a>
                 </li>
               </ul>
             </li>
 
             @else
+            <!-- Vista para Profesores/Estudiantes -->
             <li class="nav-item">
               <a href="{{ route('clases.secciones.index') }}" class="nav-link {{ request()->routeIs('clases.secciones.*', 'sesiones.*') ? 'active' : '' }}">
                 <i class="bi bi-journal-check"></i>
@@ -213,6 +170,7 @@
             </li>
             @endif
 
+            <!-- 5. Opciones (Solo Ver Perfil ahora) -->
             <li class="nav-item {{ request()->routeIs('perfil.*') ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ request()->routeIs('perfil.*') ? 'active' : '' }}">
                 <i class="bi bi-gear-fill"></i>
@@ -228,8 +186,9 @@
               </ul>
             </li>
 
-            <li class="nav-item">
-              <a href="#" class="nav-link" id="logout-link">
+            <!-- 6. Cerrar Sesión (Independiente) -->
+            <li class="nav-item mt-2">
+              <a href="#" class="nav-link " id="logout-link">
                 <i class="bi bi-door-open-fill"></i>
                 <p>Cerrar Sesión</p>
               </a>
@@ -237,6 +196,7 @@
                 @csrf
               </form>
             </li>
+
           </ul>
         </nav>
       </div>

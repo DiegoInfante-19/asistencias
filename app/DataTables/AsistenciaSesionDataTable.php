@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\InscripcionSeccion;
+use App\Models\Sesion; // <-- Importante para consultar la sesión y su sección
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
@@ -23,7 +24,15 @@ class AsistenciaSesionDataTable extends BaseDataTable
         $this->idSeccion = $idSeccion;
         $this->idPnfSeccion = $idPnfSeccion;
         $this->asistenciasRegistradas = $asistenciasRegistradas;
-        $this->puedeEditar = $puedeEditar;
+        
+        // BLINDAJE: Si la sección está inactiva, forzamos que no se pueda editar bajo ninguna circunstancia
+        $sesion = Sesion::with('seccion')->find($idSesion);
+        if ($sesion && $sesion->seccion && !$sesion->seccion->estaActiva()) {
+            $this->puedeEditar = false;
+        } else {
+            $this->puedeEditar = $puedeEditar;
+        }
+
         return $this;
     }
 
@@ -97,7 +106,7 @@ class AsistenciaSesionDataTable extends BaseDataTable
             ])
             ->orderBy(2, 'asc')
             ->parameters([
-                'paging'     => false, // CORRECCIÓN: Desactivar paginación para enviar todo el lote visible
+                'paging'     => false, 
                 'info'       => false,
                 'responsive' => false,
                 'autoWidth'  => false,

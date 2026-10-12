@@ -11,6 +11,10 @@ return new class extends Migration {
             $table->foreignId('id_personas')->constrained('personas', 'id_personas')->onDelete('cascade');
             $table->string('numero_telefono_personas', 20);
             $table->string('tipo_telefono', 50); 
+
+            // RESTRICCIONES DE INTEGRIDAD (Únicos por persona)
+            $table->unique(['id_personas', 'numero_telefono_personas'], 'uq_persona_numero_telefono');
+            $table->unique(['id_personas', 'tipo_telefono'], 'uq_persona_tipo_telefono');
         });
     }
 

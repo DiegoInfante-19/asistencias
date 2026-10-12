@@ -30,9 +30,9 @@
                     <!-- Nombres -->
                     <div class="col-md-4">
                         <label for="primer_nombre_personas" class="form-label fw-bold small text-muted text-uppercase">Primer Nombre <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('primer_nombre_personas') is-invalid @enderror"
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm text-uppercase @error('primer_nombre_personas') is-invalid @enderror"
                             id="primer_nombre_personas" name="primer_nombre_personas" value="{{ old('primer_nombre_personas') }}"
-                            autocomplete="off" required>
+                            autocomplete="off" required oninput="this.value = this.value.toUpperCase()">
                         @error('primer_nombre_personas')
                         <div class="invalid-feedback dynamic-feedback fw-bold">{{ $message }}</div>
                         @enderror
@@ -40,17 +40,17 @@
 
                     <div class="col-md-4">
                         <label for="segundo_nombre_personas" class="form-label fw-bold small text-muted text-uppercase">Segundo Nombre</label>
-                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('segundo_nombre_personas') is-invalid @enderror"
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm text-uppercase @error('segundo_nombre_personas') is-invalid @enderror"
                             id="segundo_nombre_personas" name="segundo_nombre_personas" value="{{ old('segundo_nombre_personas') }}"
-                            autocomplete="off">
+                            autocomplete="off" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <!-- Apellidos -->
                     <div class="col-md-4">
                         <label for="primer_apellido_personas" class="form-label fw-bold small text-muted text-uppercase">Primer Apellido <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('primer_apellido_personas') is-invalid @enderror"
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm text-uppercase @error('primer_apellido_personas') is-invalid @enderror"
                             id="primer_apellido_personas" name="primer_apellido_personas" value="{{ old('primer_apellido_personas') }}"
-                            autocomplete="off" required>
+                            autocomplete="off" required oninput="this.value = this.value.toUpperCase()">
                         @error('primer_apellido_personas')
                         <div class="invalid-feedback dynamic-feedback fw-bold">{{ $message }}</div>
                         @enderror
@@ -58,9 +58,9 @@
 
                     <div class="col-md-4">
                         <label for="segundo_apellido_personas" class="form-label fw-bold small text-muted text-uppercase">Segundo Apellido</label>
-                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('segundo_apellido_personas') is-invalid @enderror"
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm text-uppercase @error('segundo_apellido_personas') is-invalid @enderror"
                             id="segundo_apellido_personas" name="segundo_apellido_personas" value="{{ old('segundo_apellido_personas') }}"
-                            autocomplete="off">
+                            autocomplete="off" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <!-- Sexo -->

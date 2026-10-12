@@ -97,6 +97,15 @@ class SesionController extends Controller
     {
         $this->authorize('create', Sesion::class);
 
+        // BLINDAJE: Validar que la sección esté activa
+        $seccion = Seccion::findOrFail($request->id_seccion);
+        if (!$seccion->estaActiva()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pueden programar sesiones en secciones inactivas.'
+            ], 422);
+        }
+
         $user = Auth::user();
 
         if ($user->isProfesor()) {
@@ -130,7 +139,14 @@ class SesionController extends Controller
 
     public function update(StoreSesionRequest $request, $sesion)
     {
-        $sesionItem = Sesion::findOrFail($sesion);
+        $sesionItem = Sesion::with('seccion')->findOrFail($sesion);
+
+        if (!$sesionItem->seccion->estaActiva()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se puede modificar esta sesión porque su sección académica está inactiva.'
+            ], 403);
+        }
 
         Gate::authorize('update', $sesionItem);
 

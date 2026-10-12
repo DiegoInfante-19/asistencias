@@ -47,14 +47,34 @@ class Seccion extends Model
     }
 
     /**
-     * CORRECCIÓN: Se ajustó la búsqueda de estatus para tolerar 'Activo' o 'Activa'
-     * y se eliminó la restricción estricta de la cohorte que estaba rompiendo la consulta.
+     * =====================================================================
+     * MÉTODOS DE AYUDA Y ESTANDARIZACIÓN DE ESTATUS (FASE 1)
+     * =====================================================================
+     */
+
+    /**
+     * Valida de manera estricta si la sección se encuentra en estado Activo/Activa.
+     */
+    public function estaActiva(): bool
+    {
+        return in_array(strtolower($this->estatus_seccion), ['activo', 'activa'], true);
+    }
+
+    /**
+     * Scope para filtrar únicamente secciones activas a nivel general.
+     */
+    public function scopeActivas(Builder $query): Builder
+    {
+        return $query->whereIn('estatus_seccion', ['Activo', 'Activa', 'activo', 'activa']);
+    }
+
+    /**
+     * Scope original optimizado: Secciones activas y con período académico vigente para asignaciones.
      */
     public function scopeActivasParaAsignacion(Builder $query): Builder
     {
-        return $query->whereIn('estatus_seccion', ['Activo', 'Activa'])
+        return $query->whereIn('estatus_seccion', ['Activo', 'Activa', 'activo', 'activa'])
             ->whereHas('periodoAcademico', function ($q) {
-                // Filtramos por periodos activos (tolerando mayúsculas/minúsculas)
                 $q->whereIn('estatus_periodo', ['Activo', 'Activa', 'activo', 'activa']);
             });
     }

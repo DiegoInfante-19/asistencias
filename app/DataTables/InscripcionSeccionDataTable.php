@@ -24,6 +24,11 @@ class InscripcionSeccionDataTable extends BaseDataTable
                 return $inscripcion->persona->titulo_base ?? 'N/D';
             })
             ->addColumn('action', function ($inscripcion) {
+                // Si la sección está inactiva, bloqueamos el botón de retiro
+                if (!$this->seccion->estaActiva()) {
+                    return '<span class="badge bg-secondary">Bloqueado (Inactiva)</span>';
+                }
+
                 $seccionId = $this->seccion->id_seccion;
                 $inscripcionId = $inscripcion->id_inscripcion_seccion;
                 $url = route('secciones.retirar', [$seccionId, $inscripcionId]);
@@ -31,11 +36,11 @@ class InscripcionSeccionDataTable extends BaseDataTable
                 $method = method_field('DELETE');
 
                 return <<<HTML
-                <form action="{$url}" method="POST" class="d-inline" onsubmit="return confirm('¿Retirar a este estudiante de la sección?');">
-                    {$csrf}
-                    {$method}
-                    <button type="submit" class="btn btn-danger shadow-sm">Remover</button>
-                </form>
+        <form action="{$url}" method="POST" class="d-inline" onsubmit="return confirm('¿Retirar a este estudiante de la sección?');">
+            {$csrf}
+            {$method}
+            <button type="submit" class="btn btn-danger shadow-sm">Remover</button>
+        </form>
 HTML;
             })
             ->rawColumns(['cedula', 'action'])
