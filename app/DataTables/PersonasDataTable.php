@@ -24,7 +24,6 @@ class PersonasDataTable extends BaseDataTable
             })
             ->addColumn('titulo', function ($persona) {
                 if ($persona->titulacionPersona && $persona->titulacionPersona->id_titulacion) {
-                    // Ahora usamos nuestro Accessor que respeta estrictamente el PNF
                     $tituloEspecifico = $persona->titulacionPersona->nombre_titulo_especifico;
                     $nombreMostrar = $tituloEspecifico ?? optional($persona->titulacionPersona->titulacion)->nombre_titulo_base ?? 'Título Desconocido';
                     
@@ -43,6 +42,13 @@ class PersonasDataTable extends BaseDataTable
                     return 'bg-femenino';
                 }
                 return '';
+            })
+            ->filterColumn('full_name', function($query, $keyword) {
+                // Permite buscar por cédula O por la concatenación del nombre y apellido
+                $query->where(function($q) use ($keyword) {
+                    $q->where('cedula_personas', 'like', "%{$keyword}%")
+                      ->orWhereRaw("CONCAT(primer_nombre_personas, ' ', primer_apellido_personas) like ?", ["%{$keyword}%"]);
+                });
             })
             ->filter(function ($query) {
                 // 1. Filtro por Cohorte
@@ -75,17 +81,16 @@ class PersonasDataTable extends BaseDataTable
                     });
                 }
 
-                // 5. Filtro por Título a Optar (Corregido y Simplificado)
+                // 5. Filtro por Título a Optar
                 if (request()->has('filtro_titulo') && !empty(request()->get('filtro_titulo'))) {
                     $tituloId = request()->get('filtro_titulo');
                     $query->whereHas('titulacionPersonas', function ($q) use ($tituloId) {
-                        // Filtramos directo por la llave foránea real sin hacer cruces peligrosos
                         $q->where('id_titulacion', $tituloId)
                           ->whereRaw('id_titulacion_personas = (select max(id_titulacion_personas) from titulacion_personas as tp where tp.id_personas = personas.id_personas)');
                     });
                 }
 
-                // 6. Filtro por Estatus de Expediente (Blindado al expediente más reciente de la persona)
+                // 6. Filtro por Estatus de Expediente
                 if (request()->has('filtro_estatus') && !empty(request()->get('filtro_estatus'))) {
                     $estatusId = request()->get('filtro_estatus');
                     $query->whereHas('titulacionPersonas', function ($q) use ($estatusId) {
@@ -94,15 +99,14 @@ class PersonasDataTable extends BaseDataTable
                     });
                 }
 
-                // 7. Filtro por Estado de Nacimiento (Corregido para usar la relación anidada de ciudad)
+                // 7. Filtro por Estado de Nacimiento
                 if (request()->has('filtro_estado') && !empty(request()->get('filtro_estado'))) {
-                    // Usamos notación de punto para cruzar de lugarNacimiento -> ciudad
                     $query->whereHas('lugarNacimiento.ciudad', function ($q) {
                         $q->where('id_estado', request()->get('filtro_estado'));
                     });
                 }
 
-                // 8. Filtro por Profesor (Corrección: Uso de inscripcionActiva y profesores.id_profesor)
+                // 8. Filtro por Profesor
                 if (request()->has('filtro_profesor') && !empty(request()->get('filtro_profesor'))) {
                     $profesorId = request()->get('filtro_profesor');
                     $query->whereHas('inscripcionActiva', function ($q) use ($profesorId) {

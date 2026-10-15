@@ -11,6 +11,7 @@ use App\DataTables\PnfsDataTable;
 use App\Http\Requests\StorePnfRequest;
 use App\Http\Requests\UpdatePnfRequest;
 use App\Http\Requests\VincularTituloPnfRequest;
+use App\Http\Requests\UpdateTituloPnfRequest; // <-- 1. Importación del nuevo Request
 use App\Http\Requests\VincularEmpresaPnfRequest;
 use Illuminate\Database\QueryException;
 
@@ -107,15 +108,35 @@ class PnfController extends Controller
         }
     }
 
+    // <-- 2. NUEVO MÉTODO: Actualiza el título sin destruir el ID
+    public function actualizarTitulo(UpdateTituloPnfRequest $request, $id_titulos_pnf)
+    {
+        try {
+            $vinculo = TituloPnf::findOrFail($id_titulos_pnf);
+            
+            // Actualiza los campos validados in-situ
+            $vinculo->update($request->validated());
+
+            return redirect()->back()
+                ->with('success', 'Configuración del título actualizada correctamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Ocurrió un error al actualizar el título: ' . $e->getMessage());
+        }
+    }
+
+    // <-- 3. MÉTODO REFACTORIZADO (Aprovecha SoftDeletes)
     public function desvincularTitulo($id_titulos_pnf)
     {
         try {
             $vinculo = TituloPnf::findOrFail($id_titulos_pnf);
+            
+            // Gracias al SoftDeletes, esto ahora hace un UPDATE deleted_at = NOW()
+            // Ya no arrojará error de llave foránea ni dejará huérfanos a los estudiantes.
             $vinculo->delete();
 
-            return redirect()->back()->with('success', 'Título desvinculado exitosamente.');
+            return redirect()->back()->with('success', 'Título retirado exitosamente del catálogo activo.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'No se pudo desvincular el título porque está en uso por expedientes de estudiantes.');
+            return redirect()->back()->with('error', 'Ocurrió un error al intentar retirar el título: ' . $e->getMessage());
         }
     }
 

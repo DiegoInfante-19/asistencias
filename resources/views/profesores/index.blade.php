@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    
+
     <!-- TARJETA DE FILTROS AVANZADOS -->
     <div class="card shadow-sm ecosystem-card mb-4">
         <!-- Header estático -->
@@ -11,39 +11,39 @@
                 Filtros Avanzados de Búsqueda
             </h4>
         </div>
-        
+
         <!-- Body blanco -->
         <div class="card-body bg-white p-4">
             <div class="row g-4">
-                
+
                 <!-- 1. Filtro por PNF -->
                 <div class="col-md-3">
                     <label for="filtro_pnf" class="form-label fw-bold small text-muted text-uppercase">PNF Asignado</label>
                     <select id="filtro_pnf" class="form-select select2-buscador">
                         <option value="" selected>Todos los PNF...</option>
                         @if(isset($pnfs))
-                            @foreach($pnfs as $pnf)
-                                <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
-                            @endforeach
+                        @foreach($pnfs as $pnf)
+                        <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
+                        @endforeach
                         @endif
                     </select>
                 </div>
 
                 <!-- 2. Filtro por Sección -->
-<div class="col-md-3">
-    <label for="filtro_seccion" class="form-label fw-bold small text-muted text-uppercase">Sección Específica</label>
-    <select id="filtro_seccion" class="form-select select2-buscador">
-        <option value="" selected>Todas las Secciones...</option>
-        @if(isset($secciones))
-            <!-- CORRECCIÓN: Filtramos las secciones en vivo para mostrar solo las activas -->
-            @foreach(\App\Models\Seccion::with('pnf')->activasParaAsignacion()->orderBy('nombre_seccion')->get() as $seccion)
-                <option value="{{ $seccion->id_seccion }}">
-                    {{ $seccion->nombre_seccion }} ({{ $seccion->pnf->nombre_pnf ?? 'Sin PNF' }})
-                </option>
-            @endforeach
-        @endif
-    </select>
-</div>
+                <div class="col-md-3">
+                    <label for="filtro_seccion" class="form-label fw-bold small text-muted text-uppercase">Sección Específica</label>
+                    <select id="filtro_seccion" class="form-select select2-buscador">
+                        <option value="" selected>Todas las Secciones...</option>
+                        @if(isset($secciones))
+                        <!-- CORRECCIÓN: Filtramos las secciones en vivo para mostrar solo las activas -->
+                        @foreach(\App\Models\Seccion::with('pnf')->activasParaAsignacion()->orderBy('nombre_seccion')->get() as $seccion)
+                        <option value="{{ $seccion->id_seccion }}">
+                            {{ $seccion->nombre_seccion }} ({{ $seccion->pnf->nombre_pnf ?? 'Sin PNF' }})
+                        </option>
+                        @endforeach
+                        @endif
+                    </select>
+                </div>
 
                 <!-- 3. Filtro por Rol -->
                 <div class="col-md-3">
@@ -51,9 +51,9 @@
                     <select id="filtro_rol" class="form-select select2-buscador">
                         <option value="" selected>Todos los Roles...</option>
                         @if(isset($roles))
-                            @foreach($roles as $rol)
-                                <option value="{{ $rol->id_rol }}">{{ $rol->nombre_rol ?? $rol->name_role ?? 'Rol #' . $rol->id_rol }}</option>
-                            @endforeach
+                        @foreach($roles as $rol)
+                        <option value="{{ $rol->id_rol }}">{{ $rol->nombre_rol ?? $rol->name_role ?? 'Rol #' . $rol->id_rol }}</option>
+                        @endforeach
                         @endif
                     </select>
                 </div>
@@ -153,7 +153,7 @@
     /* ---------------------------------------------------
        ESTÉTICA UNIFICADA PARA INPUTS Y SELECT2 "SOFT"
     ----------------------------------------------------- */
-    
+
     /* 1. Entradas de texto y selects normales */
     .card-body.bg-white .form-control,
     .card-body.bg-white .form-select {
@@ -205,14 +205,14 @@
 
         // 3. INTERCEPTOR AJAX DE DATATABLES PARA ENVIAR FILTROS
         $('#users-table').on('preXhr.dt', function(e, settings, data) {
-            data.filtro_pnf            = $('#filtro_pnf').val();
-            data.filtro_seccion        = $('#filtro_seccion').val();
-            data.filtro_rol            = $('#filtro_rol').val();
-            data.filtro_estatus        = $('#filtro_estatus').val();
+            data.filtro_pnf = $('#filtro_pnf').val();
+            data.filtro_seccion = $('#filtro_seccion').val();
+            data.filtro_rol = $('#filtro_rol').val();
+            data.filtro_estatus = $('#filtro_estatus').val();
             data.filtro_seccion_activa = $('#filtro_seccion_activa').val();
-            data.filtro_tiene_seccion  = $('#filtro_tiene_seccion').val();
-            data.filtro_tiene_pnf      = $('#filtro_tiene_pnf').val();
-            data.filtro_nivel          = $('#filtro_nivel').val();
+            data.filtro_tiene_seccion = $('#filtro_tiene_seccion').val();
+            data.filtro_tiene_pnf = $('#filtro_tiene_pnf').val();
+            data.filtro_nivel = $('#filtro_nivel').val();
         });
 
         // 4. DISPARADOR DE RECARGA AL CAMBIAR CUALQUIER FILTRO
@@ -264,15 +264,15 @@
         });
 
         // 8. LÓGICA PARA AUTO-ABRIR MODAL TRAS ERROR DE VALIDACIÓN
-        @if($errors->any())
-            @if(old('origen') == 'modal')
-                var createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
-                createUserModal.show();
-            @elseif(old('_method') == 'PUT')
-                $('#editUserForm').attr('action', $('#edit_url').val());
-                var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
-                editUserModal.show();
-            @endif
+        @if($errors -> any())
+        @if(old('origen') == 'modal')
+        var createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+        createUserModal.show();
+        @elseif(old('_method') == 'PUT')
+        $('#editUserForm').attr('action', $('#edit_url').val());
+        var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        editUserModal.show();
+        @endif
         @endif
     });
 </script>

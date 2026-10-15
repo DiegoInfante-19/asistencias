@@ -188,6 +188,33 @@
         }
     });
 
+    // --- Lógica del Modal: Actualizar Título del PNF ---
+    let updateTituloModal = document.getElementById('updateTituloModal');
+    if (updateTituloModal) {
+        updateTituloModal.addEventListener('show.bs.modal', function(event) {
+            let button = event.relatedTarget; // El botón que disparó el modal
+            let modal = this;
+            
+            // 1. Inyectamos la URL dinámica en el formulario
+            modal.querySelector('#updateTituloForm').setAttribute('action', button.getAttribute('data-url'));
+            
+            // 2. Llenamos el input de texto
+            modal.querySelector('#edit-nombre-titulo-pnf').value = button.getAttribute('data-nombre');
+            
+            // 3. Sincronizamos el Select del Título Base
+            let tituloSelect = modal.querySelector('#edit-titulo-pnf-id');
+            tituloSelect.value = button.getAttribute('data-titulo');
+            
+            // Refrescar Select2 si está inicializado en tu proyecto
+            if (typeof window.$ !== 'undefined') {
+                let $tituloSelect = $(tituloSelect);
+                if ($tituloSelect.data('select2')) { 
+                    $tituloSelect.trigger('change'); 
+                }
+            }
+        });
+    }
+
     document.addEventListener('submit', function(event) {
         if (event.target && event.target.classList.contains('form-desvincular-titulo')) {
             event.preventDefault();

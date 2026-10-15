@@ -28,7 +28,7 @@ class AsistenciaController extends Controller
 
         $request->validate([
             'id_sesiones' => 'required|exists:sesiones,id_sesiones',
-            'asistencias' => 'required|array|max:150',
+            'asistencias' => 'nullable|array|max:150', // Cambiamos a nullable para manejar el array vacío manualmente
 
             'asistencias.*.id_inscripcion_seccion' => [
                 'required',
@@ -40,18 +40,15 @@ class AsistenciaController extends Controller
             'asistencias.*.observacion' => 'nullable|string|max:255',
         ]);
 
-        $totalAlumnosInscritos = InscripcionSeccion::where('id_seccion', $sesion->id_seccion)
-            ->where('estatus_inscripcion', 'Activo')
-            ->count();
-
-        $totalEnviadosEnLote = count($request->asistencias);
-
-        if ($totalEnviadosEnLote !== $totalAlumnosInscritos) {
+        // Si el profesor no evaluó a nadie (todos en "Ignorar"), evitamos ir a BD
+        if (empty($request->asistencias) || count($request->asistencias) === 0) {
             return response()->json([
                 'success' => false,
-                'message' => "Error de integridad: El lote enviado contiene {$totalEnviadosEnLote} registros, pero la sección posee {$totalAlumnosInscritos} estudiantes activos. No se permiten guardados parciales o duplicados."
+                'message' => 'No seleccionaste el estado de ningún estudiante. Selecciona al menos uno para guardar.'
             ], 422);
         }
+
+        // ELIMINAMOS LA VALIDACIÓN DEL 100% AQUÍ. AHORA ACEPTAMOS ENVÍOS PARCIALES.
 
         DB::beginTransaction();
 
@@ -74,7 +71,7 @@ class AsistenciaController extends Controller
             DB::commit();
             return response()->json([
                 'success' => true,
-                'message' => 'El registro de asistencia se guardó correctamente.'
+                'message' => 'El registro de asistencia se actualizó correctamente.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -42,6 +42,13 @@ class CohortesDataTable extends BaseDataTable
             ->addColumn('action', function ($cohorte) {
                 return view('estructura_academica.partials.actions', compact('cohorte'))->render();
             })
+            ->filterColumn('periodo', function($query, $keyword) {
+                // Permite buscar por los años del período académico relacionado
+                $query->whereHas('periodosAcademicos', function($q) use ($keyword) {
+                    $q->whereRaw("YEAR(fecha_inicio) like ?", ["%{$keyword}%"])
+                      ->orWhereRaw("YEAR(fecha_fin) like ?", ["%{$keyword}%"]);
+                });
+            })
             ->rawColumns(['periodo', 'estatus_cohorte', 'action'])
             ->setRowId('id_cohortes');
     }
@@ -83,8 +90,8 @@ class CohortesDataTable extends BaseDataTable
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center align-middle'),
             Column::make('numero_cohorte')->title('Cohorte')->addClass('text-center fw-bold align-middle')->width('25%'),
-            Column::make('periodo')->title('Período')->addClass('text-center align-middle')->searchable(false)->width('25%'),
-            Column::make('estatus_cohorte')->title('Estatus')->addClass('text-center align-middle')->width('25%'),
+            Column::make('periodo')->title('Período')->addClass('text-center align-middle')->searchable(true)->width('25%'), // <-- Habilitado searchable
+            Column::make('estatus_cohorte')->title('Estatus')->addClass('text-center align-middle')->searchable(true)->width('25%'), // <-- Habilitado searchable
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('25%')->addClass('text-center align-middle'),
         ];
     }

@@ -28,14 +28,12 @@
 <div class="content pt-4" style="margin: 20px;">
 
     @php
-        $tieneAsistencia = count($asistenciasRegistradas) > 0;
-        // Variables para la lógica visual
-        $esSuperUsuario = (method_exists(auth()->user(), 'isAdministrador') && auth()->user()->isAdministrador()) || 
-                          (method_exists(auth()->user(), 'isCoordinador') && auth()->user()->isCoordinador());
-        $tiempoAgotado = $sesion->tiempoAgotado();
+    $tieneAsistencia = count($asistenciasRegistradas) > 0;
+    $esSuperUsuario = (method_exists(auth()->user(), 'isAdministrador') && auth()->user()->isAdministrador()) ||
+    (method_exists(auth()->user(), 'isCoordinador') && auth()->user()->isCoordinador());
+    $tiempoAgotado = $sesion->tiempoAgotado();
     @endphp
 
-    <!-- ENCABEZADO Y DATOS DE LA CLASE -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
             <h4 class="fw-bold text-dark mb-1">
@@ -43,7 +41,15 @@
             </h4>
             <p class="text-muted small mb-0">
                 <strong>PNF:</strong> {{ $sesion->seccion->pnf->nombre_pnf ?? 'N/D' }} |
-                <strong>Cohorte Ref.:</strong> {{ $sesion->seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }} |
+                <strong>Período Académico:</strong>
+                @if($sesion->seccion->periodoAcademico)
+                {{ \Carbon\Carbon::parse($sesion->seccion->periodoAcademico->fecha_inicio)->format('Y') }}
+                -
+                {{ \Carbon\Carbon::parse($sesion->seccion->periodoAcademico->fecha_fin)->format('Y') }}
+                @else
+                N/D
+                @endif
+                |
                 <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($sesion->fecha_sesion)->format('d/m/Y') }}
             </p>
 
@@ -61,34 +67,25 @@
         </div>
 
         <div class="d-flex flex-column align-items-md-end gap-2 text-md-end">
-            <!-- BADGES DE ESTADO INTELIGENTES -->
             <div class="mb-2 mb-md-0 d-flex flex-column align-items-md-end">
-                
                 @if(!$tieneAsistencia)
-                    <span class="badge bg-danger shadow-sm p-2 fs-6"><i class="bi bi-exclamation-octagon me-1"></i> Asistencia Pendiente</span>
-                    @if(!$tiempoAgotado)
-                        <span class="text-muted small fw-bold mt-1"><i class="bi bi-clock-history text-warning"></i> El profesor tiene {{ $sesion->horasRestantesEdicion() }}h para registrar</span>
-                    @endif
-                
-                @elseif($puedeEditar)
-                    <span class="badge bg-success shadow-sm p-2 fs-6 mb-1"><i class="bi bi-check-circle-fill me-1"></i> Asistencia Registrada</span>
-                    
-                    @if(!$tiempoAgotado)
-                        <span class="text-muted small fw-bold"><i class="bi bi-clock-history text-warning"></i> Restan {{ $sesion->horasRestantesEdicion() }}h de edición para el profesor</span>
-                    @else
-                        <!-- Si el tiempo se agotó pero el usuario puede editar, significa que es un superusuario -->
-                        <span class="small fw-bold"><i class="bi bi-shield-lock-fill"></i> Tiempo cerrado para el profesor (Modo Privilegiado activo)</span>
-                    @endif
-                
-                @else
-                    <!-- Si llegó aquí, es un profesor y el tiempo se agotó -->
-                    <span class="badge bg-secondary shadow-sm p-2 fs-6"><i class="bi bi-lock-fill me-1"></i> Registro Cerrado</span>
-                    <span class="text-danger small fw-bold mt-1">Tiempo de 48h finalizado</span>
+                <span class="badge bg-danger shadow-sm p-2 fs-6"><i class="bi bi-exclamation-octagon me-1"></i> Asistencia Pendiente</span>
+                @if(!$tiempoAgotado)
+                <span class="text-muted small fw-bold mt-1"><i class="bi bi-clock-history text-warning"></i> El profesor tiene {{ $sesion->horasRestantesEdicion() }}h para registrar</span>
                 @endif
-
+                @elseif($puedeEditar)
+                <span class="badge bg-success shadow-sm p-2 fs-6 mb-1"><i class="bi bi-check-circle-fill me-1"></i> Asistencia Registrada</span>
+                @if(!$tiempoAgotado)
+                <span class="text-muted small fw-bold"><i class="bi bi-clock-history text-warning"></i> Restan {{ $sesion->horasRestantesEdicion() }}h de edición para el profesor</span>
+                @else
+                <span class="small fw-bold"><i class="bi bi-shield-lock-fill"></i> Tiempo cerrado para el profesor (Modo Privilegiado activo)</span>
+                @endif
+                @else
+                <span class="badge bg-secondary shadow-sm p-2 fs-6"><i class="bi bi-lock-fill me-1"></i> Registro Cerrado</span>
+                <span class="text-danger small fw-bold mt-1">Tiempo de 48h finalizado</span>
+                @endif
             </div>
 
-            <!-- Botón de Volver Integrado -->
             <div class="d-flex gap-2">
                 <a href="{{ route('clases.secciones.sesiones', $sesion->id_seccion) }}" class="btn btn-outline-secondary fw-bold shadow-sm">
                     <i class="bi bi-arrow-left me-1"></i> Volver al Directorio
@@ -97,10 +94,7 @@
         </div>
     </div>
 
-    <!-- TARJETA PRINCIPAL (ESCRITORIO / MÓVIL) -->
     <div class="card border-0 shadow-sm">
-
-        <!-- CABECERA DE LA TABLA Y CONTROLES ESCRITORIO -->
         <div class="card-header bg-white py-3 d-flex align-items-center border-bottom">
             <h5 class="card-title text-dark mb-0 fs-5 fw-bold">
                 Lista de Estudiantes
@@ -140,16 +134,17 @@
                 <div class="d-block d-md-none">
                     @forelse($inscripciones as $index => $inscripcion)
                     @php
-                        $estadoRaw = $asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'presente';
-                        $estadoNormalizado = $estadoRaw instanceof \App\Enums\EstadoAsistencia ? $estadoRaw->value : strtolower($estadoRaw);
+                    $estadoRaw = $asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'ignorar';
+                    $estadoNormalizado = $estadoRaw instanceof \App\Enums\EstadoAsistencia ? $estadoRaw->value : strtolower($estadoRaw);
 
-                        $badgeClass = match($estadoNormalizado) {
-                        'presente' => 'bg-success',
-                        'ausente' => 'bg-danger',
-                        'justificada', 'justificado' => 'bg-warning text-dark',
-                        'tarde' => 'bg-info text-dark',
-                        default => 'bg-secondary'
-                        };
+                    $badgeClass = match($estadoNormalizado) {
+                    'presente' => 'bg-success',
+                    'ausente' => 'bg-danger',
+                    'justificada', 'justificado' => 'bg-warning text-dark',
+                    'tarde' => 'bg-info text-dark',
+                    'ignorar' => 'bg-primary', // Badge azul en móvil
+                    default => 'bg-secondary'
+                    };
                     @endphp
 
                     <div class="card mb-3 border shadow-sm fila-estudiante" data-inscripcion="{{ $inscripcion->id_inscripcion_seccion }}" data-estado-original="{{ $estadoNormalizado }}">
@@ -166,14 +161,18 @@
                                 {{ $inscripcion->persona->nombre_completo ?? 'N/D' }}
                             </h6>
 
-                            <!-- MODO LECTURA MÓVIL -->
                             <div class="modo-lectura w-100 text-center {{ !$puedeEditar || $tieneAsistencia ? '' : 'd-none' }}">
+                                @if($estadoNormalizado == 'ignorar')
+                                <span class="badge bg-primary fs-6 px-3 py-2 w-100"><i class="bi bi-dash-circle"></i> Sin Evaluar</span>
+                                @else
                                 <span class="badge {{ $badgeClass }} fs-6 px-3 py-2 w-100">{{ ucfirst($estadoNormalizado) }}</span>
+                                @endif
                             </div>
 
-                            <!-- MODO EDICIÓN MÓVIL -->
                             <div class="modo-edicion w-100 {{ !$puedeEditar || $tieneAsistencia ? 'd-none' : '' }}">
                                 <div class="btn-group w-100 shadow-sm btn-group-asistencia" role="group">
+
+                                    <!-- PRESENTE -->
                                     <input type="radio" class="btn-check btn-estado" name="estado_movil_{{ $inscripcion->id_inscripcion_seccion }}"
                                         id="m_presente_{{ $inscripcion->id_inscripcion_seccion }}" value="presente"
                                         {{ $estadoNormalizado == 'presente' ? 'checked' : '' }} autocomplete="off" {{ !$puedeEditar ? 'disabled' : '' }}>
@@ -181,6 +180,7 @@
                                         Presente
                                     </label>
 
+                                    <!-- AUSENTE -->
                                     <input type="radio" class="btn-check btn-estado" name="estado_movil_{{ $inscripcion->id_inscripcion_seccion }}"
                                         id="m_ausente_{{ $inscripcion->id_inscripcion_seccion }}" value="ausente"
                                         {{ $estadoNormalizado == 'ausente' ? 'checked' : '' }} autocomplete="off" {{ !$puedeEditar ? 'disabled' : '' }}>
@@ -188,11 +188,20 @@
                                         Ausente
                                     </label>
 
+                                    <!-- JUSTIFICADA -->
                                     <input type="radio" class="btn-check btn-estado" name="estado_movil_{{ $inscripcion->id_inscripcion_seccion }}"
                                         id="m_justificada_{{ $inscripcion->id_inscripcion_seccion }}" value="justificada"
                                         {{ $estadoNormalizado == 'justificada' ? 'checked' : '' }} autocomplete="off" {{ !$puedeEditar ? 'disabled' : '' }}>
-                                    <label class="btn btn-outline-secondary btn-asistencia-justificado text-center" for="m_justificada_{{ $inscripcion->id_inscripcion_seccion }}">
+                                    <label class="btn btn-outline-secondary btn-asistencia-justificado text-center px-1" for="m_justificada_{{ $inscripcion->id_inscripcion_seccion }}">
                                         Justif.
+                                    </label>
+
+                                    <!-- IGNORAR (A LA DERECHA) -->
+                                    <input type="radio" class="btn-check btn-estado" name="estado_movil_{{ $inscripcion->id_inscripcion_seccion }}"
+                                        id="m_ignorar_{{ $inscripcion->id_inscripcion_seccion }}" value="ignorar"
+                                        {{ $estadoNormalizado == 'ignorar' ? 'checked' : '' }} autocomplete="off" {{ !$puedeEditar ? 'disabled' : '' }}>
+                                    <label class="btn btn-outline-secondary btn-asistencia-ignorar text-center px-1" for="m_ignorar_{{ $inscripcion->id_inscripcion_seccion }}" title="No evaluar a este alumno">
+                                        <i class="bi bi-dash-lg"></i>
                                     </label>
                                 </div>
                             </div>
@@ -270,7 +279,6 @@
 <script type="module">
     $(document).ready(function() {
 
-        // 1. MANEJO DE ESTADOS LECTURA/EDICIÓN
         $('.btn-editar-asistencia').on('click', function() {
             $('.modo-lectura').addClass('d-none');
             $('.modo-edicion').removeClass('d-none').hide().fadeIn(300);
@@ -288,7 +296,6 @@
             $('.btn-procesar-asistencia').addClass('d-none');
             $('.btn-editar-asistencia').removeClass('d-none');
 
-            // Resetear los radio buttons al estado original
             $('.fila-estudiante').each(function() {
                 let estadoOriginal = $(this).data('estado-original');
                 if (estadoOriginal) {
@@ -297,7 +304,6 @@
             });
         });
 
-        // 2. LÓGICA DE GUARDADO DE ASISTENCIA
         $(document).on('click', '.btn-procesar-asistencia', function() {
             const botonesProcesar = document.querySelectorAll('.btn-procesar-asistencia');
 
@@ -310,14 +316,13 @@
             let token = document.getElementById('csrf_token').value;
             let asistenciasMap = {};
 
-            // Recorremos las filas e ignoramos las ocultas
             let filas = document.querySelectorAll('.fila-estudiante');
             filas.forEach(function(fila) {
                 if (fila.offsetParent !== null) {
                     let idInscripcion = fila.getAttribute('data-inscripcion');
                     let radioSeleccionado = fila.querySelector('input[type="radio"]:checked');
-                    
-                    if (radioSeleccionado) {
+
+                    if (radioSeleccionado && radioSeleccionado.value !== 'ignorar') {
                         asistenciasMap[idInscripcion] = {
                             id_inscripcion_seccion: idInscripcion,
                             estado: radioSeleccionado.value
@@ -331,54 +336,75 @@
                 asistencias: Object.values(asistenciasMap)
             };
 
-            fetch("{{ route('asistencias.guardar_lote') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Asistencia Guardada!',
-                            text: 'El registro se actualizó correctamente.',
-                            confirmButtonText: 'Entendido',
-                            allowOutsideClick: false
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload();
-                            }
-                        });
-                    } else {
-                        alert('¡Asistencia Guardada correctamente!');
-                        window.location.reload();
-                    }
-                } else {
-                    throw new Error(data.message || 'Error desconocido del servidor');
-                }
-            })
-            .catch(error => {
+            if (payload.asistencias.length === 0) {
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Ocurrió un error al guardar la asistencia: ' + error.message,
+                        icon: 'warning',
+                        title: 'Sin selección',
+                        text: 'No has evaluado la asistencia de ningún alumno. Por favor marca al menos uno.',
+                        confirmButtonText: 'Entendido'
                     });
                 } else {
-                    alert('Ocurrió un error al guardar: ' + error.message);
+                    alert('No has evaluado la asistencia de ningún alumno.');
                 }
 
                 botonesProcesar.forEach(function(b) {
                     b.disabled = false;
-                    b.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Intentar de nuevo';
+                    b.innerHTML = b.classList.contains('btn-primary') ?
+                        '<i class="bi bi-cloud-arrow-up-fill me-1"></i> Guardar Asistencia' :
+                        '<i class="bi bi-check-circle-fill me-1"></i> Confirmar Actualización';
                 });
-            });
+                return;
+            }
+
+            fetch("{{ route('asistencias.guardar_lote') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Asistencia Guardada!',
+                                text: 'El registro se actualizó correctamente.',
+                                confirmButtonText: 'Entendido',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                        } else {
+                            alert('¡Asistencia Guardada correctamente!');
+                            window.location.reload();
+                        }
+                    } else {
+                        throw new Error(data.message || 'Error desconocido del servidor');
+                    }
+                })
+                .catch(error => {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ocurrió un error al guardar la asistencia: ' + error.message,
+                        });
+                    } else {
+                        alert('Ocurrió un error al guardar: ' + error.message);
+                    }
+
+                    botonesProcesar.forEach(function(b) {
+                        b.disabled = false;
+                        b.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Intentar de nuevo';
+                    });
+                });
         });
     });
 </script>

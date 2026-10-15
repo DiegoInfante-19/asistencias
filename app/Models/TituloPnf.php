@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // <-- 1. Importar SoftDeletes
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany; // <-- 2. Importar HasMany
 
 class TituloPnf extends Model
 {
+    use SoftDeletes; // <-- 3. Activar el borrado lógico
+
     // Configuración de tabla y llave primaria (Paso 5)
     protected $table = 'titulos_pnf'; 
     protected $primaryKey = 'id_titulos_pnf';
@@ -32,5 +36,12 @@ class TituloPnf extends Model
     public function titulo(): BelongsTo
     {
         return $this->belongsTo(Titulo::class, 'id_titulo', 'id_titulos');
+    }
+
+    // <-- 4. Nueva relación inversa sugerida por el análisis
+    // Permite saber qué expedientes académicos dependen de este título
+    public function formacionesAcademicas(): HasMany
+    {
+        return $this->hasMany(PersonaFormacionAcademica::class, 'id_titulos_pnf', 'id_titulos_pnf');
     }
 }

@@ -27,6 +27,13 @@ class UsersDataTable extends BaseDataTable
             ->addColumn('action', function ($user) {
                 return view('profesores.partials.actions', compact('user'))->render();
             })
+            ->filterColumn('full_name', function($query, $keyword) {
+                // Permite buscar por cédula O por la concatenación del nombre y apellido
+                $query->where(function($q) use ($keyword) {
+                    $q->where('cedula_users', 'like', "%{$keyword}%")
+                      ->orWhereRaw("CONCAT(name_users, ' ', last_name_users) like ?", ["%{$keyword}%"]);
+                });
+            })
             ->filter(function ($query) {
                 // 1. Filtro por Rol
                 if (request()->has('filtro_rol') && !empty(request()->get('filtro_rol'))) {
@@ -102,10 +109,8 @@ class UsersDataTable extends BaseDataTable
     {
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center'),
-            Column::make('cedula_users')->title('Cédula'),
+            Column::make('cedula_users')->title('Cédula')->width(110), // <-- Columna de cédula restaurada
             Column::make('full_name')->title('Nombre y Apellido')->searchable(true),
-            Column::make('email_users')->title('Correo Electrónico'),
-            Column::make('username')->title('Usuario')->addClass('all'),
             Column::make('status_users')->title('Estado')->addClass('text-center'),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width(120)->addClass('text-center all'),
         ];

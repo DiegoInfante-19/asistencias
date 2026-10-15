@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="fw-bold text-dark mb-0">Títulos de Pregrado y Postgrado Vinculados</h5>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vincularTituloModal">
+    <button type="button" class="btn btn-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#vincularTituloModal">
         <i class="bi bi-plus-circle me-1"></i> Vincular Nuevo Título
     </button>
 </div>
@@ -12,7 +12,7 @@
                 <th style="width: 60px;">#</th>
                 <th class="text-start">Título Base (Catálogo)</th>
                 <th class="text-start">Nombre de Certificación Específica del PNF</th>
-                <th style="width: 100px;">Acción</th>
+                <th style="width: 120px;">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -25,13 +25,28 @@
                 </td>
                 <td class="text-start fw-semibold text-primary">{{ $vinculo->nombre_titulo_pnf }}</td>
                 <td>
-                    <form action="{{ route('pnfs.titulos.destroy', $vinculo->id_titulos_pnf) }}" method="POST" class="m-0 p-0 form-desvincular-titulo">
+                    <!-- Diseño exacto de DataTables: btn-group con outline-secondary -->
+                    <div class="btn-group" role="group" aria-label="Acciones de gestión">
+                        
+                        <button type="button" class="btn btn-outline-secondary" title="Modificar Título del PNF"
+                            data-bs-toggle="modal"
+                            data-bs-target="#updateTituloModal"
+                            data-url="{{ route('pnfs.titulos.update', $vinculo->id_titulos_pnf) }}"
+                            data-titulo="{{ $vinculo->id_titulo }}"
+                            data-nombre="{{ $vinculo->nombre_titulo_pnf }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+                        <button type="submit" form="form-delete-titulo-{{ $vinculo->id_titulos_pnf }}" class="btn btn-outline-secondary" title="Retirar Título del PNF">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        
+                    </div>
+
+                    <!-- Formulario oculto conectado por ID (incluye la clase de SweetAlert) -->
+                    <form id="form-delete-titulo-{{ $vinculo->id_titulos_pnf }}" action="{{ route('pnfs.titulos.destroy', $vinculo->id_titulos_pnf) }}" method="POST" class="d-none form-desvincular-titulo">
                         @csrf
                         @method('DELETE')
-                        <!-- Botón Original Restaurado -->
-                        <button type="submit" class="btn btn-accion-desvinculacion btn-danger shadow-sm btn-sm" title="Retirar Título del PNF">
-                            Remover
-                        </button>
                     </form>
                 </td>
             </tr>
@@ -45,21 +60,25 @@
         </tbody>
     </table>
 </div>
-
+<!-- ==========================================
+     MODAL: VINCULAR NUEVO TÍTULO
+     ========================================== -->
 <div class="modal fade" id="vincularTituloModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow">
+        <!-- class border-0 shadow añadida para estandarizar el modal -->
+        <div class="modal-content border-0 shadow">
             <div class="modal-header bg-white border-bottom">
-                <h5 class="modal-title fw-bold text-dark">
-                    <i class="bi bi-mortarboard text-primary me-2"></i>Vincular Título Base
-                </h5>
+                <h1 class="modal-title fs-5 text-dark" style="font-weight: 500;">
+                    Vincular Título Base
+                </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body bg-white p-4">
                 <form id="vincularTituloForm" method="POST" action="{{ route('pnfs.titulos.store', $pnf->id_pnf) }}">
                     @csrf
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold small text-muted">Seleccione el Título Base <span class="text-danger">*</span></label>
+                        <!-- class text-uppercase añadida al label -->
+                        <label class="form-label fw-bold small text-muted text-uppercase">Seleccione el Título Base <span class="text-danger">*</span></label>
                         <select class="form-select bg-light border-secondary-subtle shadow-sm select2-buscador" name="id_titulo" required>
                             <option value="" selected disabled>Seleccione...</option>
                             @foreach($catalogoTitulos as $cat)
@@ -69,7 +88,8 @@
                     </div>
 
                     <div class="form-group mb-0">
-                        <label class="form-label fw-bold small text-muted">Nombre Específico del Título Impreso <span class="text-danger">*</span></label>
+                        <!-- class text-uppercase añadida al label -->
+                        <label class="form-label fw-bold small text-muted text-uppercase">Nombre Específico del Título Impreso <span class="text-danger">*</span></label>
                         <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" name="nombre_titulo_pnf" placeholder="Ej: Ingeniero en Informática" required autocomplete="off">
                         <div class="form-text small text-muted mt-1">Asigne el nombre literal que tendrá el egresado en su expediente académico.</div>
                     </div>
@@ -79,10 +99,59 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x-circle me-1"></i> Cancelar
                 </button>
-                <button type="submit" form="vincularTituloForm" class="btn btn-primary fw-bold">
+                <button type="submit" form="vincularTituloForm" class="btn btn-primary fw-bold shadow-sm">
                     <i class="bi bi-save-fill me-1"></i> Asociar Título
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- ==========================================
+     MODAL: MODIFICAR TÍTULO VINCULADO
+     ========================================== -->
+<div class="modal fade" id="updateTituloModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <!-- class border-0 shadow añadida -->
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-white border-bottom">
+                <h1 class="modal-title fs-5 text-dark" style="font-weight: 500;">
+                    Actualizar Título del PNF
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-white p-4">
+                <form id="updateTituloForm" method="POST" action="">
+                    @csrf 
+                    @method('PUT')
+                    
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Título Base Asociado <span class="text-danger">*</span></label>
+                        <select class="form-select bg-light border-secondary-subtle shadow-sm select2-buscador" name="id_titulo" id="edit-titulo-pnf-id" required>
+                            <option value="" disabled>Seleccione...</option>
+                            @foreach($catalogoTitulos as $cat)
+                            <option value="{{ $cat->id_titulos }}">[{{ $cat->nivel_academico }}] - {{ $cat->nombre_titulo_base }}</option>
+                            @endforeach
+                        </select>
+                        <div class="form-text text-danger mt-1"><i class="bi bi-exclamation-triangle-fill"></i> Cambiar el título base afectará reportes estadísticos.</div>
+                    </div>
+
+                    <div class="form-group mb-0">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Nombre Específico del Título Impreso <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm" name="nombre_titulo_pnf" id="edit-nombre-titulo-pnf" required autocomplete="off">
+                        <div class="form-text small text-muted mt-1">Este texto se reflejará directamente en los expedientes de los estudiantes actuales.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-white border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Cancelar
+                </button>
+                <button type="submit" form="updateTituloForm" class="btn btn-warning fw-bold text-dark shadow-sm">
+                    <i class="bi bi-arrow-repeat me-1"></i> Actualizar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+```eof

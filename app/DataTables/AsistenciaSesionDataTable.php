@@ -3,7 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\InscripcionSeccion;
-use App\Models\Sesion; // <-- Importante para consultar la sesión y su sección
+use App\Models\Sesion; 
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
@@ -25,7 +25,6 @@ class AsistenciaSesionDataTable extends BaseDataTable
         $this->idPnfSeccion = $idPnfSeccion;
         $this->asistenciasRegistradas = $asistenciasRegistradas;
         
-        // BLINDAJE: Si la sección está inactiva, forzamos que no se pueda editar bajo ninguna circunstancia
         $sesion = Sesion::with('seccion')->find($idSesion);
         if ($sesion && $sesion->seccion && !$sesion->seccion->estaActiva()) {
             $this->puedeEditar = false;
@@ -61,12 +60,8 @@ class AsistenciaSesionDataTable extends BaseDataTable
 
                 return '<span class="text-muted fst-italic">Sin titulación asignada para este PNF</span>';
             })
-            ->addColumn('cohorte_origen', function ($inscripcion) {
-                return '<span class="text-dark">' . e($inscripcion->persona->cohorte->numero_cohorte ?? 'N/D') . '</span>';
-            })
             ->addColumn('estado_asistencia', function ($inscripcion) {
-                $estadoRegistrado = $this->asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'presente';
-                
+                $estadoRegistrado = $this->asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'ignorar';                
                 if ($estadoRegistrado instanceof \App\Enums\EstadoAsistencia) {
                     $estadoActual = $estadoRegistrado->value;
                 } else {
@@ -78,7 +73,7 @@ class AsistenciaSesionDataTable extends BaseDataTable
 
                 return view('sesiones.partials.estado_asistencia', compact('inscripcion', 'estadoActual', 'puedeEditar', 'tieneAsistencia'))->render();
             })
-            ->rawColumns(['cedula_personas', 'estudiante_nombre', 'titulo_optando', 'cohorte_origen', 'estado_asistencia'])
+            ->rawColumns(['cedula_personas', 'estudiante_nombre', 'titulo_optando', 'estado_asistencia'])
             ->setRowId(function ($inscripcion) {
                 return 'fila_' . $inscripcion->id_inscripcion_seccion;
             });
@@ -121,7 +116,6 @@ class AsistenciaSesionDataTable extends BaseDataTable
             Column::make('cedula_personas')->title('Cédula')->addClass('align-middle')->width(110),
             Column::make('estudiante_nombre')->title('Apellidos y Nombres')->searchable(false)->orderable(false)->addClass('align-middle'),
             Column::make('titulo_optando')->title('Título a Optar')->searchable(false)->orderable(false)->addClass('align-middle'),
-            Column::make('cohorte_origen')->title('Cohorte')->searchable(false)->orderable(false)->addClass('text-center align-middle')->width(100),
             Column::computed('estado_asistencia')->title('Acciones')->exportable(false)->printable(false)->addClass('text-center align-middle')->width(280),
         ];
     }

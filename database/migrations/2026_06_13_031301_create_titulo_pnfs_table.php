@@ -17,6 +17,9 @@ return new class extends Migration
             
             $table->string('nombre_titulo_pnf', 150);
             $table->timestamps(); // Solicitado en el esquema
+            
+            // --- NUEVO: Borrado Lógico ---
+            $table->softDeletes(); // Agrega la columna deleted_at
         });
     }
 

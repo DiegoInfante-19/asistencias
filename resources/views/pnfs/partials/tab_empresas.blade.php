@@ -57,9 +57,9 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow">
             <div class="modal-header bg-white border-bottom">
-                <h5 class="modal-title fw-bold text-dark">
-                    <i class="bi bi-building text-primary me-2"></i>Establecer Convenio Empresarial
-                </h5>
+                <h1 class="card-title text-dark mb-0" style="font-weight: 500;">
+                    Establecer Convenio Empresarial
+                </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body bg-white p-4">

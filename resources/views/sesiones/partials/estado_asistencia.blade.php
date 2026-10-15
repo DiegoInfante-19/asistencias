@@ -1,15 +1,17 @@
 @php
     // Evitamos el TypeError extrayendo el valor del Enum
-    $estadoNormalizado = $estadoActual instanceof \App\Enums\EstadoAsistencia ? $estadoActual->value : strtolower($estadoActual ?? 'presente');
+    $estadoNormalizado = $estadoActual instanceof \App\Enums\EstadoAsistencia ? $estadoActual->value : strtolower($estadoActual ?? 'ignorar');
     
     $badgeClass = match($estadoNormalizado) {
         'presente' => 'bg-success',
         'ausente'  => 'bg-danger',
         'justificada', 'justificado' => 'bg-warning text-dark',
         'tarde'    => 'bg-info text-dark',
+        'ignorar'  => 'bg-primary', // Azul para el estado "Sin Evaluar"
         default => 'bg-secondary'
     };
-    $badgeText = ucfirst($estadoNormalizado);
+    $badgeText = $estadoNormalizado === 'ignorar' ? 'Sin Evaluar' : ucfirst($estadoNormalizado);
+    $badgeIcon = $estadoNormalizado === 'ignorar' ? '<i class="bi bi-dash-circle"></i> ' : '';
 @endphp
 
 <div class="fila-estudiante d-inline-block w-100" data-inscripcion="{{ $inscripcion->id_inscripcion_seccion }}" data-estado-original="{{ $estadoNormalizado }}">
@@ -17,7 +19,7 @@
     <!-- MODO LECTURA: Badge -->
     <div class="modo-lectura text-center w-100 {{ !$puedeEditar || $tieneAsistencia ? '' : 'd-none' }}">
         <span class="badge {{ $badgeClass }} fs-6 px-3 py-2 shadow-sm w-100" style="min-width: 120px;">
-            {{ $badgeText }}
+            {!! $badgeIcon !!}{{ $badgeText }}
         </span>
     </div>
 
@@ -57,20 +59,36 @@
                 <span class="d-none d-md-inline">Justificada</span>
                 <span class="d-inline d-md-none">Just.</span>
             </label>
+
+            <!-- Ignorar (Sin Evaluar) movido a la derecha -->
+            <input type="radio" class="btn-check btn-estado" name="estado_desk_{{ $inscripcion->id_inscripcion_seccion }}"
+                id="ignorar_{{ $inscripcion->id_inscripcion_seccion }}" value="ignorar"
+                {{ $estadoNormalizado == 'ignorar' ? 'checked' : '' }} autocomplete="off"
+                {{ !$puedeEditar ? 'disabled' : '' }}>
+            <label class="btn btn-outline-secondary btn-asistencia-ignorar text-center px-2" 
+                   for="ignorar_{{ $inscripcion->id_inscripcion_seccion }}" title="No evaluar a este alumno">
+                <i class="bi bi-dash-lg"></i>
+            </label>
         </div>
     </div>
 </div>
 
 <style>
-    /* Diseño base y efectos de colores (Conservados de tu versión original) */
+    /* Diseño base y efectos de colores */
     .btn-group-asistencia .btn { font-size: 0.9rem !important; padding: 0.4rem 0.75rem !important; line-height: 1.5; border-color: #ced4da !important; transition: all 0.2s ease-in-out; }
     .btn-group-asistencia .btn-outline-secondary { background-color: #f8f9fa !important; color: #6c757d !important; }
+    
+    /* Hover effects */
     .btn-group-asistencia .btn-asistencia-presente:hover:not(:disabled) { background-color: #198754 !important; border-color: #198754 !important; color: #ffffff !important; opacity: 0.85; }
     .btn-group-asistencia .btn-asistencia-ausente:hover:not(:disabled) { background-color: #dc3545 !important; border-color: #dc3545 !important; color: #ffffff !important; opacity: 0.85; }
     .btn-group-asistencia .btn-asistencia-justificado:hover:not(:disabled) { background-color: #ffc107 !important; border-color: #ffc107 !important; color: #000000 !important; opacity: 0.85; }
+    .btn-group-asistencia .btn-asistencia-ignorar:hover:not(:disabled) { background-color: #0d6efd !important; border-color: #0d6efd !important; color: #ffffff !important; opacity: 0.85; } /* Hover Azul */
+    
+    /* Checked effects */
     .btn-check:checked + .btn-asistencia-presente { background-color: #198754 !important; border-color: #198754 !important; color: #ffffff !important; opacity: 1; box-shadow: inset 0 3px 5px rgba(0,0,0,0.125); }
     .btn-check:checked + .btn-asistencia-ausente { background-color: #dc3545 !important; border-color: #dc3545 !important; color: #ffffff !important; opacity: 1; box-shadow: inset 0 3px 5px rgba(0,0,0,0.125); }
     .btn-check:checked + .btn-asistencia-justificado { background-color: #ffc107 !important; border-color: #ffc107 !important; color: #000000 !important; opacity: 1; box-shadow: inset 0 3px 5px rgba(0,0,0,0.125); }
+    .btn-check:checked + .btn-asistencia-ignorar { background-color: #0d6efd !important; border-color: #0d6efd !important; color: #ffffff !important; opacity: 1; box-shadow: inset 0 3px 5px rgba(0,0,0,0.125); } /* Checked Azul */
 
     /* Modos de visualización */
     .modo-edicion, .modo-lectura { transition: opacity 0.3s ease-in-out; }

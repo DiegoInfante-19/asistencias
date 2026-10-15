@@ -3,8 +3,8 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow">
             <div class="modal-header bg-white border-bottom">
-                <h1 class="modal-title fs-5 fw-bold text-dark">
-                    <i class="bi bi-mortarboard text-primary me-2"></i>Registrar PNF
+                <h1 class="card-title text-dark mb-0" style="font-weight: 500;">
+                    Registrar PNF
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -49,8 +49,8 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow">
             <div class="modal-header bg-white border-bottom">
-                <h1 class="modal-title fs-5 fw-bold text-dark">
-                    <i class="bi bi-pencil-square text-warning me-2"></i>Modificar PNF
+                <h1 class="card-title text-dark mb-0" style="font-weight: 500;">
+                    Modificar PNF
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -95,8 +95,8 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow">
             <div class="modal-header bg-white border-bottom">
-                <h1 class="modal-title fs-5 fw-bold text-dark">
-                    <i class="bi bi-info-circle text-primary me-2"></i>Detalles del Programa
+                <h1 class="card-title text-dark mb-0" style="font-weight: 500;">
+                    Detalles del Programa
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>

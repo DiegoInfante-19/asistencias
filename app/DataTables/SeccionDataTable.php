@@ -29,10 +29,23 @@ class SeccionDataTable extends BaseDataTable
                     return $seccion->profesores->map(function ($profesor) {
                         $nombre = trim(($profesor->user->name_users ?? '') . ' ' . ($profesor->user->last_name_users ?? ''));
                         return '<span class="badge bg-light text-dark border shadow-sm mb-1">' . e($nombre) . '</span>';
-                    })->implode('<br>'); // <--- AQUÍ: Salto de línea para apilar verticalmente
+                    })->implode('<br>'); // Salto de línea para apilar verticalmente
                 }
 
                 return '<span class="text-primary fw-bold">' . $cantidad . ' Profesores</span>';
+            })
+            ->filterColumn('pnf_nombre', function($query, $keyword) {
+                // Permite buscar por el nombre del PNF relacionado
+                $query->whereHas('pnf', function($q) use ($keyword) {
+                    $q->where('nombre_pnf', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('profesores_lista', function($query, $keyword) {
+                // Permite buscar por el nombre, apellido o cédula de los docentes asignados
+                $query->whereHas('profesores.user', function($q) use ($keyword) {
+                    $q->where('cedula_users', 'like', "%{$keyword}%")
+                      ->orWhereRaw("CONCAT(name_users, ' ', last_name_users) like ?", ["%{$keyword}%"]);
+                });
             })
             ->addColumn('action', function ($seccion) {
                 return view('estructura_academica.partials.actions_secciones', compact('seccion'))->render();
@@ -50,7 +63,7 @@ class SeccionDataTable extends BaseDataTable
                 'pnf',
                 'profesores.user'
             ])
-            // Esto permite que el ordenamiento en las cabeceras funcione sin crashear
+            // Esto permite que el conteo funcione correctamente
             ->withCount([
                 'profesores as n_profesores'
             ]);
@@ -86,13 +99,11 @@ class SeccionDataTable extends BaseDataTable
 
     protected function getColumns(): array
     {
-        // Se removió 'orderable(false)' de todas las columnas de datos
-        // Se añadió el método name() para indicarle a Yajra cómo ordenar en la DB
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(50)->addClass('text-center align-middle'),
-            Column::make('nombre_seccion')->title('Sección')->addClass('align-middle fw-bold')->width('25%'),
-            Column::make('pnf_nombre')->name('pnf.nombre_pnf')->title('PNF')->addClass('align-middle')->width('25%'),
-            Column::make('profesores_lista')->name('n_profesores')->title('Docentes')->addClass('align-middle')->width('25%'),
+            Column::make('nombre_seccion')->title('Sección')->searchable(true)->addClass('align-middle fw-bold')->width('25%'),
+            Column::make('pnf_nombre')->title('PNF')->searchable(true)->addClass('align-middle')->width('25%'),
+            Column::make('profesores_lista')->title('Docentes')->searchable(true)->addClass('align-middle')->width('25%'),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('25%')->addClass('text-center align-middle'),
         ];
     }

@@ -118,8 +118,14 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             Route::put('/pnfs/{pnf}', 'update')->name('pnfs.update');
             Route::delete('/pnfs/{pnf}', 'destroy')->name('pnfs.destroy');
             Route::get('/pnfs/{pnf}', 'show')->name('pnfs.show');
+            
+            // --- GESTIÓN DE TÍTULOS DEL PNF ---
             Route::post('/pnfs/{pnf}/titulos', 'vincularTitulo')->name('pnfs.titulos.store');
+            // NUEVA RUTA: Actualización in-situ
+            Route::put('/pnfs/titulos/{titulo_pnf}', 'actualizarTitulo')->name('pnfs.titulos.update'); 
             Route::delete('/pnfs/titulos/{titulo_pnf}', 'desvincularTitulo')->name('pnfs.titulos.destroy');
+            
+            // --- GESTIÓN DE EMPRESAS DEL PNF ---
             Route::post('/pnfs/{pnf}/empresas', 'vincularEmpresa')->name('pnfs.empresas.store');
             Route::delete('/pnfs/empresas/{empresa_pnf}', 'desvincularEmpresa')->name('pnfs.empresas.destroy');
         });
