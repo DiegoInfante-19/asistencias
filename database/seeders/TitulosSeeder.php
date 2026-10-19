@@ -8,8 +8,10 @@ class TitulosSeeder extends Seeder
     public function run(): void
     {
         $titulos = [
+             ['nombre_titulo_base' => 'Bachiller',   'nivel_academico' => 'Media'],
             ['nombre_titulo_base' => 'Bachiller en Ciencias',    'nivel_academico' => 'Media'],
             ['nombre_titulo_base' => 'Bachiller en Humanidades', 'nivel_academico' => 'Media'],
+            ['nombre_titulo_base' => 'Bachiller Mención Humanidades', 'nivel_academico' => 'Media'],
             ['nombre_titulo_base' => 'Bachiller Integral',       'nivel_academico' => 'Media'],
             
             ['nombre_titulo_base' => 'Técnico Medio', 'nivel_academico' => 'Media Técnica'], 

@@ -38,7 +38,7 @@
                         <!-- Selección del Título (Se llena vía AJAX) -->
                         <div class="col-md-6">
                             <label for="id_titulacion" class="form-label fw-bold small text-muted">Título a Optar <span class="text-danger">*</span></label>
-                            <select class="form-select select2-buscador @error('id_titulacion') is-invalid @enderror" id="id_titulacion" name="id_titulacion" required>
+                            <select class="form-select select2-buscador @error('id_titulacion') is-invalid @enderror" id="id_titulacion" name="id_titulacion" >
                                 <option value="">Seleccione primero un PNF...</option>
                             </select>
                             @error('id_titulacion')
@@ -49,7 +49,7 @@
                         <!-- Selección del Estatus -->
                         <div class="col-md-6">
                             <label for="id_estatus_expediente" class="form-label fw-bold small text-muted">Estatus <span class="text-danger">*</span></label>
-                            <select class="form-select select2-buscador @error('id_estatus_expediente') is-invalid @enderror" id="id_estatus_expediente" name="id_estatus_expediente" required>
+                            <select class="form-select select2-buscador @error('id_estatus_expediente') is-invalid @enderror" id="id_estatus_expediente" name="id_estatus_expediente" >
                                 <option value="" selected disabled>Seleccione...</option>
                                 @foreach($estatusExpedientes as $estatus)
                                 <option value="{{ $estatus->id_estatus_expediente }}"

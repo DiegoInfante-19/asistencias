@@ -38,7 +38,7 @@
                         <!-- PESTAÑA 1: TÍTULO EXTERNO -->
                         <div class="tab-pane fade show active" id="pane-base" role="tabpanel" aria-labelledby="tab-base-btn">
                             <div class="mb-3">
-                                <label for="id_titulos" class="form-label fw-bold small text-muted">Seleccionar Título Base Externo/General</label>
+                                <label for="id_titulos" class="form-label fw-bold small text-muted">Seleccionar Título Base / Nivel</label>
                                 <select class="form-select select2-buscador @error('id_titulos') is-invalid @enderror" id="id_titulos" name="id_titulos">
                                     <option value="" selected>Seleccione...</option>
                                     @foreach($titulos as $titulo)
@@ -49,6 +49,37 @@
                                 </select>
                                 @error('id_titulos')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- NUEVOS CAMPOS: METADATOS PARA TÍTULOS EXTERNOS -->
+                            <div class="mb-3">
+                                <label for="mencion_especifica" class="form-label fw-bold small text-muted">Mención Específica o Especialidad</label>
+                                <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('mencion_especifica') is-invalid @enderror" 
+                                    id="mencion_especifica" name="mencion_especifica" 
+                                    value="{{ old('mencion_especifica') }}" placeholder="Ej: en Informática, en Gerencia...">
+                                @error('mencion_especifica')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="institucion_emisora" class="form-label fw-bold small text-muted">Institución Emisora / Universidad</label>
+                                <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm @error('institucion_emisora') is-invalid @enderror" 
+                                    id="institucion_emisora" name="institucion_emisora" 
+                                    value="{{ old('institucion_emisora') }}" placeholder="Ej: Universidad de Oriente">
+                                @error('institucion_emisora')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="anio_egreso" class="form-label fw-bold small text-muted">Año de Egreso</label>
+                                <input type="number" min="1950" max="{{ date('Y') + 1 }}" class="form-control bg-light border-secondary-subtle shadow-sm @error('anio_egreso') is-invalid @enderror" 
+                                    id="anio_egreso" name="anio_egreso" 
+                                    value="{{ old('anio_egreso') }}" placeholder="Ej: 2021">
+                                @error('anio_egreso')
+                                <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
@@ -77,12 +108,12 @@
                     <div class="alert alert-danger py-1 small mb-3">{{ $message }}</div>
                     @enderror
 
-                    <!-- Observación (Textarea con diseño gris y sombreado unificado) -->
+                    <!-- Observación -->
                     <div class="mb-3 mt-2">
                         <label for="observacion_formacion_academica" class="form-label fw-bold small text-muted">Observación</label>
                         <textarea class="form-control bg-light border-secondary-subtle shadow-sm @error('observacion_formacion_academica') is-invalid @enderror"
                             id="observacion_formacion_academica" name="observacion_formacion_academica"
-                            rows="3" placeholder="Detalles adicionales (opcional)...">{{ old('observacion_formacion_academica') }}</textarea>
+                            rows="2" placeholder="Detalles adicionales (opcional)...">{{ old('observacion_formacion_academica') }}</textarea>
                         @error('observacion_formacion_academica')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -90,7 +121,7 @@
 
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary">
-                             <i class="bi bi-save-fill me-1"></i> Guardar Formación
+                           <i class="bi bi-save-fill me-1"></i> Guardar Formación
                         </button>
                     </div>
                 </form>
@@ -111,8 +142,8 @@
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 18%;">Categoría</th>
-                                <th style="width: 42%;">Nombre del Título</th>
-                                <th style="width: 30%;">Observación</th>
+                                <th style="width: 45%;">Nombre del Título / Detalles</th>
+                                <th style="width: 27%;">Observación</th>
                                 <th class="text-center" style="width: 10%;">Acciones</th>
                             </tr>
                         </thead>
@@ -130,27 +161,30 @@
                                 </td>
 
                                 <td class="fw-bold text-dark">
-                                    @if($formacion->id_titulos && $formacion->titulo)
-                                    {{ $formacion->titulo->nombre_titulo_base }}
-                                    <span class="text-muted small fw-normal d-block mt-1">Nivel: {{ $formacion->titulo->nivel_academico }}</span>
-                                    @elseif($formacion->id_titulos_pnf && $formacion->tituloPnf)
-                                    {{ $formacion->tituloPnf->nombre_titulo_pnf }}
-                                    @else
-                                    <span class="text-danger small">
-                                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Error de registro.
-                                    </span>
+                                    <!-- USANDO EL ACCESSOR INTELIGENTE -->
+                                    <span class="text-dark">{{ $formacion->nombre_completo_titulo }}</span>
+                                    
+                                    @if($formacion->origen_formacion === 'Externo')
+                                        <div class="small text-muted fw-normal mt-1">
+                                            @if($formacion->institucion_emisora)
+                                                <i class="bi bi-geo-alt me-1"></i>{{ $formacion->institucion_emisora }}
+                                            @endif
+                                            @if($formacion->anio_egreso)
+                                                <span class="ms-1 badge bg-light text-dark border">Año: {{ $formacion->anio_egreso }}</span>
+                                            @endif
+                                        </div>
                                     @endif
                                 </td>
 
                                 <td class="small text-muted">
-                                    {{ $formacion->observacion_formacion_academica ?? 'Sin observaciones registradas.' }}
+                                    {{ $formacion->observacion_formacion_academica ?? 'Sin observaciones.' }}
                                 </td>
 
                                 <td class="text-center">
                                     <form action="{{ route('personas.formacion.destroy', ['persona' => $persona->id_personas, 'formacion' => $formacion->id_persona_formacion_academica]) }}" method="POST" class="form-delete">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger shadow-sm" title="Eliminar registro">
+                                        <button type="submit" class="btn btn-danger shadow-sm btn-sm" title="Eliminar registro">
                                             Remover
                                         </button>
                                     </form>
@@ -178,7 +212,6 @@
 
 @push('styles')
 <style>
-    /* Estilo unificado para los selects de Select2 */
     .select2-container--bootstrap-5 .select2-selection {
         background-color: #f8f9fa !important;
         border: 1px solid #cbd5e1 !important;

@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id('id_empresa_personas');
             $table->foreignId('id_personas')->constrained('personas', 'id_personas')->onDelete('cascade');
             $table->foreignId('id_empresa')->constrained('empresas', 'id_empresa')->onDelete('restrict');
-            $table->foreignId('id_cargo')->constrained('cargos', 'id_cargo')->onDelete('restrict');
+            $table->foreignId('id_cargo')->nullable()->constrained('cargos', 'id_cargo')->onDelete('restrict');
 
             // ÍNDICES EXPLÍCITOS PARA ACELERAR FILTROS Y JOINS
             $table->index('id_personas');

@@ -91,4 +91,30 @@ class Sesion extends Model
     {
         return $this->hasMany(Asistencia::class, 'id_sesiones', 'id_sesiones');
     }
+
+    // ==========================================
+    // HELPERS DE AUTORIZACIÓN
+    // ==========================================
+
+    /**
+     * Verifica si un profesor específico pertenece a la sección vinculada a esta sesión.
+     */
+    public function profesorPerteneceASeccion(?int $idProfesor): bool
+    {
+        if (!$idProfesor) {
+            return false;
+        }
+
+        // Si la relación ya está cargada en memoria, la usamos (optimización)
+        if ($this->relationLoaded('seccion') && $this->seccion->relationLoaded('profesores')) {
+            return $this->seccion->profesores->contains('id_profesor', $idProfesor);
+        }
+
+        // Si no, hacemos la consulta directa a la base de datos
+        return $this->seccion()
+            ->whereHas('profesores', function ($query) use ($idProfesor) {
+                $query->where('profesor_seccion.id_profesor', $idProfesor);
+            })
+            ->exists();
+    }
 }

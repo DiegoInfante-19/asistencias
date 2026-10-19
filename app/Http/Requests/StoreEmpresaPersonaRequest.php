@@ -28,7 +28,7 @@ class StoreEmpresaPersonaRequest extends FormRequest
                 'exists:empresas,id_empresa', 
             ],
             'id_cargo' => [
-                'required',
+                'nullable',
                 'integer',
                 // Verifica que el ID enviado realmente exista en la tabla 'cargos'
                 // asumiendo que tu llave primaria ahí es 'id_cargo'

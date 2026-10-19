@@ -15,7 +15,7 @@ class SesionesPorSeccionDataTable extends BaseDataTable
 
     public function withIdSeccion(int $idSeccion): self
     {
-        $this->idSeccion = $idSeccion;
+        $this->idSeccion =$idSeccion;
         return $this;
     }
 
@@ -27,20 +27,19 @@ class SesionesPorSeccionDataTable extends BaseDataTable
                 // Configuramos Carbon en español para obtener el día y mes detallados
                 $carbonDate = Carbon::parse($sesion->fecha_sesion)->locale('es');
                 $diaSemana = ucfirst($carbonDate->dayName);
-                $diaMes = $carbonDate->format('d');
-                $mes = $carbonDate->monthName;
-                $anio = $carbonDate->format('Y');
+                $diaMes =$carbonDate->format('d');
+                $mes =$carbonDate->monthName;
+                $anio =$carbonDate->format('Y');
 
                 $formatoFecha = "{$diaSemana}, {$diaMes} de {$mes} del año {$anio}";
 
                 return '<i class="bi bi-calendar-event me-1 text-secondary"></i> <span class="fw-semibold text-dark">' . $formatoFecha . '</span>';
             })
-            ->addColumn('profesor_nombre', function ($sesion) {
-                $nombre = trim(($sesion->profesor->user->name_users ?? '') . ' ' . ($sesion->profesor->user->last_name_users ?? ''));
+            ->addColumn('profesor_nombre', function ($sesion) {$nombre = trim(($sesion->profesor->user->name_users ?? '') . ' ' . ($sesion->profesor->user->last_name_users ?? ''));
                 return '<span class="fw-bold text-dark">' . ($nombre ?: 'Sin asignar') . '</span>';
             })
             ->editColumn('observacion_sesion', function ($sesion) {
-                $obs = $sesion->observacion_sesion ?? 'Sin observaciones';
+                $obs =$sesion->observacion_sesion ?? 'Sin observaciones';
                 return '<span class="d-inline-block text-truncate" style="max-width: 280px;" title="' . e($obs) . '">' . e($obs) . '</span>';
             })
             // NUEVA COLUMNA: Estado de Asistencia
@@ -61,29 +60,24 @@ class SesionesPorSeccionDataTable extends BaseDataTable
 
     public function query(Sesion $model): EloquentBuilder
     {
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
+        /** @var \App\Models\User $user */$user = auth()->user();
 
-        $query = $model->newQuery()
+        $query =$model->newQuery()
             ->select('sesiones.*') 
             ->with(['profesor.user'])
             ->withExists('asistencias') 
             ->where('id_seccion', $this->idSeccion);
 
-        // RESTRICCIÓN DE ROL: Si es profesor, solo ve sus propias sesiones en la sección
-        if ($user && $user->isProfesor()) {
-            $profesorId = $user->profesor?->id_profesor ?? -1;
-            $query->where('sesiones.id_profesor', $profesorId);
-        }
+        // RESTRICCIÓN ELIMINADA:
+        // Se borró el filtro `$query->where('sesiones.id_profesor', $profesorId);` 
+        // para permitir que todos los profesores de la sección vean las sesiones.
 
         // LÓGICA DEL FILTRO DE ASISTENCIA
         if ($this->request()->filled('filtro_asistencia')) {
-            $estado = $this->request()->get('filtro_asistencia');
+            $estado =$this->request()->get('filtro_asistencia');
             
-            if ($estado === 'registrada') {
-                $query->has('asistencias'); // Solo sesiones con asistencia
-            } elseif ($estado === 'pendiente') {
-                $query->doesntHave('asistencias'); // Solo sesiones sin asistencia
+            if ($estado === 'registrada') {$query->has('asistencias'); // Solo sesiones con asistencia
+            } elseif ($estado === 'pendiente') {$query->doesntHave('asistencias'); // Solo sesiones sin asistencia
             }
         }
 

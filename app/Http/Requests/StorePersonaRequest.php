@@ -12,9 +12,6 @@ class StorePersonaRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Prepara y sanitiza los datos antes de la validación.
-     */
     protected function prepareForValidation()
     {
         $this->merge([
@@ -22,6 +19,11 @@ class StorePersonaRequest extends FormRequest
             'segundo_nombre_personas'   => $this->segundo_nombre_personas ? Str::upper($this->segundo_nombre_personas) : null,
             'primer_apellido_personas'  => $this->primer_apellido_personas ? Str::upper($this->primer_apellido_personas) : null,
             'segundo_apellido_personas' => $this->segundo_apellido_personas ? Str::upper($this->segundo_apellido_personas) : null,
+            // Convertimos strings vacíos a null para campos opcionales
+            'email_personas'            => $this->email_personas ?: null,
+            'fecha_nacimiento_personas' => $this->fecha_nacimiento_personas ?: null,
+            'id_estado'                 => $this->id_estado ?: null,
+            'id_ciudad'                 => $this->id_ciudad ?: null,
         ]);
     }
 
@@ -63,33 +65,34 @@ class StorePersonaRequest extends FormRequest
                 'string',
                 'in:M,F'
             ],
+            // FLEXIBLE: Ahora es opcional
             'fecha_nacimiento_personas' => [
-                'required',
+                'nullable',
                 'date',
                 'before:today'
             ],
+            // FLEXIBLE: Opcional, pero si se llena debe ser único y válido
             'email_personas' => [
-                'required',
+                'nullable',
                 'string',
                 'email',
                 'max:255',
                 'unique:personas,email_personas',
                 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
             ],
-
-            // --- LÓGICA DE LUGAR DE NACIMIENTO 3NF ---
             'id_lugar_nacimiento' => [
                 'nullable',
                 'integer',
                 'exists:lugar_nacimiento_personas,id_lugar_nacimiento'
             ],
+            // FLEXIBLE: Estado y ciudad opcionales
             'id_estado' => [
-                'required',
+                'nullable',
                 'integer',
                 'exists:estados,id_estado'
             ],
             'id_ciudad' => [
-                'required',
+                'nullable',
                 'integer',
                 'exists:ciudades,id_ciudad'
             ],
@@ -98,10 +101,8 @@ class StorePersonaRequest extends FormRequest
                 'string',
                 'max:255'
             ],
-
-            // --- LÓGICA DE COHORTE ---
             'id_cohortes' => [
-                'required',
+                'nullable',
                 'integer',
                 'exists:cohortes,id_cohortes'
             ],
@@ -115,22 +116,9 @@ class StorePersonaRequest extends FormRequest
             'cedula_personas.unique' => 'Esta cédula ya está registrada.',
             'email_personas.unique' => 'Este correo electrónico ya está registrado.',
             'sexo_personas.in' => 'El género seleccionado no es válido.',
-
-            'id_estado.required' => 'Debe seleccionar un estado.',
-            'id_estado.exists' => 'El estado seleccionado no es válido.',
-            'id_ciudad.required' => 'Debe seleccionar una ciudad.',
-            'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
-            'id_lugar_nacimiento.exists' => 'El lugar de nacimiento seleccionado no es válido.',
-
             'id_cohortes.required' => 'Debe asignar una cohorte de ingreso al estudiante.',
-            'id_cohortes.exists' => 'La cohorte seleccionada no es válida.',
-
-            'cedula_personas.regex'            => 'La cédula debe tener entre 6 y 8 números exactos. Sin espacios ni puntos.',
-            'primer_nombre_personas.regex'     => 'Solo se permiten letras y espacios.',
-            'segundo_nombre_personas.regex'    => 'Solo se permiten letras y espacios.',
-            'primer_apellido_personas.regex'   => 'Solo se permiten letras y espacios.',
-            'segundo_apellido_personas.regex'  => 'Solo se permiten letras y espacios.',
-            'email_personas.regex'             => 'Ingrese un correo electrónico válido.',
+            'cedula_personas.regex' => 'La cédula debe tener entre 6 y 8 números exactos. Sin espacios ni puntos.',
+            'email_personas.email' => 'Ingrese un correo electrónico válido.',
             'fecha_nacimiento_personas.before' => 'La fecha de nacimiento no es válida.',
         ];
     }

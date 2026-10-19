@@ -58,6 +58,7 @@ class TitulosPnfSeeder extends Seeder
             
             // Electricidad
             ['Electricidad', 'TSU', 'TSU EN ELECTRICIDAD'],
+            ['Electricidad', 'Certificado', 'CERTIFICADO ELECTRISISTA 1'],
             ['Electricidad', 'Ingeniero', 'INGENIERO ELECTRICISTA'],
             
             // Distribución y logística

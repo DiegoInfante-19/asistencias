@@ -25,12 +25,14 @@ class PersonasDataTable extends BaseDataTable
             ->addColumn('titulo', function ($persona) {
                 if ($persona->titulacionPersona && $persona->titulacionPersona->id_titulacion) {
                     $tituloEspecifico = $persona->titulacionPersona->nombre_titulo_especifico;
-                    $nombreMostrar = $tituloEspecifico ?? optional($persona->titulacionPersona->titulacion)->nombre_titulo_base ?? 'Título Desconocido';
+                    $nombreMostrar = $tituloEspecifico ?? optional($persona->titulacionPersona->titulacion)->nombre_titulo_base;
                     
-                    return $nombreMostrar;
+                    if ($nombreMostrar) {
+                        return e($nombreMostrar);
+                    }
                 }
                 
-                return '<span class="text-muted fst-italic">No asignado</span>';
+                return '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"><i class="bi bi-dash-circle me-1"></i>No colocado todavía</span>';
             })
             ->addColumn('action', function ($persona) {
                 return view('personas.partials.actions', compact('persona'))->render();

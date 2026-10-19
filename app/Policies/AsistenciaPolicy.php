@@ -30,7 +30,9 @@ class AsistenciaPolicy
 
     public function view(User $user, Asistencia $asistencia): bool
     {
-        return $user->profesor?->id_profesor === $asistencia->sesion->id_profesor;
+        $idProfesor = $user->profesor?->id_profesor;
+        // Autoriza si el profesor pertenece a la sección de esta sesión
+        return $asistencia->sesion->profesorPerteneceASeccion($idProfesor);
     }
 
     public function create(User $user): bool
@@ -40,7 +42,10 @@ class AsistenciaPolicy
 
     public function update(User $user, Asistencia $asistencia): Response|bool
     {
-        if ($user->profesor?->id_profesor !== $asistencia->sesion->id_profesor) {
+        $idProfesor = $user->profesor?->id_profesor;
+
+        // Autoriza la edición si el profesor pertenece a la sección
+        if (!$asistencia->sesion->profesorPerteneceASeccion($idProfesor)) {
             return false;
         }
 
@@ -57,6 +62,8 @@ class AsistenciaPolicy
 
     public function delete(User $user, Asistencia $asistencia): bool
     {
-        return $user->profesor?->id_profesor === $asistencia->sesion->id_profesor;
+        $idProfesor = $user->profesor?->id_profesor;
+        // Autoriza la eliminación si el profesor pertenece a la sección
+        return $asistencia->sesion->profesorPerteneceASeccion($idProfesor);
     }
 }

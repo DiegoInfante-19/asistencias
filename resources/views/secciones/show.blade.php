@@ -268,6 +268,12 @@
 
 @section('styles')
 <style>
+    /* Parche para que el calendario Flatpickr flote SOBRE el Modal de Bootstrap */
+    .flatpickr-calendar {
+        z-index: 1060 !important;
+    }
+
+    /* Tus otros estilos que ya tenías... */
     .card-header-tabs {
         margin-right: 0 !important;
         margin-left: 0 !important;
@@ -387,9 +393,7 @@
         // ==========================================
         // CONFIGURACIÓN DE FLATPICKR (MÁQUINA DEL TIEMPO)
         // ==========================================
-        const recesosDB = {
-            !!json_encode($periodosRecesos ?? [], JSON_HEX_TAG) !!
-        };
+        const recesosDB = {!! json_encode($periodosRecesos ?? [], JSON_HEX_TAG) !!};
         let bloqueosFlatpickr = recesosDB.map(receso => {
             return {
                 from: receso.fecha_inicio_periodo_receso.split('T')[0],
@@ -408,8 +412,8 @@
                 dateFormat: "Y-m-d",
                 maxDate: "today",
                 disable: bloqueosFlatpickr,
-                allowInput: false
-                // Nota: Eliminamos 'appendTo' para que se posicione de manera natural sobre el input del modal
+                allowInput: false,
+                // Agrega esta línea para evitar problemas de enfoque con Bootstrap
             });
         }
     });

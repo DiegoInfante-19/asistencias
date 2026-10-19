@@ -21,7 +21,7 @@ class PersonaTitulacionController extends Controller
             DB::beginTransaction();
 
             $datosValidados = $request->validated();
-            
+
             // 1. Detectar si hubo cambio de PNF
             $pnfActual = $persona->titulacionPersona->id_pnf ?? null;
             $nuevoPnf = $datosValidados['id_pnf'];
@@ -29,7 +29,7 @@ class PersonaTitulacionController extends Controller
 
             // 2. Si el estudiante ya tenía PNF y lo están cambiando...
             if ($pnfActual && $pnfActual != $nuevoPnf) {
-                
+
                 // Buscamos todas las inscripciones ACTIVAS en secciones que pertenezcan al PNF viejo
                 $inscripcionesIncompatibles = InscripcionSeccion::where('id_personas', $persona->id_personas)
                     ->where('estatus_inscripcion', 'Activo')
@@ -45,13 +45,13 @@ class PersonaTitulacionController extends Controller
                     ]);
                     // Al aplicar delete(), Laravel llena el deleted_at y evitamos
                     // que el ON DELETE CASCADE de la BD borre las asistencias.
-                    $inscripcion->delete(); 
+                    $inscripcion->delete();
                     $seccionesRetiradas++;
                 }
             }
 
             // 3. Guardamos el nuevo PNF y estatus
-            $persona->titulacionPersona()->updateOrCreate(
+            \App\Models\TitulacionPersona::updateOrCreate(
                 ['id_personas' => $persona->id_personas],
                 $datosValidados
             );
@@ -66,12 +66,11 @@ class PersonaTitulacionController extends Controller
             }
 
             return redirect()->back()->with('success', $mensaje);
-
         } catch (\Exception $e) {
             // Si algo falla (ej. error de constraint), deshacemos todo
             DB::rollBack();
             Log::error('Error guardando expediente académico y/o limpiando secciones: ' . $e->getMessage());
-            
+
             return redirect()->back()->with('error', 'Ocurrió un error en el servidor al actualizar el expediente.');
         }
     }
@@ -82,12 +81,11 @@ class PersonaTitulacionController extends Controller
         $titulos = TituloPnf::with('titulo')
             ->where('id_pnf', $id_pnf)
             ->get();
-            
+
         // Transformamos los datos para que el JS los entienda fácil
         $data = $titulos->map(function ($item) {
             return [
-                // REVERTIDO: Volvemos a usar el ID específico del título en el PNF
-                'id_titulo' => $item->id_titulo, 
+                'id_titulo' => $item->id_titulos ?? $item->id_titulo,
                 'nombre_titulo_pnf' => $item->nombre_titulo_pnf
             ];
         });

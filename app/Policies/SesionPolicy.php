@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Sesion;
+use App\Models\Seccion;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -32,22 +33,12 @@ class SesionPolicy
         return true;
     }
 
-   public function view(User $user, Sesion $sesion): bool
+    public function view(User $user, Sesion $sesion): bool
     {
         if ($user->isProfesor()) {
-            
-            // --- DEPURADOR TEMPORAL ---
-            // dd([
-            //     'id_user_logueado' => $user->id,
-            //     'email' => $user->email,
-            //     'es_profesor_según_isProfesor' => $user->isProfesor(),
-            //     'relacion_profesor_objeto' => $user->profesor,
-            //     'id_profesor_del_usuario' => $user->profesor?->id_profesor,
-            //     'id_profesor_de_la_sesion' => $sesion->id_profesor,
-            // ]);
-            // ---------------------------
-
-            return (int) $user->profesor?->id_profesor === (int) $sesion->id_profesor;
+            $idProfesor = $user->profesor?->id_profesor;
+            // Autoriza si el profesor pertenece a la sección de esta sesión
+            return $sesion->profesorPerteneceASeccion($idProfesor);
         }
         return true;
     }
@@ -68,8 +59,11 @@ class SesionPolicy
         }
 
         if ($user->isProfesor()) {
-            if ((int) $user->profesor?->id_profesor !== (int) $sesion->id_profesor) {
-                return Response::deny('No tiene autorización para modificar sesiones de otros profesores.');
+            $idProfesor = $user->profesor?->id_profesor;
+
+            // Autoriza la edición si el profesor pertenece a la sección
+            if (!$sesion->profesorPerteneceASeccion($idProfesor)) {
+                return Response::deny('No tiene autorización para modificar sesiones de esta sección.');
             }
 
             if ($sesion->tiempoAgotado()) {

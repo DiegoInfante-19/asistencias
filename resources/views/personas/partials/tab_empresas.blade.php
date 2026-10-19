@@ -30,7 +30,7 @@
                     <!-- Selección de Cargo -->
                     <div class="mb-3">
                         <label for="id_cargo" class="form-label fw-bold small text-muted">Cargo <span class="text-danger">*</span></label>
-                        <select class="form-select select2-buscador @error('id_cargo') is-invalid @enderror" id="id_cargo" name="id_cargo" required>
+                        <select class="form-select select2-buscador @error('id_cargo') is-invalid @enderror" id="id_cargo" name="id_cargo">
                             <option value="" selected disabled>Seleccione un cargo...</option>
                             @foreach($cargos as $cargo)
                             <option value="{{ $cargo->id_cargo }}"
@@ -46,7 +46,7 @@
 
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-save-fill me-1"></i>  {{ $persona->empresaPersona ? 'Actualizar' : 'Guardar' }} Perfil Laboral
+                            <i class="bi bi-save-fill me-1"></i> {{ $persona->empresaPersona ? 'Actualizar' : 'Guardar' }} Perfil Laboral
                         </button>
                     </div>
                 </form>
@@ -83,7 +83,7 @@
                                 <div class="fs-6 text-secondary fw-bold d-flex align-items-start">
                                     <i class="bi bi-person-badge me-2 mt-1 flex-shrink-0"></i>
                                     <span class="text-wrap">
-                                        {{ $persona->empresaPersona->cargo->descripcion_cargo ?? 'ID Cargo: ' . $persona->empresaPersona->id_cargo }}
+                                        {{ $persona->empresaPersona->cargo?->descripcion_cargo ?? 'No registrado...' }}
                                     </span>
                                 </div>
                             </div>

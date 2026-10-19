@@ -4,126 +4,288 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str; 
-use Faker\Factory as Faker;
 
 class PersonasSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Instanciamos Faker con localización de Venezuela
-        $faker = Faker::create('es_VE');
+        // 1. Desactivamos llaves foráneas temporalmente 
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        // 2. Extraemos todos los IDs necesarios de las tablas maestras
-        $ciudadesIds = DB::table('ciudades')->pluck('id_ciudad')->toArray();
-        $cohortesIds = DB::table('cohortes')->pluck('id_cohortes')->toArray();
-        $estatusExpedienteIds = DB::table('estatus_expedientes')->pluck('id_estatus_expediente')->toArray();
-        $empresasIds = DB::table('empresas')->pluck('id_empresa')->toArray();
-        $cargosIds = DB::table('cargos')->pluck('id_cargo')->toArray();
+        // 2. Limpiamos SOLO las tablas que pertenecen directamente a la entidad Persona
+        $tablas = [
+            'empresa_personas',
+            'telefonos_personas',
+            'titulacion_personas',
+            'persona_formacion_academica',
+            'observacion_personas',
+            'personas'
+        ];
 
-        // Extraemos TODAS las combinaciones válidas (PNF + Título) ya establecidas
-        $titulosPnfValidos = DB::table('titulos_pnf')->select('id_pnf', 'id_titulo')->get()->toArray();
-
-        // Blindaje de seguridad básico
-        if (empty($ciudadesIds) || empty($cohortesIds)) {
-            $this->command->error('Error: Faltan registros base (ciudades o cohortes). Ejecute los seeders correspondientes primero.');
-            return;
+        foreach ($tablas as $tabla) {
+            DB::table($tabla)->truncate();
         }
 
-        $cantidadGenerar = 50;
-        $this->command->info("Verificando y generando {$cantidadGenerar} registros de personas con historial académico (Lógica PNF validada) y laboral...");
+        // 3. Inyectamos la información REAL de personas y sus relaciones
+        $sql = <<<SQL
 
-        for ($i = 1; $i <= $cantidadGenerar; $i++) {
+INSERT INTO `personas` (`id_personas`, `cedula_personas`, `primer_nombre_personas`, `segundo_nombre_personas`, `primer_apellido_personas`, `segundo_apellido_personas`, `sexo_personas`, `fecha_nacimiento_personas`, `id_lugar_nacimiento`, `email_personas`, `id_cohortes`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, '30735892', 'CANDRISBET', 'PAOLA', 'MORALES', 'CORTES', 'F', '1990-01-01', NULL, 'sin_correo_30735892@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(2, '15033921', 'CÉSAR ALBERTO', 'ALBERTO', 'FIGUERAS', 'RIVERO', 'M', '1990-01-01', NULL, 'sin_correo_15033921@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(3, '9950980', 'EDGAR', NULL, 'MORENO', 'ALVARADO', 'M', '1990-01-01', NULL, 'sin_correo_9950980@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(4, '12599249', 'ELSY ', 'YUBISAY', 'REYES', 'MAITA', 'F', '1990-01-01', NULL, 'sin_correo_12599249@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(5, '14120111', 'ELVIS', 'MIGUEL', 'CARRASQUERO', 'SÁNCHEZ', 'M', '1990-01-01', NULL, 'sin_correo_14120111@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(6, '11732660', 'INDIRA', 'CRISTHINA', 'MAHARAJ', NULL, 'F', '1990-01-01', NULL, 'sin_correo_11732660@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(7, '9980606', 'JESÚS', 'NATIVIDAD', 'YEGUEZ', 'LAREZ', 'M', '1990-01-01', NULL, 'sin_correo_9980606@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(8, '18665959', 'JHOLMERY', 'CAROLINA', 'ALCALÁ', 'RODRÍGUEZ', 'F', '1990-01-01', NULL, 'sin_correo_18665959@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(9, '9938555', 'JORGE', 'ANDRÉS', 'CARRASCO', 'RISQUEZ', 'M', '1990-01-01', NULL, 'sin_correo_9938555@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(10, '10941906', 'JOSÉ', 'GREGORIO', 'GUZMÁN', NULL, 'M', '1990-01-01', NULL, 'sin_correo_10941906@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(11, '8922075', 'JULIO', 'JOSÉ', 'GARCÍA', 'ROJAS', 'M', '1990-01-01', NULL, 'sin_correo_8922075@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(12, '8895239', 'ORLANDO', 'JOSÉ', 'LEZAMA', 'RAMOS', 'M', '1990-01-01', NULL, 'sin_correo_8895239@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(13, '11725711', 'RICHARD', 'JONAK', 'SALAZAR', 'GUILARTE', 'M', '1990-01-01', NULL, 'sin_correo_11725711@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(14, '10890257', 'RUBÉN', 'DARÍO', 'TOVAR', 'PEÑA', 'M', '1990-01-01', NULL, 'sin_correo_10890257@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(15, '27733027', 'SCARLETH', 'SARAIS', 'ZABALA', 'ARIAS', 'F', '1990-01-01', NULL, 'sin_correo_27733027@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(16, '16628176', 'YULIMAR DE LOS ÁNGELES', NULL, 'MORENO', 'NATERA', 'F', '1990-01-01', NULL, 'sin_correo_16628176@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(17, '13089369', 'YURBELYS', 'ALEJANDRA', 'BELLORÍN', 'CHACARE', 'F', '1990-01-01', NULL, 'sin_correo_13089369@sistema.local', 2, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(18, '8931648', 'ALEXIS ', 'JOSÉ', 'VERA', NULL, 'M', '1990-01-01', NULL, 'vera.alexis62@gmail.com', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(19, '12893821', 'ASDRÚBAL', 'REINALDO', 'VERA', 'BOLÍVAR', 'M', '1990-01-01', NULL, 'sin_correo_12893821@sistema.local', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(20, '18806246', 'EUCLIDES', NULL, 'BETANCOURT', NULL, 'M', '1990-01-01', NULL, 'sin_correo_18806246@sistema.local', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(21, '14586040', 'JOSÉ ', 'ANTONIO', 'NAVARRO', 'NAVARRO', 'M', '1990-01-01', NULL, 'sin_correo_14586040@sistema.local', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(22, '14089210', 'JOSELINA', NULL, 'COLINA', 'AGUILERA', 'F', '1990-01-01', NULL, 'JOSELINA9210@GMAIL.COM', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(23, '19804432', 'MARIANGEL', 'BERTINA', 'ASTUDILLO', 'SEQUERA', 'F', '1990-01-01', NULL, 'THOTY1987@GMAIL.COM', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(24, '11998401', 'RICHARD', 'RAFAEL', 'ESTRADA', 'RIVAS', 'M', '1990-01-01', NULL, 'RICHARDESTRADASAM@GMAIL.COM', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(25, '10552678', 'CARLOS', 'NICOLAS', 'FERNANDEZ', 'BARRIOS', 'M', '1990-01-01', NULL, 'CARLOSNICOLASFB@GMAIL.COM', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(26, '21248197', 'YUGLET', NULL, 'LEÓN', NULL, 'M', '1990-01-01', NULL, 'sin_correo_21248197@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(27, '27838001', 'JORGE', 'ALEJANDRO', 'BETANCOURT', 'LÓPEZ', 'M', '1990-01-01', NULL, 'JORGEBETANCOURT03112GMAIL.COM', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(28, '18667245', 'JUAN', 'DANIEL', 'ROJAS', 'HOSPEDALES', 'M', '1990-01-01', NULL, 'JUANDANIELRH@GMAIL.COM', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(29, '25745690', 'OSVERLIS', NULL, 'VENTURINI', NULL, 'F', '1990-01-01', NULL, 'sin_correo_25745690@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(30, '13553416', 'ALEXANDER', NULL, 'ZORIILLA', NULL, 'M', '1990-01-01', NULL, 'sin_correo_13553416@sistema.local', NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(31, '22813021', 'ALVIZ', NULL, 'MARQUEZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_22813021@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(32, '16392030', 'ANARDO', NULL, 'BLANCA', NULL, 'M', '1990-01-01', NULL, 'sin_correo_16392030@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(33, '8462968', 'ARGENIS', NULL, 'ROSAS', NULL, 'M', '1990-01-01', NULL, 'sin_correo_8462968@sistema.local', 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(34, '15136257', 'CARLOS', NULL, 'JIMENEZ', NULL, 'M', '1990-01-01', NULL, '23JC15136257@GMAIL.COM', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(35, '11726640', 'CARLOS', NULL, 'MARIN', NULL, 'M', '1990-01-01', NULL, 'sin_correo_11726640@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(36, '18385532', 'CARLOS', NULL, 'MELENDEZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_18385532@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(37, '13773922', 'CESAR', NULL, 'MANDARIN', NULL, 'M', '1990-01-01', NULL, 'sin_correo_13773922@sistema.local', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(38, '15371154', 'CESAR', NULL, 'RONDON', NULL, 'M', '1990-01-01', NULL, 'sin_correo_15371154@sistema.local', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(39, '14726679', 'CESAR', NULL, 'TOVAR', NULL, 'M', '1990-01-01', NULL, 'sin_correo_14726679@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(40, '17301224', 'CIRO', NULL, 'TANG', NULL, 'M', '1990-01-01', NULL, 'sin_correo_17301224@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(41, '15618749', 'DANIEL', NULL, 'MONTAÑEZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_15618749@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(42, '10929984', 'ELVIS', NULL, 'MILLAN', NULL, 'M', '1990-01-01', NULL, 'sin_correo_10929984@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(43, '25084177', 'ERWIN', NULL, 'FUENTES', NULL, 'M', '1990-01-01', NULL, 'erwinfuentes1996@gmail.com', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(44, '11271918', 'FRANKLIN', NULL, 'GONZALEZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_11271918@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(45, '13838599', 'HANS', NULL, 'DUERTO', NULL, 'M', '1990-01-01', NULL, 'sin_correo_13838599@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(46, '10797945', 'HECTOR', NULL, 'PEREZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_10797945@sistema.local', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(47, '16395281', 'HENRIQUEZ', NULL, 'JOSE', NULL, 'M', '1990-01-01', NULL, 'sin_correo_16395281@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(48, '13443150', 'ISMAEL', NULL, 'SALAZAR', NULL, 'M', '1990-01-01', NULL, 'ISMAEL.LEE.40@GMAIL.COM', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(49, '13121956', 'JAVIER', NULL, 'ALONZO', NULL, 'M', '1990-01-01', NULL, 'sin_correo_13121956@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(50, '14144415', 'JHEISLER', NULL, 'LAGUNA', NULL, 'M', '1990-01-01', NULL, 'sin_correo_14144415@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(51, '16759176', 'JOHANI', NULL, 'TORRES', NULL, 'M', '1990-01-01', NULL, 'sin_correo_16759176@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(52, '15469006', 'JOSE', NULL, 'FERNANDEZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_15469006@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(53, '17045350', 'JOSE', NULL, 'GARCIA', NULL, 'M', '1990-01-01', NULL, 'sin_correo_17045350@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(54, '8868188', 'JOSE', NULL, 'RODRIGUEZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_8868188@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(55, '11996196', 'LEONARDO', NULL, 'COLUCCI', NULL, 'M', '1990-01-01', NULL, 'sin_correo_11996196@sistema.local', 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(56, '11415627', 'LINO', NULL, 'SALAZAR', NULL, 'M', '1990-01-01', NULL, 'sin_correo_11415627@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(57, '14118378', 'LUIS', NULL, 'LISBOA', NULL, 'M', '1990-01-01', NULL, 'sin_correo_14118378@sistema.local', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(58, '12051175', 'NELSON', NULL, 'GIRON', NULL, 'M', '1990-01-01', NULL, 'sin_correo_12051175@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(59, '14403756', 'NELSON', NULL, 'SALAZAR', NULL, 'M', '1990-01-01', NULL, 'sin_correo_14403756@sistema.local', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(60, '11719716', 'NELSON', NULL, 'SANCHEZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_11719716@sistema.local', 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(61, '8935249', 'NESTOR', NULL, 'RODRIGUEZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_8935249@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(62, '13214008', 'OSCAR', NULL, 'RODRIGUEZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_13214008@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(63, '13994901', 'RICHARD', NULL, 'LIMA', NULL, 'M', '1990-01-01', NULL, 'sin_correo_13994901@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(64, '15782862', 'ROBUAN', NULL, 'TORRES', NULL, 'M', '1990-01-01', NULL, 'sin_correo_15782862@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(65, '14441724', 'ROMER', NULL, 'PARIGUAN', NULL, 'M', '1990-01-01', NULL, 'sin_correo_14441724@sistema.local', 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(66, '14635616', 'ROMERO', NULL, 'PEDRO', NULL, 'M', '1990-01-01', NULL, 'sin_correo_14635616@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(67, '12007173', 'SATURNINO', NULL, 'NORIEGA', NULL, 'M', '1990-01-01', NULL, 'sin_correo_12007173@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(68, '19167901', 'VICTOR', 'JOSÉ', 'OLIVO', 'AMAYA', 'M', '1990-01-01', NULL, 'VICTOROLIVO26@GMAIL.COM', 3, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(69, '8961489', 'VICTOR', NULL, 'RUIZ', NULL, 'M', '1990-01-01', NULL, 'sin_correo_8961489@sistema.local', 2, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(70, '12652639', 'DANNY', 'JOSÉ', 'HERNANDEZ', 'INDRIAGO', 'M', NULL, NULL, 'DANNYJHERNANDEZ21@GMAIL.COM', 3, NULL, '2026-10-18 04:09:54', '2026-10-18 04:09:54'),
+(71, '17210643', 'EDWUAR', 'JAVIER', 'MEZA', 'APONTE', 'M', NULL, NULL, NULL, 1, NULL, '2026-10-18 05:06:12', '2026-10-18 05:06:12'),
+(72, '14173553', 'JOEL', 'ANTONIO', 'SÁNCHEZ', 'HERNANDEZ', 'M', NULL, NULL, NULL, 3, NULL, '2026-10-18 05:11:03', '2026-10-18 05:11:03'),
+(73, '16614813', 'JOSE', 'GABRIEL', 'LÓPEZ', 'BRATHWATTE', 'M', NULL, NULL, NULL, 1, NULL, '2026-10-18 06:11:59', '2026-10-18 06:11:59'),
+(74, '11723501', 'JOSÉ', 'GREGORIO', 'LÓPEZ', 'BRATHWATE', 'M', NULL, NULL, NULL, 1, NULL, '2026-10-18 06:15:09', '2026-10-18 06:15:09'),
+(75, '11513409', 'JOSE', 'RAMON', 'VARGAS', 'VARGAS', 'M', NULL, NULL, NULL, 3, NULL, '2026-10-18 06:19:16', '2026-10-18 06:20:14'),
+(76, '22820864', 'LUIS DE JESÚS', NULL, 'QUEVEDO', 'ZAMBRANO', 'M', NULL, NULL, 'LUISDJQZ92@GMAIL.COM', 3, NULL, '2026-10-18 06:24:34', '2026-10-18 06:24:34'),
+(77, '13798071', 'MAYRA', 'ALEJANDRA', 'MARCANO', 'DIAZ', 'F', NULL, NULL, 'MAYMCLA06@GMAIL.COM', 3, NULL, '2026-10-18 06:27:27', '2026-10-18 06:28:57'),
+(78, '27602054', 'MICHAEL', 'ANTONY', 'ARTEAGA', 'BRICEÑO', 'M', NULL, NULL, NULL, 3, NULL, '2026-10-18 06:31:39', '2026-10-18 06:31:39'),
+(79, '19703001', 'NEUGER', 'ENRIQUE', 'RIVERO', 'SALAZAR', 'M', NULL, NULL, NULL, 1, NULL, '2026-10-18 06:35:47', '2026-10-18 06:35:47'),
+(80, '15370460', 'RICARDO', 'RAMON', 'MONTALBAN', 'CEDEÑO', 'M', NULL, NULL, NULL, 3, NULL, '2026-10-18 06:38:54', '2026-10-18 06:38:54'),
+(81, '26649022', 'ANDREINA', NULL, 'MEDINA', NULL, 'F', NULL, NULL, NULL, 3, NULL, '2026-10-19 15:46:31', '2026-10-19 15:46:31'),
+(82, '17998280', 'JOSÉ', 'ÁNGEL', 'GONZÁLEZ', 'SOTO', 'M', NULL, NULL, 'JOSEGONZALEZSOTO1985@GMAIL.COM', 3, NULL, '2026-10-19 15:50:06', '2026-10-19 15:50:06'),
+(83, '16844273', 'JOSE', NULL, 'SANDOVAL', NULL, 'M', NULL, NULL, NULL, 2, NULL, '2026-10-19 15:55:00', '2026-10-19 15:55:00'),
+(84, '17884221', 'JUAN', 'CARLOS', 'ZERPA', 'SUAREZ', 'M', NULL, NULL, 'ZERPA19852@GMAIL.COM', 3, NULL, '2026-10-19 16:07:51', '2026-10-19 16:07:51'),
+(85, '9909186', 'NEGLYS', 'MILDRE', 'VALLADARES', 'FIGUEREDO', 'F', NULL, NULL, NULL, 2, NULL, '2026-10-19 16:47:23', '2026-10-19 16:47:23'),
+(86, '12660822', 'ORLANDO', NULL, 'GARCIA', NULL, 'M', NULL, NULL, NULL, 2, NULL, '2026-10-19 16:50:03', '2026-10-19 16:50:03'),
+(87, '17508568', 'YUSLEIDY', 'VIRGINIA', 'CASTELLANO', 'GUERRA', 'F', NULL, NULL, NULL, 2, NULL, '2026-10-19 16:56:02', '2026-10-19 16:56:02'),
+(88, '19127913', 'ZUANNYS', 'MARIMAR', 'JIMENEZ', 'DÍAZ', 'F', NULL, NULL, NULL, 3, NULL, '2026-10-19 17:04:43', '2026-10-19 17:04:43');
 
-            // Cédula determinista (fija)
-            $correlativo = str_pad($i, 4, '0', STR_PAD_LEFT);
-            $cedula = '2700' . $correlativo;
+INSERT INTO `empresa_personas` (`id_empresa_personas`, `id_personas`, `id_empresa`, `id_cargo`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (2, 2, 5, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(3, 3, 5, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (4, 4, 6, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(5, 5, 5, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (6, 6, 6, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(7, 7, 4, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (8, 8, 2, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(9, 9, 15, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (10, 10, 2, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(11, 11, 15, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (12, 12, 6, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(13, 13, 15, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (14, 14, 15, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(15, 15, 3, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (16, 16, 15, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(17, 17, 2, 4, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (18, 18, 11, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(19, 19, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (20, 20, 15, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(21, 21, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (22, 22, 7, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(23, 23, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (24, 24, 3, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(25, 25, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (26, 26, 5, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(27, 27, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (28, 28, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(29, 29, 5, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (30, 30, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(31, 31, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (32, 32, 11, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(33, 33, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (34, 34, 5, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(35, 35, 11, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (36, 36, 15, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(37, 37, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (38, 38, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(39, 39, 6, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (40, 40, 11, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(41, 41, 6, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (42, 42, 5, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(43, 43, 11, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (44, 44, 11, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(45, 45, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (46, 46, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(47, 47, 5, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (48, 48, 5, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(49, 49, 15, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (50, 50, 6, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(51, 51, 15, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (52, 52, 15, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(53, 53, 15, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (54, 54, 6, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(55, 55, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (56, 56, 5, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(57, 57, 3, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (58, 58, 15, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(59, 59, 5, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (60, 60, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(61, 61, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (62, 62, 11, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(63, 63, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (64, 64, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(65, 65, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (66, 66, 5, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(67, 67, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (68, 68, 2, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(69, 69, 1, 4, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (70, 70, 7, NULL, NULL, '2026-10-18 04:19:13', '2026-10-18 04:19:13'),
+(71, 71, 7, NULL, NULL, '2026-10-18 05:07:00', '2026-10-18 05:07:00'), (72, 72, 4, NULL, NULL, '2026-10-18 05:13:09', '2026-10-18 05:13:09'),
+(73, 73, 7, NULL, NULL, '2026-10-18 06:12:38', '2026-10-18 06:12:38'), (74, 74, 7, NULL, NULL, '2026-10-18 06:16:16', '2026-10-18 06:16:16'),
+(75, 75, 2, NULL, NULL, '2026-10-18 06:21:08', '2026-10-18 06:21:08'), (76, 76, 7, NULL, NULL, '2026-10-18 06:25:07', '2026-10-18 06:25:07'),
+(77, 77, 11, NULL, NULL, '2026-10-18 06:29:15', '2026-10-18 06:29:15'), (78, 78, 7, NULL, NULL, '2026-10-18 06:32:57', '2026-10-18 06:32:57'),
+(79, 79, 2, NULL, NULL, '2026-10-18 06:36:11', '2026-10-18 06:36:11'), (80, 80, 4, NULL, NULL, '2026-10-18 06:40:27', '2026-10-18 06:40:27'),
+(81, 81, 3, NULL, NULL, '2026-10-19 15:47:24', '2026-10-19 15:47:24'), (82, 82, 15, NULL, NULL, '2026-10-19 15:52:52', '2026-10-19 15:52:52'),
+(83, 83, 5, NULL, NULL, '2026-10-19 15:55:25', '2026-10-19 15:55:25'), (84, 84, 15, NULL, NULL, '2026-10-19 16:36:56', '2026-10-19 16:36:56'),
+(85, 85, 2, NULL, NULL, '2026-10-19 16:47:49', '2026-10-19 16:47:49'), (86, 86, 2, NULL, NULL, '2026-10-19 16:50:46', '2026-10-19 16:50:46'),
+(87, 87, 4, NULL, NULL, '2026-10-19 16:56:42', '2026-10-19 16:56:42'), (88, 88, 13, NULL, NULL, '2026-10-19 17:05:15', '2026-10-19 17:05:15');
 
-            // Verificar si ya existe
-            $personaExistente = DB::table('personas')->where('cedula_personas', $cedula)->first();
+INSERT INTO `observacion_personas` (`id_observacion_personas`, `id_personas`, `observacion_personas`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 82, 'PASA A TRAYECTO II', NULL, '2026-10-19 15:53:26', '2026-10-19 15:53:26'),
+(2, 83, 'PASA A TRAYECTO IV', NULL, '2026-10-19 15:56:07', '2026-10-19 15:56:07'),
+(3, 84, 'PASA A TRAYECTO II', NULL, '2026-10-19 16:37:48', '2026-10-19 16:37:48'),
+(4, 85, 'PASA A TRAYECTO IV', NULL, '2026-10-19 16:48:42', '2026-10-19 16:48:42'),
+(5, 86, 'PASA A TRAYECTO IV', NULL, '2026-10-19 16:51:27', '2026-10-19 16:51:27'),
+(6, 87, 'PASA A TRAYECTO IV', NULL, '2026-10-19 16:57:05', '2026-10-19 16:57:05'),
+(7, 88, 'PASA A TRAYECTO II', NULL, '2026-10-19 17:06:09', '2026-10-19 17:06:09');
 
-            if (!$personaExistente) {
+INSERT INTO `persona_formacion_academica` (`id_persona_formacion_academica`, `id_personas`, `id_titulos_pnf`, `id_titulos`, `origen_formacion`, `mencion_especifica`, `institucion_emisora`, `anio_egreso`, `observacion_formacion_academica`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 14, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(2, 19, NULL, 4, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(3, 21, NULL, 1, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(4, 22, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, '2026-10-18 02:19:27', '2026-10-18 01:45:26', '2026-10-18 02:19:27'),
+(5, 23, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, '2026-10-18 02:37:31', '2026-10-18 01:45:26', '2026-10-18 02:37:31'),
+(6, 24, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, '2026-10-18 02:54:09', '2026-10-18 01:45:26', '2026-10-18 02:54:09'),
+(7, 26, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(8, 27, NULL, 6, 'Externo', NULL, NULL, NULL, NULL, '2026-10-18 03:09:50', '2026-10-18 01:45:26', '2026-10-18 03:09:50'),
+(9, 28, NULL, 6, 'Externo', NULL, NULL, NULL, NULL, '2026-10-18 03:10:59', '2026-10-18 01:45:26', '2026-10-18 03:10:59'),
+(10, 29, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(11, 30, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(12, 31, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(13, 32, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(14, 33, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(15, 35, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(16, 18, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 01:56:20', '2026-10-18 01:56:20'),
+(17, 22, NULL, 6, 'Externo', 'Mención electricidad', NULL, NULL, NULL, '2026-10-18 02:03:41', '2026-10-18 02:01:57', '2026-10-18 02:03:41'),
+(18, 22, NULL, 6, 'Externo', 'Mención electricidad', NULL, NULL, NULL, '2026-10-18 02:04:15', '2026-10-18 02:04:04', '2026-10-18 02:04:15'),
+(19, 22, NULL, 6, 'Externo', 'Mención Electricidad', NULL, NULL, NULL, '2026-10-18 02:08:17', '2026-10-18 02:04:29', '2026-10-18 02:08:17'),
+(20, 22, NULL, 17, 'Externo', 'Mención Electricidad', NULL, NULL, NULL, NULL, '2026-10-18 02:08:43', '2026-10-18 02:08:43'),
+(21, 22, NULL, 9, 'Externo', 'En la Especialidad Electricista', NULL, NULL, NULL, '2026-10-18 03:00:38', '2026-10-18 02:14:26', '2026-10-18 03:00:38'),
+(22, 22, NULL, 9, 'Externo', 'Mención Instrumentación y Control', NULL, NULL, NULL, '2026-10-18 03:00:45', '2026-10-18 02:18:19', '2026-10-18 03:00:45'),
+(23, 23, NULL, 2, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 02:37:19', '2026-10-18 02:37:19'),
+(24, 23, NULL, 9, 'Externo', 'En Electricidad', NULL, NULL, NULL, '2026-10-18 02:40:37', '2026-10-18 02:37:54', '2026-10-18 02:40:37'),
+(25, 23, 28, 9, 'Interno', NULL, NULL, NULL, NULL, NULL, '2026-10-18 02:40:52', '2026-10-18 02:40:52'),
+(26, 24, 33, 9, 'Interno', NULL, NULL, NULL, NULL, NULL, '2026-10-18 02:54:37', '2026-10-18 02:54:37'),
+(27, 22, 28, 9, 'Interno', NULL, NULL, NULL, 'Especialidad', NULL, '2026-10-18 03:01:44', '2026-10-18 03:01:44'),
+(28, 22, 38, 9, 'Interno', NULL, NULL, NULL, 'Mención', NULL, '2026-10-18 03:02:06', '2026-10-18 03:02:06'),
+(29, 25, NULL, 2, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 03:06:35', '2026-10-18 03:06:35'),
+(30, 25, 38, 9, 'Interno', NULL, NULL, NULL, NULL, NULL, '2026-10-18 03:07:05', '2026-10-18 03:07:05'),
+(31, 27, NULL, 17, 'Externo', 'Mención Instrumentación y Control', NULL, NULL, NULL, NULL, '2026-10-18 03:09:41', '2026-10-18 03:09:41'),
+(32, 28, NULL, 17, 'Externo', 'Mención Instrumentación y Control', NULL, NULL, NULL, NULL, '2026-10-18 03:11:42', '2026-10-18 03:11:42'),
+(33, 36, 7, 9, 'Interno', NULL, NULL, NULL, NULL, NULL, '2026-10-18 03:13:15', '2026-10-18 03:13:15'),
+(34, 71, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 05:07:39', '2026-10-18 05:07:39'),
+(35, 73, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 06:12:56', '2026-10-18 06:12:56'),
+(36, 74, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 06:16:45', '2026-10-18 06:16:45'),
+(37, 75, NULL, 2, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 06:21:18', '2026-10-18 06:21:18'),
+(38, 76, NULL, 2, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 06:25:34', '2026-10-18 06:25:34'),
+(39, 77, NULL, 2, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 06:29:28', '2026-10-18 06:29:28'),
+(40, 78, NULL, 2, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 06:33:17', '2026-10-18 06:33:17'),
+(41, 79, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 06:36:24', '2026-10-18 06:36:24'),
+(42, 80, NULL, 1, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-18 06:52:32', '2026-10-18 06:52:32'),
+(43, 82, NULL, 2, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-19 15:53:03', '2026-10-19 15:53:03'),
+(44, 83, 26, 9, 'Interno', NULL, NULL, NULL, NULL, NULL, '2026-10-19 15:55:51', '2026-10-19 15:55:51'),
+(45, 84, NULL, 2, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-19 16:37:30', '2026-10-19 16:37:30'),
+(46, 85, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-19 16:48:10', '2026-10-19 16:48:10'),
+(47, 86, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-19 16:50:59', '2026-10-19 16:50:59'),
+(48, 87, NULL, 9, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-19 16:56:54', '2026-10-19 16:56:54'),
+(49, 88, NULL, 2, 'Externo', NULL, NULL, NULL, NULL, NULL, '2026-10-19 17:05:27', '2026-10-19 17:05:27');
 
-                // --- PASO A: CREAR LUGAR DE NACIMIENTO ---
-                $idLugarNacimiento = DB::table('lugar_nacimiento_personas')->insertGetId([
-                    'id_ciudad'            => $faker->randomElement($ciudadesIds),
-                    'detalles_adicionales' => $faker->optional(0.6)->streetName(),
-                    'created_at'           => now(),
-                    'updated_at'           => now(),
-                ]);
+INSERT INTO `telefonos_personas` (`id_telefonos_personas`, `id_personas`, `numero_telefono_personas`, `tipo_telefono`) VALUES
+(1, 18, '04249093886', 'Celular'), (2, 19, '4249017790', 'Celular'), (3, 22, '04127293156', 'Celular'),
+(4, 23, '04148838187', 'Celular'), (5, 24, '04129874885', 'Celular'), (6, 25, '04148695788', 'Celular'),
+(7, 27, '04249023189', 'Celular'), (8, 28, '04264948827', 'Celular'), (9, 34, '04167383188', 'Celular'),
+(10, 37, '04249064584', 'Celular'), (11, 43, '04148774548', 'Celular'), (12, 44, '04165894937', 'Celular'),
+(13, 46, '04249637526', 'Celular'), (14, 48, '04249041021', 'Celular'), (15, 68, '04162814752', 'Celular'),
+(16, 43, '04129861418', 'Móvil'), (17, 48, '04127914787', 'Móvil'), (18, 34, '04249032784', 'Móvil'),
+(19, 70, '04249237937', 'Móvil'), (20, 75, '04148642871', 'Móvil'), (21, 77, '4148715028', 'Móvil'),
+(22, 78, '02869715078', 'Móvil'), (23, 82, '04128394100', 'Móvil'), (24, 82, '02869324882', 'Fijo'),
+(25, 84, '04249028332', 'Móvil'), (28, 84, '04128604387', 'Móvil');
 
-                // --- PASO B: DATOS DE LA PERSONA ---
-                $sexo = $faker->randomElement(['M', 'F']);
-                $regexFiltro = '/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/u';
+INSERT INTO `titulacion_personas` (`id_titulacion_personas`, `id_personas`, `id_titulacion`, `id_pnf`, `id_estatus_expediente`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (2, 2, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(3, 3, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (4, 4, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(5, 5, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (6, 6, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(7, 7, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (8, 8, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(9, 9, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (10, 10, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(11, 11, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (12, 12, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(13, 13, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (14, 14, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(15, 15, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'), (16, 16, 10, 2, 1, NULL, '2026-10-18 01:45:25', '2026-10-18 01:45:25'),
+(17, 17, 10, 2, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (18, 18, 11, 3, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(19, 19, 7, 3, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (20, 20, 11, 3, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(21, 21, 7, 3, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (22, 22, 11, 3, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(23, 23, 11, 3, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (24, 24, 11, 3, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(25, 25, 11, 9, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (26, 26, 11, 9, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(27, 27, 9, 9, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (28, 28, 11, 9, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(29, 29, 11, 9, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (30, 30, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(31, 31, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (32, 32, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(33, 33, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (34, 34, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(35, 35, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (36, 36, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(37, 37, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (38, 38, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(39, 39, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (40, 40, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(41, 41, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (42, 42, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(43, 43, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (44, 44, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(45, 45, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (46, 46, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(47, 47, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (48, 48, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(49, 49, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (50, 50, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(51, 51, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (52, 52, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(53, 53, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (54, 54, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(55, 55, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (56, 56, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(57, 57, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (58, 58, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(59, 59, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (60, 60, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(61, 61, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (62, 62, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(63, 63, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (64, 64, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(65, 65, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (66, 66, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(67, 67, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (68, 68, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'),
+(69, 69, 11, 11, 1, NULL, '2026-10-18 01:45:26', '2026-10-18 01:45:26'), (70, 70, 7, 8, 1, NULL, NULL, NULL),
+(71, 71, 7, 8, 1, NULL, NULL, NULL), (72, 72, 7, 8, 1, NULL, NULL, NULL),
+(73, 73, 7, 8, 1, NULL, NULL, NULL), (74, 74, 7, 8, 1, NULL, NULL, NULL),
+(75, 75, 7, 8, 1, NULL, NULL, NULL), (76, 76, 7, 8, 1, NULL, NULL, NULL),
+(77, 77, 7, 8, 1, NULL, NULL, NULL), (78, 78, 7, 8, 1, NULL, NULL, NULL),
+(79, 79, 7, 8, 1, NULL, NULL, NULL), (80, 80, 7, 8, 1, NULL, NULL, NULL),
+(81, 81, 9, 6, 1, NULL, NULL, NULL);
 
-                $primerNombre = preg_replace($regexFiltro, '', $faker->firstName($sexo == 'M' ? 'male' : 'female'));
-                
-                $segundoNombreRaw = $faker->optional(0.5)->firstName($sexo == 'M' ? 'male' : 'female');
-                $segundoNombre = $segundoNombreRaw ? preg_replace($regexFiltro, '', $segundoNombreRaw) : null;
+SQL;
 
-                $primerApellido = preg_replace($regexFiltro, '', $faker->lastName());
-                
-                $segundoApellidoRaw = $faker->optional(0.5)->lastName();
-                $segundoApellido = $segundoApellidoRaw ? preg_replace($regexFiltro, '', $segundoApellidoRaw) : null;
+        DB::unprepared($sql);
 
-                // --- PASO C: INSERTAR PERSONA (Forzando Mayúsculas con Str::upper) ---
-                $idPersona = DB::table('personas')->insertGetId([
-                    'cedula_personas'           => $cedula,
-                    'primer_nombre_personas'    => Str::upper(trim($primerNombre)),
-                    'segundo_nombre_personas'   => $segundoNombre ? Str::upper(trim($segundoNombre)) : null,
-                    'primer_apellido_personas'  => Str::upper(trim($primerApellido)),
-                    'segundo_apellido_personas' => $segundoApellido ? Str::upper(trim($segundoApellido)) : null,
-                    'sexo_personas'             => $sexo,
-                    'fecha_nacimiento_personas' => $faker->dateTimeBetween('-30 years', '-17 years')->format('Y-m-d'),
-                    'id_lugar_nacimiento'       => $idLugarNacimiento,
-                    'id_cohortes'               => $faker->randomElement($cohortesIds),
-                    'email_personas'            => Str::lower('estudiante' . $cedula . '@universidad.edu.ve'), // Correos siempre en minúsculas
-                    'created_at'                => now(),
-                    'updated_at'                => now(),
-                ]);
+        // 4. Reactivamos las llaves foráneas
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-                // --- PASO D: TELÉFONO Y OBSERVACIÓN ---
-                DB::table('telefonos_personas')->insert([
-                    'id_personas'              => $idPersona,
-                    'numero_telefono_personas' => $faker->randomElement(['0414', '0424', '0412', '0416', '0426']) . $faker->numerify('#######'),
-                    'tipo_telefono'            => 'Móvil Principal'
-                ]);
-
-                if ($faker->boolean(30)) {
-                    DB::table('observacion_personas')->insert([
-                        'id_personas'          => $idPersona,
-                        'observacion_personas' => $faker->realText(150),
-                        'created_at'           => now(),
-                        'updated_at'           => now(),
-                    ]);
-                }
-
-                // =========================================================
-                // DATOS PARA PROBAR LOS FILTROS AVANZADOS
-                // =========================================================
-
-                // --- PASO E: EXPEDIENTE DE TITULACIÓN ---
-                if ($faker->boolean(80) && !empty($titulosPnfValidos) && !empty($estatusExpedienteIds)) {
-                    
-                    $combinacionRandom = $faker->randomElement($titulosPnfValidos);
-
-                    DB::table('titulacion_personas')->insert([
-                        'id_personas'           => $idPersona,
-                        'id_pnf'                => $combinacionRandom->id_pnf,        // PNF validado
-                        'id_titulacion'         => $combinacionRandom->id_titulo,     // Título validado para ese PNF
-                        'id_estatus_expediente' => $faker->randomElement($estatusExpedienteIds)
-                    ]);
-                }
-
-                // --- PASO F: PERFIL LABORAL ---
-                if ($faker->boolean(60) && !empty($empresasIds) && !empty($cargosIds)) {
-                    DB::table('empresa_personas')->insert([
-                        'id_personas' => $idPersona,
-                        'id_empresa'  => $faker->randomElement($empresasIds),
-                        'id_cargo'    => $faker->randomElement($cargosIds)
-                    ]);
-                }
-            }
-        }
+        $this->command->info('¡Información REAL de Personas importada respetando los Catálogos!');
     }
 }

@@ -48,14 +48,18 @@ class AsistenciaSesionDataTable extends BaseDataTable
             ->addColumn('titulo_optando', function ($inscripcion) {
                 $titulacionPersona = $inscripcion->persona->titulacionPersona;
 
-                if ($titulacionPersona && $titulacionPersona->id_titulacion && $titulacionPersona->id_pnf == $this->idPnfSeccion) {
-                    $tituloEspecifico = DB::table('titulos_pnf')
-                        ->where('id_pnf', $titulacionPersona->id_pnf)
-                        ->where('id_titulo', $titulacionPersona->id_titulacion)
-                        ->value('nombre_titulo_pnf');
+                if ($titulacionPersona && $titulacionPersona->id_pnf == $this->idPnfSeccion) {
+                    if ($titulacionPersona->id_titulacion) {
+                        $tituloEspecifico = DB::table('titulos_pnf')
+                            ->where('id_pnf', $titulacionPersona->id_pnf)
+                            ->where('id_titulo', $titulacionPersona->id_titulacion)
+                            ->value('nombre_titulo_pnf');
 
-                    $nombreMostrar = $tituloEspecifico ?? $titulacionPersona->titulacion->nombre_titulo_base ?? 'Título Desconocido';
-                    return '<span class="text-secondary">' . e($nombreMostrar) . '</span>';
+                        $nombreMostrar = $tituloEspecifico ?? optional($titulacionPersona->titulacion)->nombre_titulo_base ?? 'Título Desconocido';
+                        return '<span class="text-secondary">' . e($nombreMostrar) . '</span>';
+                    }
+
+                    return '<span class="text-muted fst-italic">No colocado todavía</span>';
                 }
 
                 return '<span class="text-muted fst-italic">Sin titulación asignada para este PNF</span>';
@@ -101,8 +105,8 @@ class AsistenciaSesionDataTable extends BaseDataTable
             ])
             ->orderBy(2, 'asc')
             ->parameters([
-                'paging'     => false, 
-                'info'       => false,
+                'paging'    => false, 
+                'info'      => false,
                 'responsive' => false,
                 'autoWidth'  => false,
                 'scrollX'    => true,

@@ -3,8 +3,9 @@
         use Carbon\Carbon;
 
         $esEncargado = auth()->user()->isAdmin() || auth()->user()->isCoordinador();
-        $authProfesorId = auth()->user()->profesor?->id_profesor;
-        $puedeEditar = $esEncargado || ($authProfesorId === $sesion->id_profesor);
+        
+        // Reemplazado por la validación unificada de la Policy
+        $puedeEditar = auth()->user()->can('update', $sesion);
         
         // Verificamos si la sesión ya cuenta con registros de asistencia
         $tieneAsistencia = $sesion->asistencias()->count() > 0;

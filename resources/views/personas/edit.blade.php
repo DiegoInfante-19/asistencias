@@ -74,26 +74,29 @@
                         </select>
                     </div>
 
-                    <!-- Fecha de Nacimiento -->
+                    <!-- Fecha de Nacimiento (Opcional) -->
                     <div class="col-md-4">
-                        <label for="fecha_nacimiento_personas" class="form-label fw-bold small text-muted text-uppercase">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                        <label for="fecha_nacimiento_personas" class="form-label fw-bold small text-muted text-uppercase">Fecha de Nacimiento <span class="text-muted fw-normal">(Opcional)</span></label>
                         <input type="date" class="form-control bg-light border-secondary-subtle shadow-sm @error('fecha_nacimiento_personas') is-invalid @enderror"
-                            id="fecha_nacimiento_personas" name="fecha_nacimiento_personas" value="{{ old('fecha_nacimiento_personas', $persona->fecha_nacimiento_personas) }}" autocomplete="off" required>
+                            id="fecha_nacimiento_personas" name="fecha_nacimiento_personas" value="{{ old('fecha_nacimiento_personas', $persona->fecha_nacimiento_personas) }}" autocomplete="off">
                     </div>
 
-                    <!-- Correo -->
+                    <!-- Correo (Opcional) -->
                     <div class="col-md-4">
-                        <label for="email_personas" class="form-label fw-bold small text-muted text-uppercase">Correo Electrónico <span class="text-danger">*</span></label>
+                        <label for="email_personas" class="form-label fw-bold small text-muted text-uppercase">Correo Electrónico <span class="text-muted fw-normal">(Opcional)</span></label>
                         <input type="email" class="form-control bg-light border-secondary-subtle shadow-sm @error('email_personas') is-invalid @enderror"
-                            id="email_personas" name="email_personas" value="{{ old('email_personas', $persona->email_personas) }}" autocomplete="off" required>
+                            id="email_personas" name="email_personas" value="{{ old('email_personas', $persona->email_personas) }}" autocomplete="off">
                     </div>
 
+                    <!-- COHORTE DE INGRESO -->
                     <div class="col-md-4">
-                        <label for="id_cohortes" class="form-label fw-bold small text-muted text-uppercase">Cohorte de Ingreso <span class="text-danger">*</span></label>
-                        <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_cohortes') is-invalid @enderror" id="id_cohortes" name="id_cohortes" required>
+                        <label for="id_cohortes" class="form-label fw-bold small text-muted text-uppercase">Cohorte de Ingreso <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_cohortes') is-invalid @enderror" id="id_cohortes" name="id_cohortes">
                             <option value="">Seleccione...</option>
                             @foreach($cohortes as $cohorte)
-                            <option value="{{ $cohorte->id_cohortes }}" {{ old('id_cohortes', $persona->id_cohortes) == $cohorte->id_cohortes ? 'selected' : '' }}>
+                            <!-- En create.blade.php usa old('id_cohortes') -->
+                            <!-- En edit.blade.php usa old('id_cohortes', $persona->id_cohortes) -->
+                            <option value="{{ $cohorte->id_cohortes }}" {{ old('id_cohortes', $persona->id_cohortes ?? '') == $cohorte->id_cohortes ? 'selected' : '' }}>
                                 {{ $cohorte->numero_cohorte }}
                             </option>
                             @endforeach
@@ -103,7 +106,7 @@
 
                     <!-- LUGAR DE NACIMIENTO -->
                     <div class="col-12 mt-4">
-                        <h5 class="fw-bold border-bottom pb-2 text-dark"><i class="bi bi-geo-alt-fill me-2 text-primary"></i>Lugar de Nacimiento</h5>
+                        <h5 class="fw-bold border-bottom pb-2 text-dark"><i class="bi bi-geo-alt-fill me-2 text-primary"></i>Lugar de Nacimiento <span class="text-muted fw-normal fs-6">(Opcional)</span></h5>
                     </div>
 
                     @php
@@ -112,10 +115,10 @@
                     $detallesActual = $persona->lugarNacimiento->detalles_adicionales ?? '';
                     @endphp
 
-                    <!-- Estado -->
+                    <!-- Estado (Opcional) -->
                     <div class="col-md-4">
-                        <label for="id_estado" class="form-label fw-bold small text-muted text-uppercase">Estado <span class="text-danger">*</span></label>
-                        <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado" required>
+                        <label for="id_estado" class="form-label fw-bold small text-muted text-uppercase">Estado <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_estado') is-invalid @enderror" id="id_estado" name="id_estado">
                             <option value="">Seleccione...</option>
                             @foreach($estados as $estado)
                             <option value="{{ $estado->id_estado }}" {{ old('id_estado', $estadoActual) == $estado->id_estado ? 'selected' : '' }}>
@@ -126,12 +129,12 @@
                         @error('id_estado') <div class="invalid-feedback dynamic-feedback fw-bold d-block">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Ciudad -->
+                    <!-- Ciudad (Opcional) -->
                     <div class="col-md-4">
-                        <label for="id_ciudad" class="form-label fw-bold small text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
+                        <label for="id_ciudad" class="form-label fw-bold small text-muted text-uppercase">Ciudad <span class="text-muted fw-normal">(Opcional)</span></label>
                         <div class="d-flex align-items-center gap-2">
                             <div class="flex-grow-1">
-                                <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" required disabled>
+                                <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_ciudad') is-invalid @enderror" id="id_ciudad" name="id_ciudad" disabled>
                                     <option value="">Seleccione primero un estado...</option>
                                 </select>
                             </div>
@@ -188,9 +191,6 @@
 
 @section('styles')
 <style>
-    /* ---------------------------------------------------
-        ESTÉTICA UNIFICADA DEL ECOSISTEMA DE TARJETAS
-    ----------------------------------------------------- */
     .ecosystem-card {
         border: 1px solid #cbd5e1 !important;
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
@@ -212,19 +212,12 @@
         border-bottom-right-radius: 0.5rem !important;
     }
 
-    /* ---------------------------------------------------
-        AJUSTES PARA SELECT2 (Igualar al diseño de inputs bg-light)
-    ----------------------------------------------------- */
     .select2-container--bootstrap-5 .select2-selection {
         background-color: #f8f9fa !important;
-        /* Equivalente a bg-light */
         border-color: #e2e3e5 !important;
-        /* Equivalente a border-secondary-subtle */
         box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
-        /* Equivalente a shadow-sm */
     }
 
-    /* Efecto al hacer Focus (Inputs y Select2) */
     .form-control:focus,
     .form-select:focus,
     .select2-container--bootstrap-5.select2-container--open .select2-selection {
@@ -238,7 +231,6 @@
 @push('scripts')
 <script type="module">
     $(document).ready(function() {
-        // Inicializar Select2 en los campos correspondientes
         $('.select2-buscador').select2({
             theme: 'bootstrap-5',
             width: '100%'
@@ -264,7 +256,6 @@
             if (!id_estado) {
                 ciudadSelect.prop('disabled', true).empty().append('<option value="">Seleccione primero un estado...</option>');
                 ciudadSelect.trigger('change.select2');
-
                 btnToggleCiudad.prop('disabled', true);
                 collapseElement.collapse('hide');
                 return;

@@ -1,9 +1,9 @@
 <div class="btn-group" role="group" aria-label="Acciones de sesión">
     @php
         $esEncargado = auth()->user()->isAdmin() || auth()->user()->isCoordinador();
-        $dentroDeGracia = \Carbon\Carbon::parse($sesion->fecha_sesion)->addHours(48)->isFuture();
-        $authProfesorId = auth()->user()->profesor?->id_profesor;
-        $puedeEditar = $esEncargado || ($authProfesorId === $sesion->id_profesor && $dentroDeGracia);
+        
+        // Reemplazado por la validación unificada de la Policy (que ya incluye el cálculo de las 48h)
+        $puedeEditar = auth()->user()->can('update', $sesion);
     @endphp
 
     {{-- Botón Editar / Ver Asistencia --}}

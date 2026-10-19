@@ -13,9 +13,6 @@ class UpdatePersonaRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Prepara y sanitiza los datos antes de la validación.
-     */
     protected function prepareForValidation()
     {
         $this->merge([
@@ -23,6 +20,10 @@ class UpdatePersonaRequest extends FormRequest
             'segundo_nombre_personas'   => $this->segundo_nombre_personas ? Str::upper($this->segundo_nombre_personas) : null,
             'primer_apellido_personas'  => $this->primer_apellido_personas ? Str::upper($this->primer_apellido_personas) : null,
             'segundo_apellido_personas' => $this->segundo_apellido_personas ? Str::upper($this->segundo_apellido_personas) : null,
+            'email_personas'            => $this->email_personas ?: null,
+            'fecha_nacimiento_personas' => $this->fecha_nacimiento_personas ?: null,
+            'id_estado'                 => $this->id_estado ?: null,
+            'id_ciudad'                 => $this->id_ciudad ?: null,
         ]);
     }
 
@@ -37,105 +38,27 @@ class UpdatePersonaRequest extends FormRequest
                 Rule::unique('personas', 'cedula_personas')->ignore($id, 'id_personas'),
                 'regex:/^\d{6,8}$/'
             ],
-            'primer_nombre_personas' => [
-                'required',
-                'string',
-                'max:50',
-                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'
-            ],
-            'segundo_nombre_personas' => [
-                'nullable',
-                'string',
-                'max:50',
-                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'
-            ],
-            'primer_apellido_personas' => [
-                'required',
-                'string',
-                'max:50',
-                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'
-            ],
-            'segundo_apellido_personas' => [
-                'nullable',
-                'string',
-                'max:50',
-                'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'
-            ],
-            'sexo_personas' => [
-                'required',
-                'string',
-                'in:M,F'
-            ],
-            'fecha_nacimiento_personas' => [
-                'required',
-                'date',
-                'before:today'
-            ],
-            // --- CORRECCIÓN APLICADA AQUÍ ---
+            'primer_nombre_personas' => ['required', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],
+            'segundo_nombre_personas' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'],
+            'primer_apellido_personas' => ['required', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],
+            'segundo_apellido_personas' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'],
+            'sexo_personas' => ['required', 'string', 'in:M,F'],
+
+            // FLEXIBLES
+            'fecha_nacimiento_personas' => ['nullable', 'date', 'before:today'],
             'email_personas' => [
-                'required',
+                'nullable',
                 'string',
                 'email',
                 'max:255',
                 Rule::unique('personas', 'email_personas')->ignore($id, 'id_personas'),
-                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
             ],
 
-            // --- LÓGICA DE LUGAR DE NACIMIENTO 3NF ---
-            'id_lugar_nacimiento' => [
-                'nullable',
-                'integer',
-                'exists:lugar_nacimiento_personas,id_lugar_nacimiento'
-            ],
-            'id_estado' => [
-                'required',
-                'integer',
-                'exists:estados,id_estado'
-            ],
-            'id_ciudad' => [
-                'required',
-                'integer',
-                'exists:ciudades,id_ciudad'
-            ],
-            'detalles_adicionales' => [
-                'nullable',
-                'string',
-                'max:255'
-            ],
-
-            // --- LÓGICA DE COHORTE ---
-            'id_cohortes' => [
-                'required',
-                'integer',
-                'exists:cohortes,id_cohortes'
-            ],
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'required'               => 'Este campo es obligatorio.',
-            'cedula_personas.unique' => 'Esta cédula ya está registrada en otro expediente.',
-            'email_personas.unique'  => 'Este correo electrónico ya le pertenece a otro registro.',
-            'sexo_personas.in'       => 'El género seleccionado no es válido.',
-
-            'id_estado.required' => 'Debe seleccionar un estado.',
-            'id_estado.exists'   => 'El estado seleccionado no es válido.',
-            'id_ciudad.required' => 'Debe seleccionar una ciudad.',
-            'id_ciudad.exists'   => 'La ciudad seleccionada no es válida.',
-            'id_lugar_nacimiento.exists' => 'El lugar de nacimiento procesado no es válido.',
-
-            'id_cohortes.required' => 'Debe asignar una cohorte de ingreso al estudiante.',
-            'id_cohortes.exists'   => 'La cohorte seleccionada no es válida.',
-
-            'cedula_personas.regex'            => 'La cédula debe tener entre 6 y 8 números exactos. Sin espacios ni puntos.',
-            'primer_nombre_personas.regex'     => 'Solo se permiten letras y espacios.',
-            'segundo_nombre_personas.regex'    => 'Solo se permiten letras y espacios.',
-            'primer_apellido_personas.regex'   => 'Solo se permiten letras y espacios.',
-            'segundo_apellido_personas.regex'  => 'Solo se permiten letras y espacios.',
-            'email_personas.regex'             => 'Ingrese un correo electrónico válido.',
-            'fecha_nacimiento_personas.before' => 'La fecha de nacimiento no es válida.',
+            'id_lugar_nacimiento' => ['nullable', 'integer', 'exists:lugar_nacimiento_personas,id_lugar_nacimiento'],
+            'id_estado' => ['nullable', 'integer', 'exists:estados,id_estado'],
+            'id_ciudad' => ['nullable', 'integer', 'exists:ciudades,id_ciudad'],
+            'detalles_adicionales' => ['nullable', 'string', 'max:255'],
+            'id_cohortes' => ['nullable', 'integer', 'exists:cohortes,id_cohortes'],
         ];
     }
 }

@@ -10,9 +10,11 @@ return new class extends Migration {
         Schema::create('titulacion_personas', function (Blueprint $table) {
             $table->id('id_titulacion_personas');
             $table->foreignId('id_personas')->constrained('personas', 'id_personas')->onDelete('cascade');
-            $table->foreignId('id_titulacion')->constrained('titulos', 'id_titulos')->onDelete('restrict');
+            
+            // Campos modificados para permitir valores nulos (nullable)
+            $table->foreignId('id_titulacion')->nullable()->constrained('titulos', 'id_titulos')->nullOnDelete();
             $table->foreignId('id_pnf')->constrained('pnfs', 'id_pnf')->onDelete('restrict');
-            $table->foreignId('id_estatus_expediente')->constrained('estatus_expedientes', 'id_estatus_expediente')->onDelete('restrict');
+            $table->foreignId('id_estatus_expediente')->nullable()->constrained('estatus_expedientes', 'id_estatus_expediente')->nullOnDelete();
 
             // ÍNDICES EXPLÍCITOS (Vital para el rendimiento del DataTable y filtros por PNF/Estatus)
             $table->index('id_personas');

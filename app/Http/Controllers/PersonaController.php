@@ -32,14 +32,19 @@ class PersonaController extends Controller{
             DB::beginTransaction();
 
             $data = $request->validated();
+            $lugarId = null;
 
-            $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate([
-                'id_ciudad' => $data['id_ciudad'],
-                'detalles_adicionales' => $data['detalles_adicionales'] ?? null
-            ]);
+            // Solo creamos/buscamos lugar de nacimiento si se seleccionó una ciudad
+            if (!empty($data['id_ciudad'])) {
+                $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate([
+                    'id_ciudad' => $data['id_ciudad'],
+                    'detalles_adicionales' => $data['detalles_adicionales'] ?? null
+                ]);
+                $lugarId = $lugar->id_lugar_nacimiento;
+            }
 
             $personaData = array_diff_key($data, array_flip(['id_estado', 'id_ciudad', 'detalles_adicionales']));
-            $personaData['id_lugar_nacimiento'] = $lugar->id_lugar_nacimiento;
+            $personaData['id_lugar_nacimiento'] = $lugarId;
 
             \App\Models\Persona::create($personaData);
 
@@ -117,14 +122,18 @@ class PersonaController extends Controller{
             DB::beginTransaction();
 
             $data = $request->validated();
+            $lugarId = null;
 
-            $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate([
-                'id_ciudad' => $data['id_ciudad'],
-                'detalles_adicionales' => $data['detalles_adicionales'] ?? null
-            ]);
+            if (!empty($data['id_ciudad'])) {
+                $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate([
+                    'id_ciudad' => $data['id_ciudad'],
+                    'detalles_adicionales' => $data['detalles_adicionales'] ?? null
+                ]);
+                $lugarId = $lugar->id_lugar_nacimiento;
+            }
 
             $personaData = array_diff_key($data, array_flip(['id_estado', 'id_ciudad', 'detalles_adicionales']));
-            $personaData['id_lugar_nacimiento'] = $lugar->id_lugar_nacimiento;
+            $personaData['id_lugar_nacimiento'] = $lugarId;
 
             $persona->update($personaData);
 
