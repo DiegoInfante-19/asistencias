@@ -29,7 +29,7 @@
   @yield('styles')
 
   <!-- 3. Cargar DESPUÉS Vite (Nuestras sobreescrituras en app.css ganarán por cascada) -->
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
+  @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <!--end::Head-->
 
