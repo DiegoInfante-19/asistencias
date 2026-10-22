@@ -1,4 +1,4 @@
-<script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
+<!-- <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script> -->
 
 <script>
     // Inyectamos las variables de sesión
