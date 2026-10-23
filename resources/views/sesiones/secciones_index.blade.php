@@ -3,107 +3,14 @@
 @section('styles')
 <style>
     /* =========================================
-       DISEÑO BASE (COMPUTADORAS / ESCRITORIO)
+        ESTILOS GENERALES Y DE FORMULARIO "SOFT"
        ========================================= */
-    .btn-group-asistencia .btn {
-        font-size: 0.9rem !important;
-        padding: 0.4rem 0.75rem !important;
-        line-height: 1.5;
-        border-color: #ced4da !important;
-        transition: all 0.2s ease-in-out;
-        color: #6c757d !important;
-        background-color: #f8f9fa !important;
-    }
-
-    /* Atenuar un poco los botones que NO están marcados */
-    .btn-group-asistencia:hover .btn:not(:hover) {
-        opacity: 0.7;
-    }
-
-    /* =========================================
-       EFECTOS HOVER (COLOR ANTES DE HACER CLIC)
-       ========================================= */
-    .btn-group-asistencia .btn-asistencia-presente:hover:not(:disabled) {
-        background-color: #d1e7dd !important;
-        border-color: #198754 !important;
-        color: #146c43 !important;
-    }
-
-    .btn-group-asistencia .btn-asistencia-ausente:hover:not(:disabled) {
-        background-color: #f8d7da !important;
-        border-color: #dc3545 !important;
-        color: #b02a37 !important;
-    }
-
-    .btn-group-asistencia .btn-asistencia-justificado:hover:not(:disabled) {
-        background-color: #fff3cd !important;
-        border-color: #ffc107 !important;
-        color: #997404 !important;
-    }
-
-    /* =========================================
-       ESTILOS DE ESTADOS ACTIVOS (¡MUY RESALTADOS!)
-       ========================================= */
-
-    .btn-check:checked+.btn-asistencia-presente {
-        background-color: #198754 !important;
-        border-color: #146c43 !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        transform: scale(1.02);
-        z-index: 2;
-    }
-
-    .btn-check:checked+.btn-asistencia-ausente {
-        background-color: #dc3545 !important;
-        border-color: #b02a37 !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        transform: scale(1.02);
-        z-index: 2;
-    }
-
-    .btn-check:checked+.btn-asistencia-justificado {
-        background-color: #ffc107 !important;
-        border-color: #cc9a06 !important;
-        color: #000000 !important;
-        font-weight: 700 !important;
-        transform: scale(1.02);
-        z-index: 2;
-    }
-
-    /* =========================================
-       DISEÑO MÓVIL (TELÉFONOS)
-       ========================================= */
-    @media (max-width: 767.98px) {
-        .btn-group-asistencia {
-            display: flex !important;
-            width: 100% !important;
-        }
-
-        .btn-group-asistencia .btn {
-            flex: 1 !important;
-            font-size: 0.9rem !important;
-            padding: 0.5rem 0.1rem !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-        }
-    }
-
-    /* ===================================================
-       ESTÉTICA UNIFICADA PARA INPUTS Y SELECT2 "SOFT"
-       =================================================== */
-    
-    /* 1. Entradas de texto y selects normales */
     .card-body.bg-white .form-control,
     .card-body.bg-white .form-select {
         background-color: #f8f9fa !important;
         border-color: #dee2e6 !important;
     }
 
-    /* 2. Forzar a Select2 para que adopte el fondo gris, borde y sombra */
     .card-body.bg-white .select2-container--bootstrap-5 .select2-selection {
         background-color: #f8f9fa !important;
         border-color: #dee2e6 !important;
@@ -112,7 +19,6 @@
         font-size: 0.9rem;
     }
 
-    /* 3. Efecto Focus */
     .card-body.bg-white .form-control:focus,
     .card-body.bg-white .form-select:focus,
     .card-body.bg-white .select2-container--bootstrap-5.select2-container--open .select2-selection {
@@ -120,7 +26,44 @@
         border-color: #86b7fe !important;
     }
 
-    /* 4. Estilos para el botón ColVis de DataTables */
+    /* =========================================
+        ESTILO CUSTOM PARA BADGE SECCIÓN (SOFT BORDER)
+       ========================================= */
+    .badge-seccion-custom {
+        background-color: #e7f1ff !important; /* Fondo azul primario muy claro */
+        color: #0d6efd !important;             /* Texto azul primario */
+        border: 1px solid #0d6efd !important;  /* Borde con el color completo primario */
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        padding: 0.4em 0.75em !important;
+        border-radius: 0.375rem !important;
+    }
+
+    /* =========================================
+        DISEÑO MÓVIL (TELÉFONOS)
+       ========================================= */
+    @media (max-width: 767.98px) {
+        .content {
+            margin: 5px !important;
+            padding: 0 !important;
+        }
+
+        .card {
+            border-radius: 0.5rem !important;
+            box-shadow: none !important;
+            border: 1px solid #dee2e6 !important;
+        }
+
+        .card-seccion-movil {
+            transition: transform 0.2s ease;
+        }
+
+        .card-seccion-movil:active {
+            transform: scale(0.99);
+        }
+    }
+
+    /* Estilos para el botón ColVis de DataTables */
     .dt-buttons .btn.buttons-colvis {
         background-color: #fff !important;
         border: 1px solid #dee2e6 !important;
@@ -159,49 +102,48 @@
 <div class="content pt-4" style="margin: 20px;">
 
     <!-- PANEL DE FILTROS AVANZADOS -->
-    <div class="card shadow-sm mb-4">
-        <!-- Header estático y limpio -->
+    <div class="card shadow-sm mb-4 border-0">
         <div class="card-header bg-white py-3 border-bottom">
-            <h4 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">
-                Filtros de Búsqueda
+            <h4 class="card-title text-dark mb-0 fs-5 fw-bold">
+                <i class="bi bi-funnel-fill text-primary me-2"></i>Filtros de Búsqueda
             </h4>
         </div>
         
-        <!-- Body blanco -->
         <div class="card-body bg-white py-4">
             <div class="row g-3">
-
                 <!-- Filtro por PNF -->
-                <div class="col-md-6">
+                <div class="{{ (auth()->user()->isAdmin() || auth()->user()->isCoordinador()) ? 'col-md-6' : 'col-12' }}">
                     <label for="filtro_pnf" class="form-label fw-bold small text-muted text-uppercase">Programa (PNF)</label>
-                    <select id="filtro_pnf" class="form-select select2-buscador bg-light border-secondary-subtle">
-                        <option value="">Todos...</option>
+                    <select id="filtro_pnf" class="form-select select2-buscador">
+                        <option value="">Todos los PNF...</option>
                         @foreach($pnfs as $pnf)
-                        <option value="{{ $pnf->id_pnf }}">{{ $pnf->nombre_pnf }}</option>
+                        <option value="{{ $pnf->id_pnf }}" {{ request('id_pnf') == $pnf->id_pnf ? 'selected' : '' }}>
+                            {{ $pnf->nombre_pnf }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
 
-                <!-- Filtro por Profesor (Solo si es Administrador o Coordinador) -->
+                <!-- Filtro por Profesor (Solo visible para Administradores o Coordinadores) -->
                 @if(auth()->user()->isAdmin() || auth()->user()->isCoordinador())
                 <div class="col-md-6">
                     <label for="filtro_profesor" class="form-label fw-bold small text-muted text-uppercase">Docente Asignado</label>
-                    <select id="filtro_profesor" class="form-select select2-buscador bg-light border-secondary-subtle">
-                        <option value="">Cualquiera...</option>
+                    <select id="filtro_profesor" class="form-select select2-buscador">
+                        <option value="">Cualquier docente...</option>
                         @foreach($profesores as $profesor)
                         @php
                         $nombreProf = trim(($profesor->user->name_users ?? '') . ' ' . ($profesor->user->last_name_users ?? ''));
                         @endphp
-                        <option value="{{ $profesor->id_profesor }}">{{ $nombreProf }}</option>
+                        <option value="{{ $profesor->id_profesor }}" {{ request('id_profesor') == $profesor->id_profesor ? 'selected' : '' }}>
+                            {{ $nombreProf }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
                 @endif
-
             </div>
         </div>
 
-        <!-- Footer BLANCO -->
         <div class="card-footer bg-white py-3 d-flex justify-content-end border-top">
             <button type="button" id="btn-limpiar-filtros" class="btn btn-success fw-bold shadow-sm">
                 <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar Filtros
@@ -209,15 +151,116 @@
         </div>
     </div>
 
-    <!-- TARJETA PRINCIPAL CON LA TABLA -->
+    <!-- TARJETA PRINCIPAL -->
     <div class="card shadow-sm border-0">
-        <div class="card-header bg-white py-3 d-flex align-items-center">
-            <h5 class="card-title text-dark mb-0 fs-5" style="font-weight: 500;">Directorio de Secciones</h5>
+        <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+            <h5 class="card-title text-dark mb-0 fs-5 fw-bold">
+                <i class="bi bi-easel2-fill text-primary me-2"></i>Directorio de Secciones
+            </h5>
+            <span class="badge bg-light text-primary border fs-6 d-md-none">
+                {{ isset($seccionesMovil) ? $seccionesMovil->count() : 0 }} Registros
+            </span>
         </div>
+
         <div class="card-body bg-white py-4">
-            <div class="table-responsive">
+            
+            <!-- MODO COMPUTADORA (TABLA DATATABLES) -->
+            <div class="table-responsive d-none d-md-block">
                 {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
             </div>
+
+            <!-- MODO TELÉFONO (TARJETAS TÁCTILES RESPONSIVE) -->
+            <div class="d-block d-md-none">
+                @php
+                    $user = auth()->user();
+                    $queryMovil = App\Models\Seccion::query()->activasParaAsignacion()->with(['pnf', 'periodoAcademico.cohorte', 'profesores.user']);
+                    
+                    if (!$user->isAdmin() && !$user->isCoordinador()) {
+                        if ($user->profesor) {
+                            $queryMovil->porProfesor($user->profesor->id_profesor);
+                        } else {
+                            $queryMovil->whereRaw('1 = 0');
+                        }
+                    } else {
+                        if (request()->filled('id_profesor')) {
+                            $queryMovil->porProfesor(request('id_profesor'));
+                        }
+                    }
+
+                    if (request()->filled('id_pnf')) {
+                        $queryMovil->porPnf(request('id_pnf'));
+                    }
+
+                    $seccionesMovil = $queryMovil->get();
+                @endphp
+
+                @forelse($seccionesMovil as $seccion)
+                <div class="card card-seccion-movil mb-3 border shadow-sm p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <!-- Badge con estilo de borde completo y fondo claro diferenciado -->
+                            <span class="badge badge-seccion-custom mb-1">Sección: {{ $seccion->nombre_seccion }}</span>
+                            <div class="text-muted small fw-medium mt-1">
+                                <i class="bi bi-mortarboard text-secondary me-1"></i>{{ $seccion->pnf->nombre_pnf ?? 'Sin PNF' }}
+                            </div>
+                        </div>
+                        <!-- Cohorte limpio sin texto adicional -->
+                        <span class="badge bg-light text-dark border shadow-sm">
+                            {{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'S/C' }}
+                        </span>
+                    </div>
+
+                    <!-- Profesores asignados en móvil -->
+                    <div class="bg-light rounded p-2 mb-3 small text-secondary">
+                        <strong><i class="bi bi-person-badge me-1"></i>Docente(s):</strong>
+                        <div class="mt-1">
+                            @forelse($seccion->profesores as $prof)
+                                <span class="badge bg-white text-dark border me-1 mb-1 shadow-sm">
+                                    {{ trim(($prof->user->name_users ?? '') . ' ' . ($prof->user->last_name_users ?? '')) }}
+                                </span>
+                            @empty
+                                <span class="fst-italic text-muted">Sin asignar</span>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Métricas de Clases en Móvil -->
+                    <div class="row text-center g-2 mb-3">
+                        <div class="col-4">
+                            <div class="border rounded p-1 bg-white shadow-sm">
+                                <span class="d-block text-muted" style="font-size: 0.7rem;">Vistas</span>
+                                <span class="fw-bold text-success fs-6">{{ $seccion->sesiones()->has('asistencias')->count() }}</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border rounded p-1 bg-white shadow-sm">
+                                <span class="d-block text-muted" style="font-size: 0.7rem;">Pendientes</span>
+                                <span class="fw-bold text-warning fs-6">{{ $seccion->sesiones()->doesntHave('asistencias')->count() }}</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border rounded p-1 bg-white shadow-sm">
+                                <span class="d-block text-muted" style="font-size: 0.7rem;">Totales</span>
+                                <span class="fw-bold text-primary fs-6">{{ $seccion->sesiones()->count() }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Acción Principal en Móvil (Sólido) -->
+                    <div class="d-grid">
+                        <a href="{{ route('clases.secciones.sesiones', $seccion->id_seccion) }}" class="btn btn-primary btn-sm fw-bold shadow-sm py-2">
+                            <i class="bi bi-calendar-check me-1"></i> Gestionar Sesiones y Asistencia
+                        </a>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                    <p class="mb-0">No se encontraron secciones registradas con los filtros seleccionados.</p>
+                </div>
+                @endforelse
+            </div>
+
         </div>
     </div>
 
@@ -227,39 +270,67 @@
 @push('scripts')
 <script type="module">
     $(document).ready(function() {
-        // 0. Inicializar Select2 local con tema Bootstrap 5
+        // 0. Inicializar Select2 con tema Bootstrap 5
         $('.select2-buscador').select2({
             theme: 'bootstrap-5',
             width: '100%'
         });
 
-        // 1. Adjuntar los filtros a la petición AJAX del DataTable mediante preXhr
+        // 1. Vincular los filtros a la petición AJAX del DataTable (Escritorio)
         $('#secciones-clases-table').on('preXhr.dt', function(e, settings, data) {
             data.id_pnf = $('#filtro_pnf').val();
             data.id_profesor = $('#filtro_profesor').length ? $('#filtro_profesor').val() : null;
         });
 
-        function triggerDatatableDraw() {
-            if (window.LaravelDataTables && window.LaravelDataTables['secciones-clases-table']) {
-                window.LaravelDataTables['secciones-clases-table'].draw();
-            } else if ($.fn.DataTable.isDataTable('#secciones-clases-table')) {
-                $('#secciones-clases-table').DataTable().draw();
+        function aplicarFiltros() {
+            let idPnf = $('#filtro_pnf').val();
+            let idProfesor = $('#filtro_profesor').length ? $('#filtro_profesor').val() : '';
+
+            let url = new URL(window.location.href);
+            if (idPnf) {
+                url.searchParams.set('id_pnf', idPnf);
+            } else {
+                url.searchParams.delete('id_pnf');
             }
+
+            if (idProfesor) {
+                url.searchParams.set('id_profesor', idProfesor);
+            } else {
+                url.searchParams.delete('id_profesor');
+            }
+
+            window.location.href = url.toString();
         }
 
-        // 2. Disparar redibujado automático al cambiar cualquier select de filtro
+        // 2. Disparar cambio de filtros
         const selectsFiltros = '#filtro_pnf, #filtro_profesor';
         $(selectsFiltros).on('change', function() {
-            triggerDatatableDraw();
+            if (window.innerWidth < 768) {
+                aplicarFiltros();
+            } else {
+                if (window.LaravelDataTables && window.LaravelDataTables['secciones-clases-table']) {
+                    window.LaravelDataTables['secciones-clases-table'].draw();
+                } else if ($.fn.DataTable.isDataTable('#secciones-clases-table')) {
+                    $('#secciones-clases-table').DataTable().draw();
+                }
+            }
+        });
+
+        $('#filtro_pnf, #filtro_profesor').on('select2:select select2:unselect', function() {
+            if (window.innerWidth < 768) {
+                aplicarFiltros();
+            }
         });
 
         // 3. Botón para limpiar filtros
         $('#btn-limpiar-filtros').on('click', function() {
-            $(selectsFiltros).val(null).trigger('change.select2');
-            triggerDatatableDraw();
+            let url = new URL(window.location.href);
+            url.searchParams.delete('id_pnf');
+            url.searchParams.delete('id_profesor');
+            window.location.href = url.toString();
         });
 
-        // 4. Reajuste Responsive de la tabla
+        // 4. Reajuste Responsive de la tabla de escritorio
         $(window).on('resize', function() {
             if ($.fn.DataTable.isDataTable('#secciones-clases-table')) {
                 let dt = $('#secciones-clases-table').DataTable();

@@ -40,20 +40,20 @@ class SeccionClasesDataTable extends BaseDataTable
             })
             ->addColumn('clases_vistas', function ($seccion) {
                 $vistas = $seccion->clases_vistas ?? 0;
-                return $vistas > 0 
-                    ? '<span class="fw-bold text-primary fs-6">'.$vistas.'</span>' 
+                return $vistas > 0
+                    ? '<span class="fw-bold text-primary fs-6">' . $vistas . '</span>'
                     : '<span class="text-muted small fst-italic">Sin clases</span>';
             })
             ->addColumn('clases_programadas', function ($seccion) {
                 $prog = $seccion->clases_programadas ?? 0;
-                return $prog > 0 
-                    ? '<span class="fw-bold text-primary fs-6">'.$prog.'</span>' 
+                return $prog > 0
+                    ? '<span class="fw-bold text-primary fs-6">' . $prog . '</span>'
                     : '<span class="text-muted small fst-italic">Sin clases</span>';
             })
             ->addColumn('clases_totales', function ($seccion) {
                 $total = $seccion->clases_totales ?? 0;
-                return $total > 0 
-                    ? '<span class="fw-bold text-primary fs-6">'.$total.'</span>' 
+                return $total > 0
+                    ? '<span class="fw-bold text-primary fs-6">' . $total . '</span>'
                     : '<span class="text-muted small fst-italic">Sin clases</span>';
             })
             ->addColumn('action', function ($seccion) {
@@ -66,7 +66,7 @@ class SeccionClasesDataTable extends BaseDataTable
     public function query(Seccion $model): EloquentBuilder
     {
         $query = $model->newQuery()
-            ->select('secciones.*') // CORREGIDO: de 'sesiones.*' a 'secciones.*'
+            ->select('secciones.*')
             ->with(['pnf', 'periodoAcademico.cohorte', 'profesores.user'])
             ->withCount([
                 'profesores as n_profesores',
@@ -84,13 +84,15 @@ class SeccionClasesDataTable extends BaseDataTable
         $user = Auth::user();
         $request = $this->request();
 
+        // Restricción: Si NO es Administrador ni Coordinador (es Profesor), se filtra estrictamente por sus secciones
         if (!$user->isAdmin() && !$user->isCoordinador()) {
             if ($user->profesor) {
                 $query->porProfesor($user->profesor->id_profesor);
             } else {
-                $query->whereRaw('1 = 0');
+                $query->whereRaw('1 = 0'); // Si el usuario no tiene perfil de profesor asociado, no muestra nada
             }
         } else {
+            // Administradores y Coordinadores tienen acceso total y pueden filtrar opcionalmente por profesor
             if ($request->filled('id_profesor')) {
                 $query->porProfesor($request->get('id_profesor'));
             }

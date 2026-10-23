@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <!-- TARJETA PRINCIPAL CON DATATABLE -->
+    <!-- TARJETA PRINCIPAL CON DATATABLE / TARJETAS MÓVILES -->
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white py-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between border-bottom">
             <h5 class="card-title text-dark mb-3 mb-md-0 fs-5" style="font-weight: 500;">
@@ -46,18 +46,109 @@
             <div class="d-flex align-items-center" style="min-width: 250px;">
                 <label for="filtro_asistencia" class="form-label me-2 mb-0 fw-bold small text-muted text-nowrap">Filtrar por:</label>
                 <select id="filtro_asistencia" class="form-select form-select-sm shadow-sm border-secondary-subtle">
-                    <option value="">Todas las clases</option>
-                    <option value="registrada">Asistencia Registrada</option>
-                    <option value="pendiente">Asistencia Pendiente</option>
+                    <option value="" {{ request('filtro_asistencia') == '' ? 'selected' : '' }}>Todas las clases</option>
+                    <option value="registrada" {{ request('filtro_asistencia') == 'registrada' ? 'selected' : '' }}>Asistencia Registrada</option>
+                    <option value="pendiente" {{ request('filtro_asistencia') == 'pendiente' ? 'selected' : '' }}>Asistencia Pendiente</option>
                 </select>
             </div>
         </div>
         
         <div class="card-body bg-white py-4">
-            <div class="table-responsive">
+            
+            <!-- MODO COMPUTADORA (TABLA DATATABLES) -->
+            <div class="table-responsive d-none d-md-block">
                 {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
             </div>
+
+            <!-- MODO TELÉFONO (TARJETAS TÁCTILES RESPONSIVE) -->
+            <div class="d-block d-md-none">
+                @php
+                    $queryMovil = App\Models\Sesion::query()
+                        ->with(['profesor.user'])
+                        ->withExists('asistencias')
+                        ->where('id_seccion', $seccion->id_seccion)
+                        ->orderBy('fecha_sesion', 'desc');
+
+                    if (request()->filled('filtro_asistencia')) {
+                        $estado = request('filtro_asistencia');
+                        if ($estado === 'registrada') {
+                            $queryMovil->has('asistencias');
+                        } elseif ($estado === 'pendiente') {
+                            $queryMovil->doesntHave('asistencias');
+                        }
+                    }
+
+                    $sesionesMovil = $queryMovil->get();
+                @endphp
+
+                @forelse($sesionesMovil as $sesionItem)
+                @php
+                    $carbonDate = \Carbon\Carbon::parse($sesionItem->fecha_sesion)->locale('es');
+                    $diaSemana = ucfirst($carbonDate->dayName);
+                    $diaMes = $carbonDate->format('d');
+                    $mes = $carbonDate->monthName;
+                    $anio = $carbonDate->format('Y');
+                    $formatoFecha = "{$diaSemana}, {$diaMes} de {$mes} del año {$anio}";
+
+                    $nombreProf = trim(($sesionItem->profesor->user->name_users ?? '') . ' ' . ($sesionItem->profesor->user->last_name_users ?? ''));
+                @endphp
+                <div class="card card-sesion-movil mb-3 border shadow-sm p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="fw-bold text-dark mb-1">
+                                <i class="bi bi-calendar-event text-primary me-1"></i>{{ $formatoFecha }}
+                            </div>
+                            <!-- Nombre del profesor más legible y con desvanecimiento elegante si es largo -->
+                            <div class="text-secondary fw-semibold small text-fade-container mt-1">
+                                <span>Profesor: {{ $nombreProf ?: 'Sin asignar' }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            @if($sesionItem->asistencias_exists)
+                                <span class="badge badge-asistencia-registrada shadow-sm px-2 py-1">Registrada</span>
+                            @else
+                                <span class="badge badge-asistencia-pendiente shadow-sm px-2 py-1">Pendiente</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    @if($sesionItem->observacion_sesion)
+                    <div class="bg-light rounded p-2 mb-3 small text-secondary">
+                        <strong><i class="bi bi-chat-text me-1"></i>Obs:</strong> {{ $sesionItem->observacion_sesion }}
+                    </div>
+                    @endif
+
+                    <!-- Botones de Acción en Móvil (Estilo idéntico a escritorio) -->
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('sesiones.show', $sesionItem->id_sesiones) }}" class="btn btn-primary btn-sm fw-bold flex-grow-1 shadow-sm py-2">
+                            <i class="bi bi-check2-square me-1"></i> Tomar Asistencia
+                        </a>
+                        @can('update', $sesionItem)
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-2 shadow-sm" onclick="abrirModalEditar({{ json_encode($sesionItem) }})" title="Editar Sesión">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        @endcan
+                        @can('delete', $sesionItem)
+                        <form action="{{ route('sesiones.destroy', $sesionItem->id_sesiones) }}" method="POST" class="d-inline form-eliminar">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-outline-secondary btn-sm px-3 py-2 shadow-sm" title="Anular Sesión">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                        @endcan
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                    <p class="mb-0">No se encontraron sesiones registradas con los filtros seleccionados.</p>
+                </div>
+                @endforelse
+            </div>
+
         </div>
+
         <div class="card-footer bg-white text-muted small py-3">
             Historial de sesiones académicas registradas para la sección {{ $seccion->nombre_seccion }}.
         </div>
@@ -79,6 +170,66 @@
         padding: .375rem .75rem;
         font-size: 0.9rem;
     }
+
+    /* =========================================
+        ESTILOS CUSTOM PARA BADGES (SOFT OUTLINE)
+       ========================================= */
+    .badge-asistencia-registrada {
+        background-color: #d1e7dd !important;
+        color: #0f5132 !important;
+        border: 1px solid #198754 !important;
+        font-weight: 600;
+    }
+
+    .badge-asistencia-pendiente {
+        background-color: #fff3cd !important;
+        color: #664d03 !important;
+        border: 1px solid #ffc107 !important;
+        font-weight: 600;
+    }
+
+    /* =========================================
+        CONTENEDOR CON DESVANECIMIENTO (FADE-OUT)
+       ========================================= */
+    .text-fade-container {
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        overflow: hidden;
+        position: relative;
+        max-width: 220px;
+    }
+
+    .text-fade-container span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        mask-image: linear-gradient(to right, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+        -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+    }
+
+    /* =========================================
+        DISEÑO MÓVIL (TELÉFONOS)
+       ========================================= */
+    @media (max-width: 767.98px) {
+        .content {
+            margin: 5px !important;
+            padding: 0 !important;
+        }
+
+        .card {
+            border-radius: 0.5rem !important;
+            box-shadow: none !important;
+            border: 1px solid #dee2e6 !important;
+        }
+
+        .card-sesion-movil {
+            transition: transform 0.2s ease;
+        }
+
+        .card-sesion-movil:active {
+            transform: scale(0.99);
+        }
+    }
 </style>
 @endsection
 
@@ -89,12 +240,23 @@
     let flatpickrInstance = null;
 
     $(document).ready(function() {
-        // Escuchar cambios en el selector de filtro de la tabla
+        // Escuchar cambios en el selector de filtro de la tabla y sincronizar modo móvil/escritorio
         $('#filtro_asistencia').on('change', function() {
-            if (window.LaravelDataTables && window.LaravelDataTables['sesiones-seccion-table']) {
-                window.LaravelDataTables['sesiones-seccion-table'].draw();
-            } else if ($.fn.DataTable.isDataTable('#sesiones-seccion-table')) {
-                $('#sesiones-seccion-table').DataTable().draw();
+            let filtro = $(this).val();
+            if (window.innerWidth < 768) {
+                let url = new URL(window.location.href);
+                if (filtro) {
+                    url.searchParams.set('filtro_asistencia', filtro);
+                } else {
+                    url.searchParams.delete('filtro_asistencia');
+                }
+                window.location.href = url.toString();
+            } else {
+                if (window.LaravelDataTables && window.LaravelDataTables['sesiones-seccion-table']) {
+                    window.LaravelDataTables['sesiones-seccion-table'].draw();
+                } else if ($.fn.DataTable.isDataTable('#sesiones-seccion-table')) {
+                    $('#sesiones-seccion-table').DataTable().draw();
+                }
             }
         });
 
@@ -124,8 +286,10 @@
 
         // Inicializar Select2 en el modal cuando se abra (evita problemas de z-index y focus)
         $('#modalSesion').on('shown.bs.modal', function () {
-            let $modal = $(this);$modal.find('.select2-buscador').each(function() {
-                if (!$(this).hasClass('select2-hidden-accessible')) {$(this).select2({
+            let $modal = $(this);
+            $modal.find('.select2-buscador').each(function() {
+                if (!$(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2({
                         theme: 'bootstrap-5',
                         width: '100%',
                         dropdownParent: $modal, // Vital para modales Bootstrap
