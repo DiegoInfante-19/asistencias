@@ -8,8 +8,9 @@ enum EstadoAsistencia: string
     case AUSENTE = 'ausente';
     case JUSTIFICADA = 'justificada';
     case TARDE = 'tarde';
+    case IGNORAR = 'ignorar'; // <-- NUEVO ESTADO AÑADIDO OFICIALMENTE
 
-    // Utilidad para renderizar los componentes visuales (Badges Bootstrap)
+    // Utilidad para renderizar los componentes visuales
     public function label(): string
     {
         return match($this) {
@@ -17,6 +18,7 @@ enum EstadoAsistencia: string
             self::AUSENTE => 'Ausente',
             self::JUSTIFICADA => 'Justificada',
             self::TARDE => 'Tarde',
+            self::IGNORAR => 'Ignorado', // <-- LABEL ACTUALIZADO
         };
     }
 
@@ -25,8 +27,9 @@ enum EstadoAsistencia: string
         return match($this) {
             self::PRESENTE => 'success',
             self::AUSENTE => 'danger',
-            self::JUSTIFICADA => 'warning text-dark',
-            self::TARDE => 'info text-dark',
+            self::JUSTIFICADA => 'warning', 
+            self::TARDE => 'info',
+            self::IGNORAR => 'primary', // <-- COLOR AZUL MANTENIDO
         };
     }
 }

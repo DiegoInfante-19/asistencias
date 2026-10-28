@@ -45,24 +45,9 @@ class AsistenciaSesionDataTable extends BaseDataTable
             ->addColumn('estudiante_nombre', function ($inscripcion) {
                 return '<span class="fw-medium text-dark">' . e($inscripcion->persona->nombre_completo ?? 'N/D') . '</span>';
             })
-            ->addColumn('titulo_optando', function ($inscripcion) {
-                $titulacionPersona = $inscripcion->persona->titulacionPersona;
-
-                if ($titulacionPersona && $titulacionPersona->id_pnf == $this->idPnfSeccion) {
-                    if ($titulacionPersona->id_titulacion) {
-                        $tituloEspecifico = DB::table('titulos_pnf')
-                            ->where('id_pnf', $titulacionPersona->id_pnf)
-                            ->where('id_titulo', $titulacionPersona->id_titulacion)
-                            ->value('nombre_titulo_pnf');
-
-                        $nombreMostrar = $tituloEspecifico ?? optional($titulacionPersona->titulacion)->nombre_titulo_base ?? 'Título Desconocido';
-                        return '<span class="text-secondary">' . e($nombreMostrar) . '</span>';
-                    }
-
-                    return '<span class="text-muted fst-italic">No colocado todavía</span>';
-                }
-
-                return '<span class="text-muted fst-italic">Sin titulación asignada para este PNF</span>';
+            ->addColumn('cohorte', function ($inscripcion) {
+                $numeroCohorte = $inscripcion->persona->cohorte->numero_cohorte ?? 'N/D';
+                return '<span class="badge bg-light text-dark border px-2 py-1">' . e($numeroCohorte) . '</span>';
             })
             ->addColumn('estado_asistencia', function ($inscripcion) {
                 $estadoRegistrado = $this->asistenciasRegistradas[$inscripcion->id_inscripcion_seccion] ?? 'ignorar';                
@@ -77,7 +62,7 @@ class AsistenciaSesionDataTable extends BaseDataTable
 
                 return view('sesiones.partials.estado_asistencia', compact('inscripcion', 'estadoActual', 'puedeEditar', 'tieneAsistencia'))->render();
             })
-            ->rawColumns(['cedula_personas', 'estudiante_nombre', 'titulo_optando', 'estado_asistencia'])
+            ->rawColumns(['cedula_personas', 'estudiante_nombre', 'cohorte', 'estado_asistencia'])
             ->setRowId(function ($inscripcion) {
                 return 'fila_' . $inscripcion->id_inscripcion_seccion;
             });
@@ -86,7 +71,7 @@ class AsistenciaSesionDataTable extends BaseDataTable
     public function query(InscripcionSeccion $model): EloquentBuilder
     {
         return $model->newQuery()
-            ->with(['persona.cohorte', 'persona.titulacionPersona.titulacion'])
+            ->with(['persona.cohorte']) 
             ->where('id_seccion', $this->idSeccion)
             ->where('estatus_inscripcion', 'Activo')
             ->select('inscripciones_secciones.*');
@@ -115,12 +100,13 @@ class AsistenciaSesionDataTable extends BaseDataTable
 
     protected function getColumns(): array
     {
+        // Se definieron anchos precisos. La columna de nombre no tiene ancho para que ocupe todo el espacio libre restante.
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->addClass('text-center align-middle')->width(40),
             Column::make('cedula_personas')->title('Cédula')->addClass('align-middle')->width(110),
             Column::make('estudiante_nombre')->title('Apellidos y Nombres')->searchable(false)->orderable(false)->addClass('align-middle'),
-            Column::make('titulo_optando')->title('Título a Optar')->searchable(false)->orderable(false)->addClass('align-middle'),
-            Column::computed('estado_asistencia')->title('Acciones')->exportable(false)->printable(false)->addClass('text-center align-middle')->width(280),
+            Column::make('cohorte')->title('Cohorte')->searchable(false)->orderable(false)->addClass('text-center align-middle')->width(80),
+            Column::computed('estado_asistencia')->title('Acciones')->exportable(false)->printable(false)->addClass('text-center align-middle')->width(320),
         ];
     }
 }

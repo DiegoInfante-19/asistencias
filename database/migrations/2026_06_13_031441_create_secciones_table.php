@@ -15,9 +15,11 @@ return new class extends Migration
             $table->string('estatus_seccion', 50)->default('Activo');
             $table->timestamps();
 
+            // Asegurar que la restricción única se llame exactamente como en SQL
             $table->unique(['id_periodo', 'id_pnf', 'nombre_seccion'], 'uk_seccion_periodo_pnf');
         });
     }
+    
     public function down(): void
     {
         Schema::dropIfExists('secciones');

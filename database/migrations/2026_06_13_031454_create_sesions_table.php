@@ -8,19 +8,21 @@ return new class extends Migration {
         Schema::create('sesiones', function (Blueprint $table) {
             $table->id('id_sesiones');
             
-            // NUEVA FORÁNEA (Sustituye a grupo)
+            // Foráneas
             $table->foreignId('id_seccion')->constrained('secciones', 'id_seccion')->onDelete('restrict');
-            
             $table->foreignId('id_profesor')->constrained('profesores', 'id_profesor')->onDelete('restrict');
+            
             $table->dateTime('fecha_sesion');
             $table->text('observacion_sesion')->nullable();
             $table->softDeletes();
             $table->timestamps();
             
-            // Nuevo índice único para secciones
-            $table->unique(['id_seccion', 'fecha_sesion'], 'uq_seccion_fecha_sesion');
+            // SE ELIMINA EL ÍNDICE UNIQUE GLOBAL: 
+            // $table->unique(['id_seccion', 'fecha_sesion'], 'uq_seccion_fecha_sesion');
+            // La exclusión de duplicados activos se gestiona de forma segura desde StoreSesionRequest.
         });
     }
+    
     public function down(): void {
         Schema::dropIfExists('sesiones');
     }

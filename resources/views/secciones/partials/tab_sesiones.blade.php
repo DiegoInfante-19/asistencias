@@ -12,6 +12,7 @@
                         <i class="bi bi-clock-history me-1"></i> + Registrar Sesión (Administrativo)
                     </button>
                 @elseif(auth()->user()->isProfesor())
+                    <!-- SE AGREGÓ LA CLASE form-registrar-sesion-profesor -->
                     <form action="{{ route('sesiones.store') }}" method="POST" class="d-inline">
                         @csrf
                         <input type="hidden" name="id_seccion" value="{{ $seccion->id_seccion }}">

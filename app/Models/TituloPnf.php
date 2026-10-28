@@ -3,19 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // <-- 1. Importar SoftDeletes
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany; // <-- 2. Importar HasMany
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TituloPnf extends Model
 {
-    use SoftDeletes; // <-- 3. Activar el borrado lógico
+    use SoftDeletes;
 
-    // Configuración de tabla y llave primaria (Paso 5)
     protected $table = 'titulos_pnf'; 
     protected $primaryKey = 'id_titulos_pnf';
     
-    // Seguridad de Asignación Masiva (Paso 5)
     protected $fillable = [
         'id_pnf',
         'id_titulo',
@@ -23,7 +21,7 @@ class TituloPnf extends Model
     ];
 
     /**
-     * RELACIONES (Paso 6)
+     * RELACIONES
      */
 
     // Pertenece a un Programa Nacional de Formación
@@ -38,10 +36,15 @@ class TituloPnf extends Model
         return $this->belongsTo(Titulo::class, 'id_titulo', 'id_titulos');
     }
 
-    // <-- 4. Nueva relación inversa sugerida por el análisis
-    // Permite saber qué expedientes académicos dependen de este título
+    // Formaciones académicas previas vinculadas
     public function formacionesAcademicas(): HasMany
     {
         return $this->hasMany(PersonaFormacionAcademica::class, 'id_titulos_pnf', 'id_titulos_pnf');
+    }
+
+    // Expedientes académicos/titulaciones activas de personas asociadas a este título
+    public function titulacionesPersonas(): HasMany
+    {
+        return $this->hasMany(TitulacionPersona::class, 'id_titulos_pnf', 'id_titulos_pnf');
     }
 }

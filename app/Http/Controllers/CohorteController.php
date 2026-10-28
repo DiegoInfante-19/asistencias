@@ -53,11 +53,37 @@ class CohorteController extends Controller
 
     public function update(UpdateCohorteRequest $request, $id)
     {
-        $cohorte = Cohorte::findOrFail($id);
-        $cohorte->update($request->validated());
+        try {
+            DB::transaction(function () use ($request, $id) {
+                $cohorte = Cohorte::findOrFail($id);
+                
+                // 1. Actualizamos la Cohorte
+                $cohorte->update([
+                    'numero_cohorte'      => $request->numero_cohorte,
+                    'descripcion_cohorte' => $request->descripcion_cohorte,
+                    'estatus_cohorte'     => $request->estatus_cohorte,
+                ]);
 
-        return redirect()->route('estructura.index')
-            ->with('success', 'Sello de cohorte actualizado correctamente.');
+                // 2. Sincronizamos las fechas del Período Académico asociado
+                $periodo = $cohorte->periodosAcademicos()->first();
+                if ($periodo) {
+                    $periodo->update([
+                        'fecha_inicio' => $request->fecha_inicio,
+                        'fecha_fin'    => $request->fecha_fin,
+                        // El estatus_periodo se actualiza automáticamente 
+                        // gracias al evento "updated" en el modelo Cohorte.
+                    ]);
+                }
+            });
+
+            return redirect()->route('estructura.index')
+                ->with('success', 'Cohorte y período académico actualizados correctamente.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error al actualizar la cohorte: ' . $e->getMessage());
+        }
     }
 
     public function destroy($id)

@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Casts\Attribute; // <-- Importado
-use Illuminate\Support\Str; // <-- Importado
+use Illuminate\Database\Eloquent\Casts\Attribute; 
+use Illuminate\Support\Str; 
 
 class Persona extends Model
 {
@@ -27,7 +27,8 @@ class Persona extends Model
         'fecha_nacimiento_personas',
         'id_lugar_nacimiento',
         'email_personas',
-        'id_cohortes'
+        'id_cohortes',
+        'continua_estudios' // <-- NUEVA COLUMNA AÑADIDA AQUÍ
     ];
 
     /**
@@ -98,19 +99,11 @@ class Persona extends Model
         return $this->hasOne(EmpresaPersona::class, 'id_personas', 'id_personas');
     }
 
-    /**
-     * MODIFICACIÓN FASE 3 (Paso 3.1): 
-     * Convertimos la relación principal en HasMany para soportar múltiples expedientes o cambios de PNF.
-     */
     public function titulacionPersonas(): HasMany
     {
         return $this->hasMany(TitulacionPersona::class, 'id_personas', 'id_personas');
     }
 
-    /**
-     * Método auxiliar de retrocompatibilidad optimizado con latestOfMany()
-     * para extraer de forma eficiente únicamente el expediente más reciente mediante subconsulta SQL.
-     */
     public function titulacionPersona(): HasOne
     {
         return $this->hasOne(TitulacionPersona::class, 'id_personas', 'id_personas')->latestOfMany('id_titulacion_personas');
@@ -160,18 +153,41 @@ class Persona extends Model
         return preg_replace('/\s+/', ' ', "{$nombres} {$apellidos}");
     }
 
-    // Retorna solo el primer nombre y el primer apellido
+    public function getFechaNacimientoFormateadaAttribute()
+    {
+        return $this->fecha_nacimiento_personas 
+            ? \Carbon\Carbon::parse($this->fecha_nacimiento_personas)->format('d/m/Y') 
+            : 'No registrada'; // O el mensaje que prefieras
+    }
+
+    public function getEdadAttribute()
+    {
+        return $this->fecha_nacimiento_personas 
+            ? \Carbon\Carbon::parse($this->fecha_nacimiento_personas)->age . ' años' 
+            : 'Edad desconocida';
+    }
+
     public function getNombreCortoAttribute()
     {
         return trim("{$this->primer_nombre_personas} {$this->primer_apellido_personas}");
     }
 
-    // Retorna el título específico por el que opta
     public function getTituloBaseAttribute()
     {
         $titulacion = $this->titulacionPersona;
         if (!$titulacion) return 'SIN TÍTULO';
 
         return $titulacion->titulacion->nombre_titulo_base ?? 'TÍTULO NO ESPECIFICADO';
+    }
+
+    // <-- NUEVO ACCESSOR: Evalúa si la persona tiene permitido continuar
+    public function getPuedeContinuarAttribute(): bool
+    {
+        // Si es explícitamente falso, 0 o "No", se le bloquea la inscripción.
+        // Al ser nullable, si es null o verdadero, pasará como true y podrá inscribirse.
+        if ($this->continua_estudios === 0 || $this->continua_estudios === false || strtolower((string)$this->continua_estudios) === 'no') {
+            return false;
+        }
+        return true;
     }
 }

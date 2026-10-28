@@ -9,10 +9,6 @@ use Illuminate\Auth\Access\Response;
 
 class SesionPolicy
 {
-    /**
-     * El Encargado / Administrador / Coordinador tiene superpoderes globales.
-     * Si retorna true, salta las demás validaciones.
-     */
     public function before(User $user, string $ability): ?bool
     {
         if (method_exists($user, 'isAdministrador') && $user->isAdministrador()) {
@@ -25,7 +21,7 @@ class SesionPolicy
             return true;
         }
 
-        return null; // Si es profesor, continúa a evaluar los métodos de abajo
+        return null; 
     }
 
     public function viewAny(User $user): bool
@@ -37,7 +33,6 @@ class SesionPolicy
     {
         if ($user->isProfesor()) {
             $idProfesor = $user->profesor?->id_profesor;
-            // Autoriza si el profesor pertenece a la sección de esta sesión
             return $sesion->profesorPerteneceASeccion($idProfesor);
         }
         return true;
@@ -53,7 +48,6 @@ class SesionPolicy
 
     public function update(User $user, Sesion $sesion): Response|bool
     {
-        // BLINDAJE: Si la sección padre no está activa, se bloquea por completo la edición
         if ($sesion->relationLoaded('seccion') ? $sesion->seccion && !$sesion->seccion->estaActiva() : !$sesion->seccion->estaActiva()) {
             return Response::deny('Esta sesión pertenece a una sección inactiva y su histórico se encuentra bloqueado.');
         }
@@ -61,14 +55,10 @@ class SesionPolicy
         if ($user->isProfesor()) {
             $idProfesor = $user->profesor?->id_profesor;
 
-            // Autoriza la edición si el profesor pertenece a la sección
             if (!$sesion->profesorPerteneceASeccion($idProfesor)) {
                 return Response::deny('No tiene autorización para modificar sesiones de esta sección.');
             }
-
-            if ($sesion->tiempoAgotado()) {
-                return Response::deny("El tiempo límite de 48 horas para modificar esta asistencia ha expirado. Contacte a su Coordinador.");
-            }
+            // SE ELIMINÓ LA VALIDACIÓN DE TIEMPO AGOTADO AQUÍ
         }
 
         return true;
@@ -76,7 +66,6 @@ class SesionPolicy
 
     public function delete(User $user, Sesion $sesion): Response|bool
     {
-        // La anulación (Soft Delete) queda reservada exclusivamente para el Encargado
         if ($user->isProfesor()) {
             return Response::deny('Los profesores no pueden anular sesiones. Contacte al encargado.');
         }

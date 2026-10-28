@@ -13,9 +13,10 @@ class TitulacionPersona extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_personas', 
-        'id_titulacion', 
-        'id_pnf', 
+        'id_personas',
+        'id_titulacion',
+        'id_titulos_pnf',
+        'id_pnf',
         'id_estatus_expediente'
     ];
 
@@ -29,6 +30,11 @@ class TitulacionPersona extends Model
         return $this->belongsTo(Titulo::class, 'id_titulacion', 'id_titulos');
     }
 
+    public function tituloPnf(): BelongsTo
+    {
+        return $this->belongsTo(TituloPnf::class, 'id_titulos_pnf', 'id_titulos_pnf');
+    }
+
     public function pnf(): BelongsTo
     {
         return $this->belongsTo(Pnf::class, 'id_pnf', 'id_pnf');
@@ -40,25 +46,35 @@ class TitulacionPersona extends Model
     }
 
     /**
-     * ACCESSOR INTELIGENTE Y OPTIMIZADO (Reemplaza a la vieja relación tituloPnf)
-     * Cruza matemáticamente el PNF y el Título para dar el nombre exacto (Ej: "Ingeniero en Mecánica")
+     * ACCESSOR INTELIGENTE Y OPTIMIZADO
+     * Resuelve el nombre comercial exacto priorizando la relación id_titulos_pnf
      */
     public function getNombreTituloEspecificoAttribute()
     {
-        // Caché estática en memoria para evitar el problema N+1 en DataTables.
-        // Carga el catálogo 1 sola vez sin importar si tienes 10 o 1000 estudiantes en la tabla.
-        static $titulosPnf = null;
-        
-        if ($titulosPnf === null) {
-            $titulosPnf = \App\Models\TituloPnf::all()->groupBy(function($item) {
+        // 1. Prioridad: Si la relación ya viene cargada en memoria por Eager Loading
+        if ($this->relationLoaded('tituloPnf') && $this->tituloPnf) {
+            return $this->tituloPnf->nombre_titulo_pnf;
+        }
+
+        // 2. Prioridad: Búsqueda exacta por id_titulos_pnf en caché estática
+        static $titulosPnfById = null;
+        if ($titulosPnfById === null) {
+            $titulosPnfById = \App\Models\TituloPnf::all()->keyBy('id_titulos_pnf');
+        }
+
+        if ($this->id_titulos_pnf && isset($titulosPnfById[$this->id_titulos_pnf])) {
+            return $titulosPnfById[$this->id_titulos_pnf]->nombre_titulo_pnf;
+        }
+
+        // 3. Fallback histórico para registros antiguos sin id_titulos_pnf
+        static $titulosPnfLegacy = null;
+        if ($titulosPnfLegacy === null) {
+            $titulosPnfLegacy = \App\Models\TituloPnf::all()->groupBy(function ($item) {
                 return $item->id_pnf . '-' . $item->id_titulo;
             });
         }
-        
-        // Creamos la llave combinando el PNF y el Título del estudiante
+
         $key = $this->id_pnf . '-' . $this->id_titulacion;
-        
-        // Retornamos el nombre específico si existe
-        return isset($titulosPnf[$key]) ? $titulosPnf[$key]->first()->nombre_titulo_pnf : null;
+        return isset($titulosPnfLegacy[$key]) ? $titulosPnfLegacy[$key]->first()->nombre_titulo_pnf : null;
     }
 }

@@ -94,14 +94,23 @@
                         <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_cohortes') is-invalid @enderror" id="id_cohortes" name="id_cohortes">
                             <option value="">Seleccione...</option>
                             @foreach($cohortes as $cohorte)
-                            <!-- En create.blade.php usa old('id_cohortes') -->
-                            <!-- En edit.blade.php usa old('id_cohortes', $persona->id_cohortes) -->
-                            <option value="{{ $cohorte->id_cohortes }}" {{ old('id_cohortes', $persona->id_cohortes ?? '') == $cohorte->id_cohortes ? 'selected' : '' }}>
+                            <option value="{{ $cohorte->id_cohortes }}" {{ old('id_cohortes', $persona->id_cohortes) == $cohorte->id_cohortes ? 'selected' : '' }}>
                                 {{ $cohorte->numero_cohorte }}
                             </option>
                             @endforeach
                         </select>
                         @error('id_cohortes') <div class="invalid-feedback dynamic-feedback fw-bold d-block">{{ $message }}</div> @enderror
+                    </div>
+                    
+                    <!-- NUEVO: CONTINÚA ESTUDIOS -->
+                    <div class="col-md-4">
+                        <label for="continua_estudios" class="form-label fw-bold small text-muted text-uppercase">¿Continúa Estudios? <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <select class="form-select bg-light border-secondary-subtle shadow-sm @error('continua_estudios') is-invalid @enderror" id="continua_estudios" name="continua_estudios">
+                            <option value="">Predeterminado (Sí, continúa)</option>
+                            <option value="1" {{ old('continua_estudios', $persona->continua_estudios) === 1 || old('continua_estudios', $persona->continua_estudios) === '1' ? 'selected' : '' }}>Sí, continúa estudiando</option>
+                            <option value="0" {{ old('continua_estudios', $persona->continua_estudios) === 0 || old('continua_estudios', $persona->continua_estudios) === '0' ? 'selected' : '' }}>No continúa (Inactivo)</option>
+                        </select>
+                        @error('continua_estudios') <div class="invalid-feedback dynamic-feedback fw-bold d-block">{{ $message }}</div> @enderror
                     </div>
 
                     <!-- LUGAR DE NACIMIENTO -->

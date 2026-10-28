@@ -97,20 +97,29 @@
                     </div>
 
                     <!-- COHORTE DE INGRESO -->
-<div class="col-md-4">
-    <label for="id_cohortes" class="form-label fw-bold small text-muted text-uppercase">Cohorte de Ingreso <span class="text-muted fw-normal">(Opcional)</span></label>
-    <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_cohortes') is-invalid @enderror" id="id_cohortes" name="id_cohortes">
-        <option value="">Seleccione...</option>
-        @foreach($cohortes as $cohorte)
-        <!-- En create.blade.php usa old('id_cohortes') -->
-        <!-- En edit.blade.php usa old('id_cohortes', $persona->id_cohortes) -->
-        <option value="{{ $cohorte->id_cohortes }}" {{ old('id_cohortes', $persona->id_cohortes ?? '') == $cohorte->id_cohortes ? 'selected' : '' }}>
-            {{ $cohorte->numero_cohorte }}
-        </option>
-        @endforeach
-    </select>
-    @error('id_cohortes') <div class="invalid-feedback dynamic-feedback fw-bold d-block">{{ $message }}</div> @enderror
-</div>
+                    <div class="col-md-4">
+                        <label for="id_cohortes" class="form-label fw-bold small text-muted text-uppercase">Cohorte de Ingreso <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <select class="form-select select2-buscador bg-light border-secondary-subtle shadow-sm @error('id_cohortes') is-invalid @enderror" id="id_cohortes" name="id_cohortes">
+                            <option value="">Seleccione...</option>
+                            @foreach($cohortes as $cohorte)
+                            <option value="{{ $cohorte->id_cohortes }}" {{ old('id_cohortes') == $cohorte->id_cohortes ? 'selected' : '' }}>
+                                {{ $cohorte->numero_cohorte }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('id_cohortes') <div class="invalid-feedback dynamic-feedback fw-bold d-block">{{ $message }}</div> @enderror
+                    </div>
+
+                    <!-- NUEVO: CONTINÚA ESTUDIOS -->
+                    <div class="col-md-4">
+                        <label for="continua_estudios" class="form-label fw-bold small text-muted text-uppercase">¿Continúa Estudios? <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <select class="form-select bg-light border-secondary-subtle shadow-sm @error('continua_estudios') is-invalid @enderror" id="continua_estudios" name="continua_estudios">
+                            <option value="">Predeterminado (Sí, continúa)</option>
+                            <option value="1" {{ old('continua_estudios') === '1' ? 'selected' : '' }}>Sí, continúa estudiando</option>
+                            <option value="0" {{ old('continua_estudios') === '0' ? 'selected' : '' }}>No continúa (Inactivo)</option>
+                        </select>
+                        @error('continua_estudios') <div class="invalid-feedback dynamic-feedback fw-bold d-block">{{ $message }}</div> @enderror
+                    </div>
 
                     <!-- LUGAR DE NACIMIENTO -->
                     <div class="col-12 mt-4">
@@ -197,22 +206,26 @@
         border-radius: 0.5rem !important;
         overflow: hidden !important;
     }
+
     .ecosystem-card .card-header {
         background-color: #ffffff !important;
         border-top-left-radius: 0.5rem !important;
         border-top-right-radius: 0.5rem !important;
     }
+
     .ecosystem-card .card-footer {
         background-color: #f8f9fa !important;
         border-top: 1px solid #e2e8f0 !important;
         border-bottom-left-radius: 0.5rem !important;
         border-bottom-right-radius: 0.5rem !important;
     }
+
     .select2-container--bootstrap-5 .select2-selection {
         background-color: #f8f9fa !important;
         border-color: #e2e3e5 !important;
         box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
     }
+
     .form-control:focus,
     .form-select:focus,
     .select2-container--bootstrap-5.select2-container--open .select2-selection {

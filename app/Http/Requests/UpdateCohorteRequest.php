@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Models\Cohorte; // <-- Importamos el modelo
+use App\Models\Cohorte;
 
 class UpdateCohorteRequest extends FormRequest
 {
@@ -52,6 +52,9 @@ class UpdateCohorteRequest extends FormRequest
                     }
                 },
             ],
+            // SE AÑADEN LAS VALIDACIONES DE FECHAS PARA LA ACTUALIZACIÓN
+            'fecha_inicio' => ['required', 'date'],
+            'fecha_fin' => ['required', 'date', 'after_or_equal:fecha_inicio'],
         ];
     }
 
@@ -62,6 +65,9 @@ class UpdateCohorteRequest extends FormRequest
             'numero_cohorte.unique'    => 'Este número de cohorte ya existe.',
             'numero_cohorte.regex'     => 'El número de cohorte debe contener únicamente letras, números y espacios.',
             'estatus_cohorte.required' => 'El estatus es obligatorio.',
+            'fecha_inicio.required'    => 'La fecha de inicio del período es obligatoria.',
+            'fecha_fin.required'       => 'La fecha de fin del período es obligatoria.',
+            'fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
         ];
     }
 }

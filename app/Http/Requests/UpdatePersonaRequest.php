@@ -32,33 +32,24 @@ class UpdatePersonaRequest extends FormRequest
         $id = $this->route('persona')->id_personas;
 
         return [
-            'cedula_personas' => [
-                'required',
-                'string',
-                Rule::unique('personas', 'cedula_personas')->ignore($id, 'id_personas'),
-                'regex:/^\d{6,8}$/'
-            ],
+            'cedula_personas' => ['required', 'string', Rule::unique('personas', 'cedula_personas')->ignore($id, 'id_personas'), 'regex:/^\d{6,8}$/'],
             'primer_nombre_personas' => ['required', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],
             'segundo_nombre_personas' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'],
             'primer_apellido_personas' => ['required', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/'],
             'segundo_apellido_personas' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/'],
             'sexo_personas' => ['required', 'string', 'in:M,F'],
-
-            // FLEXIBLES
             'fecha_nacimiento_personas' => ['nullable', 'date', 'before:today'],
             'email_personas' => [
-                'nullable',
-                'string',
-                'email',
-                'max:255',
+                'nullable', 'string', 'email', 'max:255',
                 Rule::unique('personas', 'email_personas')->ignore($id, 'id_personas'),
             ],
-
             'id_lugar_nacimiento' => ['nullable', 'integer', 'exists:lugar_nacimiento_personas,id_lugar_nacimiento'],
             'id_estado' => ['nullable', 'integer', 'exists:estados,id_estado'],
             'id_ciudad' => ['nullable', 'integer', 'exists:ciudades,id_ciudad'],
             'detalles_adicionales' => ['nullable', 'string', 'max:255'],
             'id_cohortes' => ['nullable', 'integer', 'exists:cohortes,id_cohortes'],
+            // NUEVO CAMPO:
+            'continua_estudios' => ['nullable', 'boolean'],
         ];
     }
 }

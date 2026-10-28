@@ -26,8 +26,11 @@ return new class extends Migration
 
             $table->string('email_personas')->nullable()->unique();
 
-            // --- NUEVO: Sello de ingreso de Cohorte ---
+            // Sello de ingreso de Cohorte
             $table->foreignId('id_cohortes')->nullable()->constrained('cohortes', 'id_cohortes')->onDelete('restrict');
+            
+            // --- NUEVO CAMPO AÑADIDO ---
+            $table->boolean('continua_estudios')->nullable()->default(null);
             
             // Auditoría y Seguridad
             $table->softDeletes(); // Columna deleted_at

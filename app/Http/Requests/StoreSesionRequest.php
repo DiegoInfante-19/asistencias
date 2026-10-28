@@ -10,7 +10,7 @@ class StoreSesionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // La autorización se delega a la Policy o Control de Roles
+        return true; 
     }
 
     public function rules(): array
@@ -48,7 +48,7 @@ class StoreSesionRequest extends FormRequest
                     }
                 },
                 function ($attribute, $value, $fail) {
-                    // 3. Prevención de Doble Sesión por sección y fecha
+                    // 3. Prevención de Doble Sesión activa por sección y fecha
                     $idSeccion = $this->input('id_seccion');
                     if ($idSeccion) {
                         $fechaSoloDia = Carbon::parse($value)->toDateString();
@@ -56,9 +56,9 @@ class StoreSesionRequest extends FormRequest
                         $query = DB::table('sesiones')
                             ->where('id_seccion', $idSeccion)
                             ->whereDate('fecha_sesion', '=', $fechaSoloDia)
-                            ->whereNull('deleted_at');
+                            ->whereNull('deleted_at'); // Solo valida contra sesiones activas
 
-                        // Si es actualización, excluimos la sesión actual para que no dé falso positivo de duplicado
+                        // Si es actualización, excluimos la sesión actual
                         if ($this->isMethod('put') || $this->isMethod('patch')) {
                             $idSesionActual = $this->route('sesione') ?? $this->route('sesion');
                             if ($idSesionActual) {

@@ -28,7 +28,7 @@ class AsistenciaController extends Controller
 
         $request->validate([
             'id_sesiones' => 'required|exists:sesiones,id_sesiones',
-            'asistencias' => 'nullable|array|max:150', // Cambiamos a nullable para manejar el array vacío manualmente
+            'asistencias' => 'nullable|array|max:150',
 
             'asistencias.*.id_inscripcion_seccion' => [
                 'required',
@@ -36,19 +36,17 @@ class AsistenciaController extends Controller
                 Rule::exists('inscripciones_secciones', 'id_inscripcion_seccion')
                     ->where('id_seccion', $sesion->id_seccion)
             ],
-            'asistencias.*.estado'      => 'required|in:presente,ausente,justificada,tarde',
+            // SE AÑADIÓ 'ignorar' A LA REGLA DE VALIDACIÓN
+            'asistencias.*.estado'      => 'required|in:presente,ausente,justificada,tarde,ignorar',
             'asistencias.*.observacion' => 'nullable|string|max:255',
         ]);
 
-        // Si el profesor no evaluó a nadie (todos en "Ignorar"), evitamos ir a BD
         if (empty($request->asistencias) || count($request->asistencias) === 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'No seleccionaste el estado de ningún estudiante. Selecciona al menos uno para guardar.'
             ], 422);
         }
-
-        // ELIMINAMOS LA VALIDACIÓN DEL 100% AQUÍ. AHORA ACEPTAMOS ENVÍOS PARCIALES.
 
         DB::beginTransaction();
 

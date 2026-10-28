@@ -87,8 +87,9 @@
                         <!-- PESTAÑA 2: TÍTULO INTERNO -->
                         <div class="tab-pane fade" id="pane-pnf" role="tabpanel" aria-labelledby="tab-pnf-btn">
                             <div class="mb-3">
-                                <label for="id_titulos_pnf" class="form-label fw-bold small text-muted">Seleccionar Título PNF Universitario</label>
-                                <select class="form-select select2-buscador @error('id_titulos_pnf') is-invalid @enderror" id="id_titulos_pnf" name="id_titulos_pnf">
+                                <!-- EL ID SE CAMBIÓ A: id_titulos_pnf_formacion PARA EVITAR CONFLICTO, EL NAME SE QUEDA IGUAL -->
+                                <label for="id_titulos_pnf_formacion" class="form-label fw-bold small text-muted">Seleccionar Título PNF Universitario</label>
+                                <select class="form-select select2-buscador @error('id_titulos_pnf') is-invalid @enderror" id="id_titulos_pnf_formacion" name="id_titulos_pnf">
                                     <option value="" selected>Seleccione...</option>
                                     @foreach($titulos_pnf as $tituloPnf)
                                     <option value="{{ $tituloPnf->id_titulos_pnf }}" {{ old('id_titulos_pnf') == $tituloPnf->id_titulos_pnf ? 'selected' : '' }}>
@@ -161,7 +162,6 @@
                                 </td>
 
                                 <td class="fw-bold text-dark">
-                                    <!-- USANDO EL ACCESSOR INTELIGENTE -->
                                     <span class="text-dark">{{ $formacion->nombre_completo_titulo }}</span>
                                     
                                     @if($formacion->origen_formacion === 'Externo')
@@ -231,29 +231,40 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const selectBase = $('#id_titulos');
-        const selectPnf = $('#id_titulos_pnf');
+        const $selectBase = $('#id_titulos');
+        const $selectPnf = $('#id_titulos_pnf_formacion'); // <-- AQUÍ BUSCAMOS EL NUEVO ID ÚNICO
         const tabBaseBtn = document.getElementById('tab-base-btn');
         const tabPnfBtn = document.getElementById('tab-pnf-btn');
         const inputOrigen = document.getElementById('origen_formacion');
 
-        function actualizarCamposYOrigen() {
+        function initSelect2($element) {
+            if (typeof window.$ !== 'undefined' && typeof window.$.fn.select2 !== 'undefined') {
+                if ($element.hasClass("select2-hidden-accessible")) {
+                    $element.select2('destroy');
+                }
+                $element.select2({ theme: 'bootstrap-5', width: '100%' });
+            }
+        }
+
+        if (tabBaseBtn && tabBaseBtn.classList.contains('active')) {
+            initSelect2($selectBase);
+        } else if (tabPnfBtn && tabPnfBtn.classList.contains('active')) {
+            initSelect2($selectPnf);
+        }
+
+        function actualizarCamposYOrigen(e) {
             if (tabPnfBtn && tabPnfBtn.classList.contains('active')) {
                 inputOrigen.value = 'Interno';
-                if (selectBase.length) {
-                    selectBase.val('');
-                    if (selectBase.data('select2')) {
-                        selectBase.trigger('change');
-                    }
+                if ($selectBase.length) {
+                    $selectBase.val('').trigger('change');
                 }
+                initSelect2($selectPnf);
             } else {
                 inputOrigen.value = 'Externo';
-                if (selectPnf.length) {
-                    selectPnf.val('');
-                    if (selectPnf.data('select2')) {
-                        selectPnf.trigger('change');
-                    }
+                if ($selectPnf.length) {
+                    $selectPnf.val('').trigger('change');
                 }
+                initSelect2($selectBase);
             }
         }
 
@@ -265,8 +276,7 @@
         @if(old('id_titulos_pnf') || old('origen_formacion') === 'Interno')
         if (tabPnfBtn && typeof bootstrap !== 'undefined') {
             var pnfTab = new bootstrap.Tab(tabPnfBtn);
-            pnfTab.show();
-            inputOrigen.value = 'Interno';
+            pnfTab.show(); 
         }
         @endif
     });

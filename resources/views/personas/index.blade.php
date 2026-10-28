@@ -151,7 +151,6 @@
                         </label>
                         <select id="filtro_seccion" class="form-select select2-buscador">
                             <option value="">Cualquier sección...</option>
-                            <!-- CORRECCIÓN: Agregamos ->activasParaAsignacion() antes del orderBy -->
                             @foreach(\App\Models\Seccion::with('pnf')->activasParaAsignacion()->orderBy('nombre_seccion')->get() as $seccion)
                             <option value="{{ $seccion->id_seccion }}">
                                 Sección: {{ $seccion->nombre_seccion }} ({{$seccion->pnf->nombre_pnf ?? 'Sin PNF' }})
@@ -187,10 +186,10 @@
             <h4 class="card-title text-dark mb-0 me-3" style="font-weight: 500;">Registro de Estudiantes</h4>
 
             @php
-            $totalFemenino = \App\Models\Persona::where('sexo_personas', 'F')->count();$totalMasculino = \App\Models\Persona::where('sexo_personas', 'M')->count();
+            $totalFemenino = \App\Models\Persona::where('sexo_personas', 'F')->count();
+            $totalMasculino = \App\Models\Persona::where('sexo_personas', 'M')->count();
             @endphp
 
-            <!-- Badges con diseño Soft mejorado y tamaño visible (fs-6, px-3 py-2) -->
             <div class="d-flex align-items-center gap-2">
                 <span class="badge px-3 py-2 fs-6 shadow-sm" style="background-color: #fce8e6; color: #d93829; border: 1px solid #d93829;" title="Total Femenino">
                     <i class="bi bi-gender-female me-1"></i> F: {{ $totalFemenino }}
@@ -231,7 +230,7 @@
             }
         });
 
-        // 0.1 CORRECCIÓN PARA EL PANEL COLLAPSE (Reajusta Select2 al desplegarse)
+        // 0.1 CORRECCIÓN PARA EL PANEL COLLAPSE
         $('#collapseFiltros').on('shown.bs.collapse', function() {
             $('#cardFiltros .select2-buscador').each(function() {
                 if ($(this).data('select2')) {
@@ -245,7 +244,7 @@
             });
         });
 
-        // 1. PATRÓN DEBOUNCE: Redibujado controlado de la tabla (Evita tormentas de peticiones AJAX)
+        // 1. PATRÓN DEBOUNCE
         let drawTimeout;
 
         function triggerDatatableDraw() {
@@ -256,7 +255,7 @@
                 } else if ($.fn.DataTable.isDataTable('#personas-table')) {
                     $('#personas-table').DataTable().draw();
                 }
-            }, 200); // Espera 200ms de respiro antes de enviar la petición al servidor
+            }, 200);
         }
 
         // 2. Adjuntar los filtros a la petición AJAX
@@ -291,7 +290,7 @@
             triggerDatatableDraw();
         });
 
-        // 4. LÓGICA EN CASCADA AJAX (PNF -> TÍTULO)
+        // 4. LÓGICA EN CASCADA AJAX (PNF -> TÍTULO) - CORREGIDA
         let $pnfSelect = $('#filtro_pnf');
         let $tituloSelect = $('#filtro_titulo');
 
@@ -316,8 +315,8 @@
                 success: function(data) {
                     $tituloSelect.empty().append('<option value="">Todos los títulos del PNF...</option>');
                     $.each(data, function(key, item) {
-                        // Se usa item.id_titulo para que coincida exactamente con el id_titulacion del backend
-                        $tituloSelect.append(`<option value="${item.id_titulo}">${item.nombre_titulo_pnf}</option>`);
+                        // CORRECCIÓN APLICADA: Se extrae id_titulos_pnf para coincidir exactamente con el ID de la tabla puente
+                        $tituloSelect.append(`<option value="${item.id_titulos_pnf}">${item.nombre_titulo_pnf}</option>`);
                     });
 
                     $tituloSelect.prop('disabled', false);
@@ -334,8 +333,6 @@
         // 5. Redibujado automático para los demás selects comunes
         const selectsComunes = '#filtro_cohorte, #filtro_pnf, #filtro_titulo, #filtro_estatus, #filtro_empresa, #filtro_cargo, #filtro_estado';
         $(selectsComunes).on('change', function(e) {
-            // ELIMINADO: if (e.originalEvent) { ... }
-            // Ahora cualquier cambio de Select2 disparará el redibujado de la tabla sin ser bloqueado.
             triggerDatatableDraw();
         });
 

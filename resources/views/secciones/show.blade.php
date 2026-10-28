@@ -315,30 +315,29 @@
         border-top: 1px solid #dee2e6 !important;
     }
 </style>
-@endsection
-
 @push('scripts')
 {{ $dataTable->html()->scripts() }}
 {{ $profesorDataTable->html()->scripts() }}
 {{ $sesionesDataTable->html()->scripts() }}
 
 <script type="module">
-    $(document).ready(function() {
-        // Buscador de Estudiantes
-        $('.select2-buscador').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: 'Buscar estudiante disponible (Cédula o Nombre)...',
-            allowClear: true
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Buscador de Estudiantes (Si usas jQuery aquí, asegúrate de que esté expuesto o mantenlo si te funciona)
+        if (typeof $ !== 'undefined') {
+            $('.select2-buscador').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Buscar estudiante disponible (Cédula o Nombre)...',
+                allowClear: true
+            });
 
-        // Buscador de Profesores
-        $('.select2-profesores').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: 'Buscar profesor disponible (Cédula o Nombre)...',
-            allowClear: true
-        });
+            $('.select2-profesores').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Buscar profesor disponible (Cédula o Nombre)...',
+                allowClear: true
+            });
+        }
 
         // ==========================================
         // UX: MANTENER LA PESTAÑA ACTIVA AL RECARGAR
@@ -354,9 +353,12 @@
             }
         }
 
-        $('#seccionTab button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-            let currentTabTarget = $(e.target).attr('data-bs-target');
-            localStorage.setItem(tabStorageKey, currentTabTarget);
+        const tabButtons = document.querySelectorAll('#seccionTab button[data-bs-toggle="tab"]');
+        tabButtons.forEach(button => {
+            button.addEventListener('shown.bs.tab', function(e) {
+                let currentTabTarget = e.target.getAttribute('data-bs-target');
+                localStorage.setItem(tabStorageKey, currentTabTarget);
+            });
         });
 
         // ==========================================
@@ -401,7 +403,6 @@
             };
         });
 
-        // Bloquear días diferentes al miércoles (getDay() !== 3)
         bloqueosFlatpickr.push(function(date) {
             return (date.getDay() !== 3);
         });
@@ -413,9 +414,56 @@
                 maxDate: "today",
                 disable: bloqueosFlatpickr,
                 allowInput: false,
-                // Agrega esta línea para evitar problemas de enfoque con Bootstrap
             });
         }
+    });
+
+    // =========================================================================
+    // INTERCEPTAR EL FORMULARIO RÁPIDO DEL PROFESOR CON VANILLA JS (ROBUSTO)
+    // =========================================================================
+    document.addEventListener('submit', function(e) {
+        const form = e.target.closest('.form-registrar-sesion-profesor');
+        if (!form) return;
+
+        e.preventDefault();
+        const formData = new FormData(form);
+        const url = form.action;
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(res => {
+            if(res.status === 200 && res.body.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: res.body.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Atención',
+                    text: res.body.message || 'Ocurrió un error al registrar la sesión.'
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de servidor',
+                text: 'No se pudo procesar la solicitud.'
+            });
+        });
     });
 </script>
 @endpush

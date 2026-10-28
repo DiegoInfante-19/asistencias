@@ -32,7 +32,7 @@ class PeriodosAcademicosSeeder extends Seeder
                 'id_cohortes'     => $cohorte3 ? $cohorte3->id_cohortes : 3,
                 'fecha_inicio'    => '2025-11-05',
                 'fecha_fin'       => '2026-07-29',
-                'estatus_periodo' => 'Activo',
+                'estatus_periodo' => 'Finalizado',
             ],
         ];
 

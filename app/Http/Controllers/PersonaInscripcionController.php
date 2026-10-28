@@ -12,7 +12,13 @@ class PersonaInscripcionController extends Controller
     public function store(StoreInscripcionSeccionRequest $request, Persona $persona)
     {
         try {
-            // DOBLE BLINDAJE: Si superó el Request pero el controlador detecta que ya tiene una inscripción activa
+            // BLINDAJE 1: Verificar si el estudiante está marcado como NO CONTINUANTE
+            if (!$persona->puede_continuar) {
+                return redirect()->back()
+                    ->with('error', 'Acción denegada: Este estudiante ha sido marcado como "No Continúa" y no puede ser matriculado en nuevas secciones.');
+            }
+
+            // BLINDAJE 2: Si superó el Request pero el controlador detecta que ya tiene una inscripción activa
             if ($request->estatus_inscripcion === 'Activo' && $persona->inscripcionActiva()->exists()) {
                 return redirect()->back()
                     ->with('error', 'Error de seguridad: El estudiante ya se encuentra cursando estudios en una sección activa.');

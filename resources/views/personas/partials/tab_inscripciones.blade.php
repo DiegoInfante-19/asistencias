@@ -15,8 +15,16 @@
                         <p class="text-muted small px-2">Para poder inscribir a este estudiante, <strong>primero debe asignarle un Programa Nacional de Formación (PNF)</strong> en la pestaña "Exp. Académico".</p>
                     </div>
 
+                @elseif(!$persona->puede_continuar)
+                    <!-- BLOQUEO 2: Estudiante NO CONTINÚA ESTUDIOS (NUEVO) -->
+                    <div class="text-center py-5">
+                        <i class="bi bi-person-dash-fill text-danger mb-3" style="font-size: 3.5rem;"></i>
+                        <h5 class="fw-bold">Estudiante Inactivo</h5>
+                        <p class="text-muted small px-2">Este estudiante ha sido marcado como <strong>"No Continúa"</strong>, por lo que su matriculación en un nuevo período académico se encuentra deshabilitada.</p>
+                    </div>
+
                 @elseif($persona->inscripcionActiva)
-                    <!-- BLOQUEO 2: Estudiante ya matriculado activamente -->
+                    <!-- BLOQUEO 3: Estudiante ya matriculado activamente -->
                     <div class="text-center py-4">
                         <i class="bi bi-person-check-fill text-success mb-3" style="font-size: 3.5rem;"></i>
                         <h5 class="fw-bold text-dark">Matrícula Activa</h5>
@@ -37,7 +45,6 @@
                     </div>
 
                     @php
-                        // CORRECCIÓN: Consultamos directamente desde la DB usando el modelo y su Scope
                         $pnfIdEstudiante = $persona->titulacionPersona->id_pnf;
                         $seccionesFiltradas = \App\Models\Seccion::activasParaAsignacion()
                                                 ->where('id_pnf', $pnfIdEstudiante)
@@ -48,7 +55,7 @@
                         @csrf
                         <input type="hidden" name="id_personas" value="{{ $persona->id_personas }}">
 
-                        <!-- Select: Sección (Ahora sin input oculto y usando el name original) -->
+                        <!-- Select: Sección -->
                         <div class="mb-3">
                             <label for="select_seccion" class="form-label fw-bold small text-muted">Sección Académica <span class="text-danger">*</span></label>
                             
@@ -195,7 +202,7 @@
 </style>
 @endpush
 
-@if($persona->titulacionPersona && !$persona->inscripcionActiva)
+@if($persona->titulacionPersona && $persona->puede_continuar && !$persona->inscripcionActiva)
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {

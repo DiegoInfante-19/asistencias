@@ -23,7 +23,7 @@ class CohorteSeeder extends Seeder
             [
                 'numero_cohorte'      => 'III COHORTE',
                 'descripcion_cohorte' => 'Período 2025-2026',
-                'estatus_cohorte'     => 'En curso',
+                'estatus_cohorte'     => 'Finalizada',
             ],
         ];
 

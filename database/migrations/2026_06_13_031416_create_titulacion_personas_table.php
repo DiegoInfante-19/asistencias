@@ -11,17 +11,18 @@ return new class extends Migration {
             $table->id('id_titulacion_personas');
             $table->foreignId('id_personas')->constrained('personas', 'id_personas')->onDelete('cascade');
             
-            // Campos modificados para permitir valores nulos (nullable)
+            // Campos de titulación y PNF
             $table->foreignId('id_titulacion')->nullable()->constrained('titulos', 'id_titulos')->nullOnDelete();
+            $table->foreignId('id_titulos_pnf')->nullable()->constrained('titulos_pnf', 'id_titulos_pnf')->nullOnDelete();
             $table->foreignId('id_pnf')->constrained('pnfs', 'id_pnf')->onDelete('restrict');
             $table->foreignId('id_estatus_expediente')->nullable()->constrained('estatus_expedientes', 'id_estatus_expediente')->nullOnDelete();
 
-            // ÍNDICES EXPLÍCITOS (Vital para el rendimiento del DataTable y filtros por PNF/Estatus)
+            // Índices para optimizar consultas de DataTables
             $table->index('id_personas');
             $table->index('id_pnf');
+            $table->index('id_titulos_pnf');
             $table->index('id_estatus_expediente');
 
-            // Recomendado: Añadir timestamps y softDeletes para historial de cambios de expediente
             $table->softDeletes();
             $table->timestamps();
         });

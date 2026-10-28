@@ -12,7 +12,6 @@
                     Esta sección define el objetivo académico del estudiante en la institución.
                 </div>
 
-                <!-- CORRECCIÓN: Agregamos id y data-pnf-original al formulario -->
                 <form id="form-titulacion" action="{{ route('personas.titulacion.store', $persona->id_personas) }}" method="POST" data-pnf-original="{{ $persona->titulacionPersona->id_pnf ?? '' }}">
                     @csrf
 
@@ -33,43 +32,41 @@
                         @enderror
                     </div>
 
-                    <!-- 2. TÍTULO Y ESTATUS EN LA MISMA LÍNEA -->
-                    <div class="row g-3 mb-3">
-                        <!-- Selección del Título (Se llena vía AJAX) -->
-                        <div class="col-md-6">
-                            <label for="id_titulacion" class="form-label fw-bold small text-muted">Título a Optar <span class="text-danger">*</span></label>
-                            <select class="form-select select2-buscador @error('id_titulacion') is-invalid @enderror" id="id_titulacion" name="id_titulacion" >
-                                <option value="">Seleccione primero un PNF...</option>
-                            </select>
-                            @error('id_titulacion')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Selección del Estatus -->
-                        <div class="col-md-6">
-                            <label for="id_estatus_expediente" class="form-label fw-bold small text-muted">Estatus <span class="text-danger">*</span></label>
-                            <select class="form-select select2-buscador @error('id_estatus_expediente') is-invalid @enderror" id="id_estatus_expediente" name="id_estatus_expediente" >
-                                <option value="" selected disabled>Seleccione...</option>
-                                @foreach($estatusExpedientes as $estatus)
-                                <option value="{{ $estatus->id_estatus_expediente }}"
-                                    {{ old('id_estatus_expediente', $persona->titulacionPersona->id_estatus_expediente ?? '') == $estatus->id_estatus_expediente ? 'selected' : '' }}>
-                                    {{ $estatus->nombre_estatus ?? $estatus->nombre_estatus_expediente ?? $estatus->descripcion_estatus ?? 'ID: '.$estatus->id_estatus_expediente }}
-                                </option>
-                                @endforeach
-                            </select>
-                            @error('id_estatus_expediente')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <!-- Selección del Título (Se llena vía AJAX) -->
+                    <div class="mb-3">
+                        <label for="id_titulos_pnf" class="form-label fw-bold small text-muted">Título a Optar <span class="text-danger">*</span></label>
+                        <select class="form-select select2-buscador @error('id_titulos_pnf') is-invalid @enderror" id="id_titulos_pnf" name="id_titulos_pnf">
+                            <option value="">Seleccione primero un PNF...</option>
+                        </select>
+                        @error('id_titulos_pnf')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
-                    <div class="mt-4">
+                    <!-- Selección del Estatus -->
+                    <div class="mb-3">
+                        <label for="id_estatus_expediente" class="form-label fw-bold small text-muted">Estatus <span class="text-danger">*</span></label>
+                        <select class="form-select select2-buscador @error('id_estatus_expediente') is-invalid @enderror" id="id_estatus_expediente" name="id_estatus_expediente">
+                            <option value="" selected disabled>Seleccione...</option>
+                            @foreach($estatusExpedientes as $estatus)
+                            <option value="{{ $estatus->id_estatus_expediente }}"
+                                {{ old('id_estatus_expediente', $persona->titulacionPersona->id_estatus_expediente ?? '') == $estatus->id_estatus_expediente ? 'selected' : '' }}>
+                                {{ $estatus->nombre_estatus ?? $estatus->nombre_estatus_expediente ?? $estatus->descripcion_estatus ?? 'ID: '.$estatus->id_estatus_expediente }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('id_estatus_expediente')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-save-fill me-1"></i>
                             {{ $persona->titulacionPersona ? 'Actualizar Expediente' : 'Guardar Expediente' }}
                         </button>
                     </div>
+
                 </form>
 
             </div>
@@ -105,7 +102,8 @@
                             <div class="fs-6 text-secondary fw-bold d-flex align-items-start">
                                 <i class="bi bi-award me-2 mt-1 flex-shrink-0"></i>
                                 <span class="text-wrap">
-                                    {{ $persona->titulacionPersona->titulacion->nombre_titulo_base ?? 'Sin nombre' }}
+                                    {{-- CORRECCIÓN APLICADA: Muestra la denominación completa del título PNF --}}
+                                    {{ $persona->titulacionPersona->tituloPnf->nombre_titulo_pnf ?? $persona->titulacionPersona->nombre_titulo_especifico ?? $persona->titulacionPersona->titulacion->nombre_titulo_base ?? 'Sin nombre' }}
                                 </span>
                             </div>
                         </div>
@@ -140,7 +138,6 @@
 
 @push('styles')
 <style>
-    /* Forzamos el estilo visual exacto (fondo gris claro, borde sutil y sombra) en el componente Select2 */
     .select2-container--bootstrap-5 .select2-selection {
         background-color: #f8f9fa !important;
         border: 1px solid #cbd5e1 !important;
@@ -149,8 +146,7 @@
         min-height: calc(1.5em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-    
-    /* Efecto al hacer clic / abrir el select de Select2 (fondo blanco y borde azul) */
+
     .select2-container--bootstrap-5.select2-container--open .select2-selection {
         background-color: #ffffff !important;
         border-color: #86b7fe !important;
@@ -162,39 +158,51 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        let preselectedTitulo = "{{ old('id_titulacion', $persona->titulacionPersona->id_titulacion ?? '') }}";
+        // CORRECCIÓN APLICADA: Resolución segura del id_titulos_pnf preseleccionado
+        let preselectedTitulo = "{{ old('id_titulos_pnf', $persona->titulacionPersona->id_titulos_pnf ?? $persona->titulacionPersona->tituloPnf?->id_titulos_pnf ?? '') }}";
 
         function inicializarSelectsTitulacion() {
-            if (typeof window.$!== 'undefined' && typeof window.$.fn.select2 !== 'undefined') {
-                let $pnfSelect =$('#id_pnf');
-                let $tituloSelect =$('#id_titulacion');
+            if (typeof window.$ !== 'undefined' && typeof window.$.fn.select2 !== 'undefined') {
+                let $pnfSelect = $('#id_pnf');
+                let $tituloSelect = $('#id_titulos_pnf');
+                let $estatusSelect = $('#id_estatus_expediente');
+
+                // 1. Inicializar Select2
+                $pnfSelect.select2({ theme: 'bootstrap-5', width: '100%' });
+                $tituloSelect.select2({ theme: 'bootstrap-5', width: '100%' });
+                $estatusSelect.select2({ theme: 'bootstrap-5', width: '100%' });
 
                 function cargarTitulos(pnfId, tituloSeleccionado = "") {
                     if (!pnfId) {
                         $tituloSelect.empty().append('<option value="">Seleccione primero un PNF...</option>').prop('disabled', true);
-                        if ($tituloSelect.data('select2')) {$tituloSelect.trigger('change'); }
+                        $tituloSelect.trigger('change');
                         return;
                     }
 
                     $tituloSelect.prop('disabled', true).html('<option value="">Cargando títulos...</option>');
-                    if ($tituloSelect.data('select2')) {$tituloSelect.trigger('change'); }
+                    $tituloSelect.trigger('change');
 
                     $.ajax({
                         url: "{{ url('/titulos-por-pnf') }}/" + pnfId,
                         type: 'GET',
                         success: function(data) {
+                            if ($tituloSelect.hasClass("select2-hidden-accessible")) {
+                                $tituloSelect.select2('destroy');
+                            }
+
                             $tituloSelect.empty().append('<option value="">Seleccione un título...</option>');
+
                             $.each(data, function(key, item) {
-                                let isSelected = (item.id_titulo == tituloSeleccionado) ? 'selected' : '';
-                                $tituloSelect.append(`<option value="${item.id_titulo}" ${isSelected}>${item.nombre_titulo_pnf}</option>`);
+                                let isSelected = (item.id_titulos_pnf == tituloSeleccionado) ? 'selected' : '';
+                                $tituloSelect.append(`<option value="${item.id_titulos_pnf}" ${isSelected}>${item.nombre_titulo_pnf}</option>`);
                             });
-                            
+
                             $tituloSelect.prop('disabled', false);
-                            if ($tituloSelect.data('select2')) {$tituloSelect.trigger('change'); }
+                            $tituloSelect.select2({ theme: 'bootstrap-5', width: '100%' });
                         },
                         error: function() {
                             $tituloSelect.empty().append('<option value="">Error al cargar los títulos</option>').prop('disabled', true);
-                            if ($tituloSelect.data('select2')) {$tituloSelect.trigger('change'); }
+                            $tituloSelect.trigger('change');
                         }
                     });
                 }
@@ -215,19 +223,16 @@
 
         inicializarSelectsTitulacion();
 
-        // =========================================================
-        // NUEVO: INTERCEPCIÓN DEL FORMULARIO CON SWEETALERT
-        // =========================================================
+        // INTERCEPCIÓN DEL FORMULARIO CON SWEETALERT
         const formTitulacion = document.getElementById('form-titulacion');
-        
+
         if (formTitulacion) {
             formTitulacion.addEventListener('submit', function(e) {
                 const pnfOriginal = this.getAttribute('data-pnf-original');
                 const pnfNuevo = document.getElementById('id_pnf').value;
 
-                // Si hay un PNF previo registrado y es diferente al seleccionado actualmente
                 if (pnfOriginal !== '' && pnfOriginal !== pnfNuevo) {
-                    e.preventDefault(); // Detener el envío estándar
+                    e.preventDefault();
 
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
@@ -241,11 +246,10 @@
                             cancelButtonText: 'Cancelar'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                formTitulacion.submit(); // Proceder si acepta
+                                formTitulacion.submit();
                             }
                         });
                     } else {
-                        // Fallback clásico si SweetAlert no carga
                         if (confirm("Estás a punto de cambiar el PNF del estudiante. Será retirado de sus secciones anteriores. ¿Deseas proceder?")) {
                             formTitulacion.submit();
                         }

@@ -10,16 +10,8 @@
 @section('styles')
 <style>
     @media (max-width: 767.98px) {
-        .content {
-            margin: 5px !important;
-            padding: 0 !important;
-        }
-
-        .card {
-            border-radius: 0.5rem !important;
-            box-shadow: none !important;
-            border: 1px solid #dee2e6 !important;
-        }
+        .content { margin: 5px !important; padding: 0 !important; }
+        .card { border-radius: 0.5rem !important; box-shadow: none !important; border: 1px solid #dee2e6 !important; }
     }
 </style>
 @endsection
@@ -31,7 +23,6 @@
     $tieneAsistencia = count($asistenciasRegistradas) > 0;
     $esSuperUsuario = (method_exists(auth()->user(), 'isAdministrador') && auth()->user()->isAdministrador()) ||
     (method_exists(auth()->user(), 'isCoordinador') && auth()->user()->isCoordinador());
-    $tiempoAgotado = $sesion->tiempoAgotado();
     @endphp
 
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
@@ -43,9 +34,7 @@
                 <strong>PNF:</strong> {{ $sesion->seccion->pnf->nombre_pnf ?? 'N/D' }} |
                 <strong>Período Académico:</strong>
                 @if($sesion->seccion->periodoAcademico)
-                {{ \Carbon\Carbon::parse($sesion->seccion->periodoAcademico->fecha_inicio)->format('Y') }}
-                -
-                {{ \Carbon\Carbon::parse($sesion->seccion->periodoAcademico->fecha_fin)->format('Y') }}
+                {{ \Carbon\Carbon::parse($sesion->seccion->periodoAcademico->fecha_inicio)->format('Y') }} - {{ \Carbon\Carbon::parse($sesion->seccion->periodoAcademico->fecha_fin)->format('Y') }}
                 @else
                 N/D
                 @endif
@@ -70,19 +59,11 @@
             <div class="mb-2 mb-md-0 d-flex flex-column align-items-md-end">
                 @if(!$tieneAsistencia)
                 <span class="badge bg-danger shadow-sm p-2 fs-6"><i class="bi bi-exclamation-octagon me-1"></i> Asistencia Pendiente</span>
-                @if(!$tiempoAgotado)
-                <span class="text-muted small fw-bold mt-1"><i class="bi bi-clock-history text-warning"></i> El profesor tiene {{ $sesion->horasRestantesEdicion() }}h para registrar</span>
-                @endif
                 @elseif($puedeEditar)
                 <span class="badge bg-success shadow-sm p-2 fs-6 mb-1"><i class="bi bi-check-circle-fill me-1"></i> Asistencia Registrada</span>
-                @if(!$tiempoAgotado)
-                <span class="text-muted small fw-bold"><i class="bi bi-clock-history text-warning"></i> Restan {{ $sesion->horasRestantesEdicion() }}h de edición para el profesor</span>
                 @else
-                <span class="small fw-bold"><i class="bi bi-shield-lock-fill"></i> Tiempo cerrado para el profesor (Modo Privilegiado activo)</span>
-                @endif
-                @else
-                <span class="badge bg-secondary shadow-sm p-2 fs-6"><i class="bi bi-lock-fill me-1"></i> Registro Cerrado</span>
-                <span class="text-danger small fw-bold mt-1">Tiempo de 48h finalizado</span>
+                <span class="badge bg-secondary shadow-sm p-2 fs-6"><i class="bi bi-lock-fill me-1"></i> Registro Bloqueado</span>
+                <span class="text-danger small fw-bold mt-1">La sección está inactiva</span>
                 @endif
             </div>
 
@@ -105,7 +86,7 @@
                 @can('update', $sesion)
                 @if($tieneAsistencia)
                 <button type="button" class="btn btn-warning btn-editar-asistencia fw-bold text-dark shadow-sm">
-                    <i class="bi bi-pencil-square me-1"></i> {{ $tiempoAgotado ? 'Forzar Edición (Admin)' : 'Actualizar Asistencia' }}
+                    <i class="bi bi-pencil-square me-1"></i> Actualizar Asistencia
                 </button>
                 <button type="button" class="btn btn-secondary btn-cancelar-edicion fw-bold shadow-sm d-none">
                     Cancelar
@@ -138,12 +119,12 @@
                     $estadoNormalizado = $estadoRaw instanceof \App\Enums\EstadoAsistencia ? $estadoRaw->value : strtolower($estadoRaw);
 
                     $badgeClass = match($estadoNormalizado) {
-                    'presente' => 'bg-success',
-                    'ausente' => 'bg-danger',
-                    'justificada', 'justificado' => 'bg-warning text-dark',
-                    'tarde' => 'bg-info text-dark',
-                    'ignorar' => 'bg-primary', // Badge azul en móvil
-                    default => 'bg-secondary'
+                        'presente' => 'bg-success',
+                        'ausente' => 'bg-danger',
+                        'justificada', 'justificado' => 'bg-warning text-dark',
+                        'tarde' => 'bg-info text-dark',
+                        'ignorar' => 'bg-primary',
+                        default => 'bg-secondary'
                     };
                     @endphp
 
@@ -163,7 +144,7 @@
 
                             <div class="modo-lectura w-100 text-center {{ !$puedeEditar || $tieneAsistencia ? '' : 'd-none' }}">
                                 @if($estadoNormalizado == 'ignorar')
-                                <span class="badge bg-primary fs-6 px-3 py-2 w-100"><i class="bi bi-dash-circle"></i> Sin Evaluar</span>
+                                <span class="badge {{ $badgeClass }} fs-6 px-3 py-2 w-100"><i class="bi bi-dash-circle me-1"></i> Ignorado</span>
                                 @else
                                 <span class="badge {{ $badgeClass }} fs-6 px-3 py-2 w-100">{{ ucfirst($estadoNormalizado) }}</span>
                                 @endif
@@ -172,7 +153,6 @@
                             <div class="modo-edicion w-100 {{ !$puedeEditar || $tieneAsistencia ? 'd-none' : '' }}">
                                 <div class="btn-group w-100 shadow-sm btn-group-asistencia" role="group">
 
-                                    <!-- PRESENTE -->
                                     <input type="radio" class="btn-check btn-estado" name="estado_movil_{{ $inscripcion->id_inscripcion_seccion }}"
                                         id="m_presente_{{ $inscripcion->id_inscripcion_seccion }}" value="presente"
                                         {{ $estadoNormalizado == 'presente' ? 'checked' : '' }} autocomplete="off" {{ !$puedeEditar ? 'disabled' : '' }}>
@@ -180,7 +160,6 @@
                                         Presente
                                     </label>
 
-                                    <!-- AUSENTE -->
                                     <input type="radio" class="btn-check btn-estado" name="estado_movil_{{ $inscripcion->id_inscripcion_seccion }}"
                                         id="m_ausente_{{ $inscripcion->id_inscripcion_seccion }}" value="ausente"
                                         {{ $estadoNormalizado == 'ausente' ? 'checked' : '' }} autocomplete="off" {{ !$puedeEditar ? 'disabled' : '' }}>
@@ -188,7 +167,6 @@
                                         Ausente
                                     </label>
 
-                                    <!-- JUSTIFICADA -->
                                     <input type="radio" class="btn-check btn-estado" name="estado_movil_{{ $inscripcion->id_inscripcion_seccion }}"
                                         id="m_justificada_{{ $inscripcion->id_inscripcion_seccion }}" value="justificada"
                                         {{ $estadoNormalizado == 'justificada' ? 'checked' : '' }} autocomplete="off" {{ !$puedeEditar ? 'disabled' : '' }}>
@@ -196,12 +174,11 @@
                                         Justif.
                                     </label>
 
-                                    <!-- IGNORAR (A LA DERECHA) -->
                                     <input type="radio" class="btn-check btn-estado" name="estado_movil_{{ $inscripcion->id_inscripcion_seccion }}"
                                         id="m_ignorar_{{ $inscripcion->id_inscripcion_seccion }}" value="ignorar"
                                         {{ $estadoNormalizado == 'ignorar' ? 'checked' : '' }} autocomplete="off" {{ !$puedeEditar ? 'disabled' : '' }}>
-                                    <label class="btn btn-outline-secondary btn-asistencia-ignorar text-center px-1" for="m_ignorar_{{ $inscripcion->id_inscripcion_seccion }}" title="No evaluar a este alumno">
-                                        <i class="bi bi-dash-lg"></i>
+                                    <label class="btn btn-outline-secondary btn-asistencia-ignorar text-center px-1" for="m_ignorar_{{ $inscripcion->id_inscripcion_seccion }}" title="Ignorar a este alumno">
+                                        Ignorado 
                                     </label>
                                 </div>
                             </div>
@@ -226,7 +203,7 @@
                 @can('update', $sesion)
                 @if($tieneAsistencia)
                 <button type="button" class="btn btn-warning btn-editar-asistencia fw-bold text-dark shadow-sm btn-lg w-100">
-                    <i class="bi bi-pencil-square me-1"></i> {{ $tiempoAgotado ? 'Forzar Edición (Admin)' : 'Actualizar Asistencia' }}
+                    <i class="bi bi-pencil-square me-1"></i> Actualizar Asistencia
                 </button>
                 <button type="button" class="btn btn-secondary btn-cancelar-edicion fw-bold shadow-sm btn-lg w-100 d-none">
                     Cancelar Edición
@@ -316,13 +293,14 @@
             let token = document.getElementById('csrf_token').value;
             let asistenciasMap = {};
 
+            // MODO MÓVIL
             let filas = document.querySelectorAll('.fila-estudiante');
             filas.forEach(function(fila) {
                 if (fila.offsetParent !== null) {
                     let idInscripcion = fila.getAttribute('data-inscripcion');
                     let radioSeleccionado = fila.querySelector('input[type="radio"]:checked');
 
-                    if (radioSeleccionado && radioSeleccionado.value !== 'ignorar') {
+                    if (radioSeleccionado) {
                         asistenciasMap[idInscripcion] = {
                             id_inscripcion_seccion: idInscripcion,
                             estado: radioSeleccionado.value
@@ -330,6 +308,22 @@
                     }
                 }
             });
+
+            // MODO ESCRITORIO
+            if (Object.keys(asistenciasMap).length === 0) {
+                let inputsEscritorio = document.querySelectorAll('.table-responsive input[type="radio"]:checked');
+                inputsEscritorio.forEach(function(elemento) {
+                    let idInscripcion = elemento.getAttribute('data-inscripcion') || elemento.name.replace(/\D/g, '');
+                    let valor = elemento.value;
+
+                    if (idInscripcion && valor) {
+                        asistenciasMap[idInscripcion] = {
+                            id_inscripcion_seccion: idInscripcion,
+                            estado: valor
+                        };
+                    }
+                });
+            }
 
             let payload = {
                 id_sesiones: idSesiones,

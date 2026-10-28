@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Cohorte;
 use Illuminate\Support\Facades\DB;
 
-class PersonaController extends Controller{
-
-    public function index(PersonasDataTable $dataTable){
+class PersonaController extends Controller
+{
+    public function index(PersonasDataTable $dataTable)
+    {
         if (request()->ajax() || request()->wantsJson()) {
             return $dataTable->ajax();
         }
@@ -20,21 +21,22 @@ class PersonaController extends Controller{
         return $dataTable->render('personas.index');
     }
 
-    public function create(){
+    public function create()
+    {
         $estados = \App\Models\Estado::all();
         $cohortes = Cohorte::all();
         
         return view('personas.create', compact('estados', 'cohortes'));
     }
 
-    public function store(StorePersonaRequest $request){
+    public function store(StorePersonaRequest $request)
+    {
         try {
             DB::beginTransaction();
 
             $data = $request->validated();
             $lugarId = null;
 
-            // Solo creamos/buscamos lugar de nacimiento si se seleccionó una ciudad
             if (!empty($data['id_ciudad'])) {
                 $lugar = \App\Models\LugarNacimientoPersona::firstOrCreate([
                     'id_ciudad' => $data['id_ciudad'],
@@ -58,6 +60,7 @@ class PersonaController extends Controller{
 
     public function show($id)
     {
+        // EXPANDIDO: Eager Loading profundo para asegurar la disponibilidad de todas las relaciones del expediente
         $persona = Persona::with([
             'lugarNacimiento.ciudad.estado', 
             'cohorte', 
@@ -65,22 +68,24 @@ class PersonaController extends Controller{
             'observacion',
             'empresaPersona.empresa',
             'empresaPersona.cargo',
-            'titulacionPersona',
+            'titulacionPersona.pnf',
+            'titulacionPersona.tituloPnf',
+            'titulacionPersona.titulacion',
+            'titulacionPersona.estatus',
             'formacionAcademica.titulo',
             'formacionAcademica.tituloPnf',
             'inscripcionesSecciones.seccion.periodoAcademico', 
             'inscripcionesSecciones.seccion.pnf'                                
         ])->findOrFail($id);
 
-        $pnfs              = \App\Models\Pnf::all();
-        $titulos           = \App\Models\Titulo::all();
-        $titulos_pnf       = \App\Models\TituloPnf::all();
+        $pnfs               = \App\Models\Pnf::all();
+        $titulos            = \App\Models\Titulo::all();
+        $titulos_pnf        = \App\Models\TituloPnf::all();
         $estatusExpedientes = \App\Models\EstatusExpediente::all();
-        $cohortes          = Cohorte::all();
-        $empresas          = \App\Models\Empresa::all();
-        $cargos            = \App\Models\Cargo::all();
+        $cohortes           = Cohorte::all();
+        $empresas           = \App\Models\Empresa::all();
+        $cargos             = \App\Models\Cargo::all();
 
-        // USO ESTRICTO DEL SCOPE: Sincronizado para traer únicamente secciones activas y vigentes
         $seccionesData = \App\Models\Seccion::with(['pnf', 'periodoAcademico.cohorte'])
             ->activasParaAsignacion()
             ->get()
