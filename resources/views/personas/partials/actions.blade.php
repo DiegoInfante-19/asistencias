@@ -11,7 +11,10 @@
     </a>
 
     <!-- Botón ELIMINAR -->
-    <button type="submit" form="form-delete-{{ $persona->id_personas }}" class="btn btn-outline-secondary" title="Eliminar Estudiante">
+    <button type="button" 
+        class="btn btn-outline-secondary btn-delete-record" 
+        data-form-id="form-delete-{{ $persona->id_personas }}" 
+        title="Eliminar Estudiante">
         <i class="bi bi-trash"></i>
     </button>
 </div>

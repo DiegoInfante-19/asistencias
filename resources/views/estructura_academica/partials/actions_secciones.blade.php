@@ -1,6 +1,6 @@
 <div class="btn-group shadow-sm" role="group" aria-label="Acciones de gestión de sección">
     
-    {{-- 1. Botón Gestionar Estudiantes (Nivel 3) --}}
+    {{-- 1. Botón Gestionar Estudiantes (Ver) --}}
     <a href="{{ route('secciones.show', $seccion->id_seccion) }}" 
        class="btn btn-outline-secondary" 
        title="Ver y Gestionar Estudiantes">
@@ -13,8 +13,7 @@
         data-bs-toggle="modal"
         data-bs-target="#modalEditarSeccion"
         data-id="{{ $seccion->id_seccion }}"
-        data-pnf="{{ $seccion->id_pnf }}"
-        data-pnf-nombre="{{ $seccion->pnf->nombre_pnf ?? '' }}"
+        data-pnfs-json="{{ json_encode($seccion->pnfs->pluck('id_pnf')->toArray()) }}"
         data-nombre="{{ $seccion->nombre_seccion }}"
         data-estatus="{{ $seccion->estatus_seccion }}"
         title="Modificar Sección">
@@ -22,9 +21,9 @@
     </button>
 
     {{-- 3. Botón Eliminar --}}
-    <button type="submit"
-        form="form-delete-seccion-{{ $seccion->id_seccion }}"
-        class="btn btn-outline-secondary"
+    <button type="button"
+        class="btn btn-outline-secondary btn-delete-record"
+        data-form-id="form-delete-seccion-{{ $seccion->id_seccion }}"
         title="Eliminar Sección">
         <i class="bi bi-trash"></i>
     </button>

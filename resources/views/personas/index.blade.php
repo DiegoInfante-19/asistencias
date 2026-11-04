@@ -151,9 +151,11 @@
                         </label>
                         <select id="filtro_seccion" class="form-select select2-buscador">
                             <option value="">Cualquier sección...</option>
-                            @foreach(\App\Models\Seccion::with('pnf')->activasParaAsignacion()->orderBy('nombre_seccion')->get() as $seccion)
+                            <!-- CORRECCIÓN: Cambiamos 'pnf' por 'pnfs' en el with() -->
+                            @foreach(\App\Models\Seccion::with('pnfs')->activasParaAsignacion()->orderBy('nombre_seccion')->get() as $seccion)
                             <option value="{{ $seccion->id_seccion }}">
-                                Sección: {{ $seccion->nombre_seccion }} ({{$seccion->pnf->nombre_pnf ?? 'Sin PNF' }})
+                                <!-- CORRECCIÓN: Manejamos múltiples PNFs usando implode -->
+                                Sección: {{ $seccion->nombre_seccion }} ({{ $seccion->pnfs->isEmpty() ? 'Sin PNF' : $seccion->pnfs->pluck('nombre_pnf')->implode(' / ') }})
                             </option>
                             @endforeach
                         </select>

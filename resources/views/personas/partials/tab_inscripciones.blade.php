@@ -16,28 +16,31 @@
                     </div>
 
                 @elseif(!$persona->puede_continuar)
-                    <!-- BLOQUEO 2: Estudiante NO CONTINÚA ESTUDIOS (NUEVO) -->
+                    <!-- BLOQUEO 2: Estudiante NO CONTINÚA ESTUDIOS -->
                     <div class="text-center py-5">
                         <i class="bi bi-person-dash-fill text-danger mb-3" style="font-size: 3.5rem;"></i>
                         <h5 class="fw-bold">Estudiante Inactivo</h5>
                         <p class="text-muted small px-2">Este estudiante ha sido marcado como <strong>"No Continúa"</strong>, por lo que su matriculación en un nuevo período académico se encuentra deshabilitada.</p>
                     </div>
 
-                @elseif($persona->inscripcionActiva)
-                    <!-- BLOQUEO 3: Estudiante ya matriculado activamente -->
+                @elseif($persona->tieneInscripcionActiva())
+                    <!-- BLOQUEO 3: ESTUDIANTE YA MATRICULADO (CANDADO FASE 3) -->
                     <div class="text-center py-4">
-                        <i class="bi bi-person-check-fill text-success mb-3" style="font-size: 3.5rem;"></i>
-                        <h5 class="fw-bold text-dark">Matrícula Activa</h5>
-                        <p class="text-muted small px-2">Este estudiante ya se encuentra cursando estudios en una sección. Un estudiante no puede estar inscrito en dos secciones simultáneamente.</p>
+                        <i class="bi bi-person-check-fill text-warning mb-3" style="font-size: 3.5rem;"></i>
+                        <h5 class="fw-bold text-dark">Matrícula Activa en Curso</h5>
+                        <p class="text-muted small px-2">
+                            Este estudiante ya se encuentra matriculado activamente en una sección. La normativa no permite cursar múltiples secciones simultáneamente.
+                        </p>
                         
-                        <div class="alert alert-success border-0 shadow-sm text-start mt-3">
+                        <div class="alert alert-light border shadow-sm text-start mt-3">
                             <span class="d-block small text-muted fw-bold">Sección Actual:</span>
-                            <span class="d-block fw-bold fs-6">{{ $persona->inscripcionActiva->seccion->nombre_seccion }}</span>
+                            <span class="d-block fw-bold fs-6 text-primary">{{ $persona->inscripcionActiva->seccion->nombre_seccion }}</span>
+                            <small class="text-muted d-block mt-2">Para inscribirlo en otra sección, debe ser retirado de su nómina actual.</small>
                         </div>
                     </div>
 
                 @else
-                    <!-- FORMULARIO DE INSCRIPCIÓN -->
+                    <!-- FORMULARIO DE INSCRIPCIÓN HABILITADO -->
                     <div class="alert alert-primary py-2 shadow-sm border-0 small mb-3">
                         <i class="bi bi-info-circle-fill me-1"></i>
                         Filtrando secciones exclusivas para:<br>
@@ -46,8 +49,9 @@
 
                     @php
                         $pnfIdEstudiante = $persona->titulacionPersona->id_pnf;
+                        // NUEVA CONSULTA MULTI-PNF (Fase 3.3)
                         $seccionesFiltradas = \App\Models\Seccion::activasParaAsignacion()
-                                                ->where('id_pnf', $pnfIdEstudiante)
+                                                ->porPnf($pnfIdEstudiante)
                                                 ->get();
                     @endphp
 
@@ -71,7 +75,7 @@
                                 @endforeach
                             </select>
                             
-                            <small class="text-muted d-block mt-1">Solo se muestran secciones activas del PNF del estudiante.</small>
+                            <small class="text-muted d-block mt-1">Solo se muestran secciones que admiten el PNF del estudiante.</small>
                             
                             @error('id_seccion')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
@@ -126,7 +130,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Período / Cohorte</th>
-                                <th>PNF / Sección</th>
+                                <th>PNFs de la Sección</th>
                                 <th>Inscripción</th>
                                 <th class="text-center">Estatus</th>
                                 <th class="text-center">Acciones</th>
@@ -140,7 +144,14 @@
                                         <div class="small text-muted">Inicio: {{ \Carbon\Carbon::parse($inscripcion->seccion->periodoAcademico->fecha_inicio ?? now())->format('d/m/y') }}</div>
                                     </td>
                                     <td>
-                                        <div class="text-dark fw-semibold">{{ $inscripcion->seccion->pnf->nombre_pnf ?? 'N/A' }}</div>
+                                        <!-- MOSTRAMOS TODOS LOS PNFS DE LA SECCIÓN HISTÓRICA -->
+                                        <div class="text-dark fw-semibold">
+                                            @if($inscripcion->seccion->pnfs->isEmpty())
+                                                <span class="fst-italic text-muted small">Sin PNF</span>
+                                            @else
+                                                {{ $inscripcion->seccion->pnfs->pluck('nombre_pnf')->implode(', ') }}
+                                            @endif
+                                        </div>
                                         <div class="small text-muted">Sec: {{ $inscripcion->seccion->nombre_seccion ?? 'N/A' }}</div>
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($inscripcion->fecha_inscripcion)->format('d/m/Y') }}</td>
@@ -202,7 +213,7 @@
 </style>
 @endpush
 
-@if($persona->titulacionPersona && $persona->puede_continuar && !$persona->inscripcionActiva)
+@if($persona->titulacionPersona && $persona->puede_continuar && !$persona->tieneInscripcionActiva())
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {

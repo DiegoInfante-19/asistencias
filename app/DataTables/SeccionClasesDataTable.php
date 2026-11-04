@@ -16,9 +16,19 @@ class SeccionClasesDataTable extends BaseDataTable
     {
         return EloquentDataTable::create($query)
             ->addIndexColumn()
+            // RENDERIZADO DE PNFs MÚLTIPLES (Estilo idéntico a SeccionDataTable)
             ->addColumn('pnf_nombre', function ($seccion) {
-                return $seccion->pnf->nombre_pnf ?? 'Sin PNF';
+                if ($seccion->pnfs->isEmpty()) {
+                    return '<span class="text-muted small fst-italic">Sin PNF asignado</span>';
+                }
+                
+                $badges = $seccion->pnfs->map(function ($pnf) {
+                    return '<span class="badge text-dark bg-dark-subtle border border-dark rounded-3 shadow-sm me-1 mb-1" style="font-size: 0.8rem; font-weight: 500; white-space: normal;">' . e($pnf->nombre_pnf) . '</span>';
+                })->implode('');
+
+                return '<div class="d-flex flex-wrap gap-1 align-items-center">' . $badges . '</div>';
             })
+            // RENDERIZADO DE DOCENTES (Estilo bg-light-subtle + border-secondary-subtle idéntico a SeccionDataTable)
             ->addColumn('profesores_nombres', function ($seccion) {
                 $cantidad = $seccion->n_profesores ?? $seccion->profesores->count();
 
@@ -27,13 +37,26 @@ class SeccionClasesDataTable extends BaseDataTable
                 }
 
                 if ($cantidad <= 4) {
-                    return $seccion->profesores->map(function ($profesor) {
+                    $badges = $seccion->profesores->map(function ($profesor) {
                         $nombre = trim(($profesor->user->name_users ?? '') . ' ' . ($profesor->user->last_name_users ?? ''));
-                        return '<span class="badge bg-light text-dark border shadow-sm mb-1">' . e($nombre) . '</span>';
-                    })->implode('<br>');
+                        return '<span class="badge bg-light-subtle text-dark border border-secondary-subtle shadow-sm rounded-3 px-2 py-1 me-1 mb-1" style="font-size: 0.78rem; font-weight: 500;">' . e($nombre) . '</span>';
+                    })->implode('');
+
+                    return '<div class="d-flex flex-wrap gap-1 align-items-center">' . $badges . '</div>';
                 }
 
-                return '<span class="text-primary fw-bold">' . $cantidad . ' Profesores</span>';
+                return '<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-bold">' . $cantidad . ' Profesores</span>';
+            })
+            ->filterColumn('pnf_nombre', function($query, $keyword) {
+                $query->whereHas('pnfs', function($q) use ($keyword) {
+                    $q->where('nombre_pnf', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('profesores_nombres', function($query, $keyword) {
+                $query->whereHas('profesores.user', function($q) use ($keyword) {
+                    $q->where('cedula_users', 'like', "%{$keyword}%")
+                      ->orWhereRaw("CONCAT(name_users, ' ', last_name_users) like ?", ["%{$keyword}%"]);
+                });
             })
             ->addColumn('cohorte_num', function ($seccion) {
                 return $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'S/C';
@@ -59,7 +82,7 @@ class SeccionClasesDataTable extends BaseDataTable
             ->addColumn('action', function ($seccion) {
                 return view('sesiones.partials.actions_secciones', compact('seccion'))->render();
             })
-            ->rawColumns(['profesores_nombres', 'clases_vistas', 'clases_programadas', 'clases_totales', 'action'])
+            ->rawColumns(['pnf_nombre', 'profesores_nombres', 'clases_vistas', 'clases_programadas', 'clases_totales', 'action'])
             ->setRowId('id_seccion');
     }
 
@@ -67,7 +90,7 @@ class SeccionClasesDataTable extends BaseDataTable
     {
         $query = $model->newQuery()
             ->select('secciones.*')
-            ->with(['pnf', 'periodoAcademico.cohorte', 'profesores.user'])
+            ->with(['pnfs', 'periodoAcademico.cohorte', 'profesores.user'])
             ->withCount([
                 'profesores as n_profesores',
                 'sesiones as clases_totales',
@@ -84,15 +107,13 @@ class SeccionClasesDataTable extends BaseDataTable
         $user = Auth::user();
         $request = $this->request();
 
-        // Restricción: Si NO es Administrador ni Coordinador (es Profesor), se filtra estrictamente por sus secciones
         if (!$user->isAdmin() && !$user->isCoordinador()) {
             if ($user->profesor) {
                 $query->porProfesor($user->profesor->id_profesor);
             } else {
-                $query->whereRaw('1 = 0'); // Si el usuario no tiene perfil de profesor asociado, no muestra nada
+                $query->whereRaw('1 = 0');
             }
         } else {
-            // Administradores y Coordinadores tienen acceso total y pueden filtrar opcionalmente por profesor
             if ($request->filled('id_profesor')) {
                 $query->porProfesor($request->get('id_profesor'));
             }
@@ -133,8 +154,8 @@ class SeccionClasesDataTable extends BaseDataTable
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->addClass('text-center align-middle'),
             Column::make('nombre_seccion')->title('Sección')->width(140)->addClass('align-middle fw-bold'),
-            Column::make('pnf_nombre')->name('pnf.nombre_pnf')->title('PNF')->searchable(false)->addClass('align-middle'),
-            Column::make('profesores_nombres')->name('n_profesores')->title('Profesor/es')->searchable(false)->addClass('align-middle'),
+            Column::make('pnf_nombre')->title('PNFs')->searchable(true)->addClass('align-middle'),
+            Column::make('profesores_nombres')->name('n_profesores')->title('Profesor/es')->searchable(true)->addClass('align-middle'),
             Column::make('clases_vistas')->name('clases_vistas')->title('N° de clases vistas')->searchable(false)->addClass('text-center align-middle'),
             Column::make('clases_programadas')->name('clases_programadas')->title('N° de clases pendientes')->searchable(false)->addClass('text-center align-middle'),
             Column::make('clases_totales')->name('clases_totales')->title('N° total clases')->searchable(false)->addClass('text-center align-middle'),

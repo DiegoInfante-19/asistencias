@@ -8,7 +8,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'SisControl') }}</title>
+    <title>{{ config('app.name', 'SATAE') }}</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/upt_logo-modified.png') }}">
@@ -119,7 +119,7 @@
                 <div class="col-12 col-md-5">
                     <a href="{{ url('/') }}" class="d-flex align-items-center text-decoration-none mb-2">
                         <img src="{{ asset('images/upt_logo-modified.png') }}" alt="Logo UPT" height="28" class="me-3">
-                        <span class="fs-6 fw-bold text-dark">SisControl</span>
+                        <span class="fs-6 fw-bold text-dark">SATAE</span>
                     </a>
                     <p class="text-muted small mb-0 pe-md-5">
                         Sistema de Control de Asistencias y Acreditaciones de los Trabajadores para la Oficina de Vice Rectorado Académico.

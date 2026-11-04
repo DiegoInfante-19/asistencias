@@ -9,7 +9,7 @@
 
 @section('content')
 <div class="content pt-4" style="margin: 20px;">
-    
+
     <!-- ENCABEZADO Y DATOS DE LA SECCIÓN -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
@@ -17,20 +17,23 @@
                 <i class="bi bi-easel2-fill me-2 text-primary"></i>Sección: {{ $seccion->nombre_seccion }}
             </h4>
             <p class="text-muted small mb-0">
-                <strong>PNF:</strong> {{ $seccion->pnf->nombre_pnf ?? 'N/D' }} | 
-                <strong>{{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }}</strong> | 
+                <strong>PNF:</strong> {{ $seccion->pnfs->isEmpty() ? 'N/D' : $seccion->pnfs->pluck('nombre_pnf')->implode(' / ') }} |
+                <strong>{{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }}</strong> |
                 <strong>Estatus:</strong> <span class="badge bg-success">{{ $seccion->estatus_seccion }}</span>
             </p>
         </div>
-        
+
         <div class="d-flex gap-2">
             <a href="{{ route('clases.secciones.index') }}" class="btn btn-outline-secondary fw-bold shadow-sm">
                 <i class="bi bi-arrow-left me-1"></i> Volver al Directorio
             </a>
 
             @can('create', App\Models\Sesion::class)
-            <button type="button" class="btn btn-primary fw-bold shadow-sm" onclick="abrirModalCrear()">
+            <button type="button" class="btn btn-outline-primary fw-bold shadow-sm" onclick="abrirModalCrear()">
                 <i class="bi bi-calendar-plus me-1"></i> Programar Clase
+            </button>
+            <button type="button" class="btn btn-primary fw-bold shadow-sm" onclick="abrirModalGenerarMasivo()">
+                <i class="bi bi-magic me-1"></i> Generación Masiva
             </button>
             @endcan
         </div>
@@ -52,9 +55,9 @@
                 </select>
             </div>
         </div>
-        
+
         <div class="card-body bg-white py-4">
-            
+
             <!-- MODO COMPUTADORA (TABLA DATATABLES) -->
             <div class="table-responsive d-none d-md-block">
                 {!! $dataTable->table(['class' => 'table table-striped table-hover align-middle w-100', 'style' => 'width:100%;']) !!}
@@ -63,34 +66,34 @@
             <!-- MODO TELÉFONO (TARJETAS TÁCTILES RESPONSIVE) -->
             <div class="d-block d-md-none">
                 @php
-                    $queryMovil = App\Models\Sesion::query()
-                        ->with(['profesor.user'])
-                        ->withExists('asistencias')
-                        ->where('id_seccion', $seccion->id_seccion)
-                        ->orderBy('fecha_sesion', 'desc');
+                $queryMovil = App\Models\Sesion::query()
+                ->with(['profesor.user'])
+                ->withExists('asistencias')
+                ->where('id_seccion', $seccion->id_seccion)
+                ->orderBy('fecha_sesion', 'desc');
 
-                    if (request()->filled('filtro_asistencia')) {
-                        $estado = request('filtro_asistencia');
-                        if ($estado === 'registrada') {
-                            $queryMovil->has('asistencias');
-                        } elseif ($estado === 'pendiente') {
-                            $queryMovil->doesntHave('asistencias');
-                        }
+                if (request()->filled('filtro_asistencia')) {
+                    $estado = request('filtro_asistencia');
+                    if ($estado === 'registrada') {
+                        $queryMovil->has('asistencias');
+                    } elseif ($estado === 'pendiente') {
+                        $queryMovil->doesntHave('asistencias');
                     }
+                }
 
-                    $sesionesMovil = $queryMovil->get();
+                $sesionesMovil = $queryMovil->get();
                 @endphp
 
                 @forelse($sesionesMovil as $sesionItem)
                 @php
-                    $carbonDate = \Carbon\Carbon::parse($sesionItem->fecha_sesion)->locale('es');
-                    $diaSemana = ucfirst($carbonDate->dayName);
-                    $diaMes = $carbonDate->format('d');
-                    $mes = $carbonDate->monthName;
-                    $anio = $carbonDate->format('Y');
-                    $formatoFecha = "{$diaSemana}, {$diaMes} de {$mes} del año {$anio}";
+                $carbonDate = \Carbon\Carbon::parse($sesionItem->fecha_sesion)->locale('es');
+                $diaSemana = ucfirst($carbonDate->dayName);
+                $diaMes = $carbonDate->format('d');
+                $mes = $carbonDate->monthName;
+                $anio = $carbonDate->format('Y');
+                $formatoFecha = "{$diaSemana}, {$diaMes} de {$mes} del año {$anio}";
 
-                    $nombreProf = trim(($sesionItem->profesor->user->name_users ?? '') . ' ' . ($sesionItem->profesor->user->last_name_users ?? ''));
+                $nombreProf = trim(($sesionItem->profesor->user->name_users ?? '') . ' ' . ($sesionItem->profesor->user->last_name_users ?? ''));
                 @endphp
                 <div class="card card-sesion-movil mb-3 border shadow-sm p-3">
                     <div class="d-flex justify-content-between align-items-start mb-2">
@@ -98,16 +101,15 @@
                             <div class="fw-bold text-dark mb-1">
                                 <i class="bi bi-calendar-event text-primary me-1"></i>{{ $formatoFecha }}
                             </div>
-                            <!-- Nombre del profesor más legible y con desvanecimiento elegante si es largo -->
                             <div class="text-secondary fw-semibold small text-fade-container mt-1">
                                 <span>Profesor: {{ $nombreProf ?: 'Sin asignar' }}</span>
                             </div>
                         </div>
                         <div>
                             @if($sesionItem->asistencias_exists)
-                                <span class="badge badge-asistencia-registrada shadow-sm px-2 py-1">Registrada</span>
+                            <span class="badge badge-asistencia-registrada shadow-sm px-2 py-1">Registrada</span>
                             @else
-                                <span class="badge badge-asistencia-pendiente shadow-sm px-2 py-1">Pendiente</span>
+                            <span class="badge badge-asistencia-pendiente shadow-sm px-2 py-1">Pendiente</span>
                             @endif
                         </div>
                     </div>
@@ -118,7 +120,6 @@
                     </div>
                     @endif
 
-                    <!-- Botones de Acción en Móvil (Estilo idéntico a escritorio) -->
                     <div class="d-flex gap-2">
                         <a href="{{ route('sesiones.show', $sesionItem->id_sesiones) }}" class="btn btn-primary btn-sm fw-bold flex-grow-1 shadow-sm py-2">
                             <i class="bi bi-check2-square me-1"></i> Tomar Asistencia
@@ -156,13 +157,13 @@
 
 </div>
 
-<!-- Incluir el Modal Único de Sesión -->
+<!-- INCLUSIÓN DE MODALES DENTRO DEL CONTENT -->
 @include('sesiones.partials.modal_sesion')
+@include('sesiones.partials.modal_generar_sesiones_masivo')
 @endsection
 
 @section('styles')
 <style>
-    /* Estética unificada para Select2 dentro del modal */
     .modal-body .select2-container--bootstrap-5 .select2-selection {
         background-color: #f8f9fa !important;
         border-color: #dee2e6 !important;
@@ -171,9 +172,6 @@
         font-size: 0.9rem;
     }
 
-    /* =========================================
-        ESTILOS CUSTOM PARA BADGES (SOFT OUTLINE)
-       ========================================= */
     .badge-asistencia-registrada {
         background-color: #d1e7dd !important;
         color: #0f5132 !important;
@@ -188,9 +186,6 @@
         font-weight: 600;
     }
 
-    /* =========================================
-        CONTENEDOR CON DESVANECIMIENTO (FADE-OUT)
-       ========================================= */
     .text-fade-container {
         display: flex;
         align-items: center;
@@ -203,13 +198,10 @@
     .text-fade-container span {
         overflow: hidden;
         text-overflow: ellipsis;
-        mask-image: linear-gradient(to right, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
-        -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+        mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
+        -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
     }
 
-    /* =========================================
-        DISEÑO MÓVIL (TELÉFONOS)
-       ========================================= */
     @media (max-width: 767.98px) {
         .content {
             margin: 5px !important;
@@ -240,7 +232,6 @@
     let flatpickrInstance = null;
 
     $(document).ready(function() {
-        // Escuchar cambios en el selector de filtro de la tabla y sincronizar modo móvil/escritorio
         $('#filtro_asistencia').on('change', function() {
             let filtro = $(this).val();
             if (window.innerWidth < 768) {
@@ -260,44 +251,38 @@
             }
         });
 
-        // Configuración de periodos de receso y bloqueo de días distintos al miércoles
         const recesosDB = {!! json_encode($periodosRecesos ?? [], JSON_HEX_TAG) !!};
         let bloqueosFlatpickr = recesosDB.map(receso => {
             return {
-                from: receso.fecha_inicio_periodo_receso.split('T')[0], 
+                from: receso.fecha_inicio_periodo_receso.split('T')[0],
                 to: receso.fecha_fin_periodo_receso.split('T')[0]
             };
         });
 
         bloqueosFlatpickr.push(function(date) {
-            return (date.getDay() !== 3); 
+            return (date.getDay() !== 3);
         });
 
-        // Inicializar Flatpickr de manera local y segura
         if (typeof window.flatpickr !== 'undefined') {
             flatpickrInstance = window.flatpickr("#modal_fecha_sesion", {
-                locale: window.Spanish || "es", 
-                dateFormat: "Y-m-d", 
-                maxDate: "today", 
+                locale: window.Spanish || "es",
+                dateFormat: "Y-m-d",
+                minDate: "{{ $seccion->periodoAcademico?->fecha_inicio?->format('Y-m-d') ?? '' }}",
+                maxDate: "{{ $seccion->periodoAcademico?->fecha_fin?->format('Y-m-d') ?? '' }}",
                 disable: bloqueosFlatpickr,
                 allowInput: false
             });
         }
 
-        // Inicializar Select2 en el modal cuando se abra (evita problemas de z-index y focus)
-        $('#modalSesion').on('shown.bs.modal', function () {
-            let $modal = $(this);
-            $modal.find('.select2-buscador').each(function() {
-                if (!$(this).hasClass('select2-hidden-accessible')) {
-                    $(this).select2({
-                        theme: 'bootstrap-5',
-                        width: '100%',
-                        dropdownParent: $modal, // Vital para modales Bootstrap
-                        placeholder: 'Seleccione una opción...'
-                    });
-                }
-            });
+        // Cambio de modalidad en modal masivo
+        $('input[name="modo_generacion"]').on('change', function() {
+            if ($(this).val() === 'meses') {
+                $('#panelModoMeses').removeClass('d-none');
+            } else {
+                $('#panelModoMeses').addClass('d-none');
+            }
         });
+        
     });
 
     window.abrirModalCrear = function() {
@@ -306,11 +291,10 @@
         document.getElementById('formSesion').reset();
         document.getElementById('formMethod').value = 'POST';
         document.getElementById('formSesion').action = "{{ route('sesiones.store') }}";
-        
-        // Limpiar Select2 al crear
+
         $('#modal_id_profesor').val(null).trigger('change');
 
-        if(flatpickrInstance) {
+        if (flatpickrInstance) {
             flatpickrInstance.set('clickOpens', true);
             flatpickrInstance.clear();
         }
@@ -330,24 +314,22 @@
         document.getElementById('formMethod').value = 'PUT';
         document.getElementById('formSesion').action = `/sesiones/${sesion.id_sesiones}`;
 
-        // Rellenar y disparar el evento change para que Select2 refleje el profesor seleccionado
         $('#modal_id_profesor').val(sesion.id_profesor).trigger('change');
         document.getElementById('modal_observacion_sesion').value = sesion.observacion_sesion || '';
-        
-        if(flatpickrInstance) {
+
+        if (flatpickrInstance) {
             flatpickrInstance.setDate(sesion.fecha_sesion, true);
         } else {
             document.getElementById('modal_fecha_sesion').value = sesion.fecha_sesion;
         }
 
-        // Blindaje si ya tiene asistencias registradas
         if (sesion.tiene_asistencia) {
-            if(flatpickrInstance) flatpickrInstance.set('clickOpens', false);
+            if (flatpickrInstance) flatpickrInstance.set('clickOpens', false);
             document.getElementById('modal_fecha_sesion').setAttribute('readonly', true);
             document.getElementById('alertaAsistenciaRegistrada').classList.remove('d-none');
             document.getElementById('ayuda_fecha').classList.add('d-none');
         } else {
-            if(flatpickrInstance) flatpickrInstance.set('clickOpens', true);
+            if (flatpickrInstance) flatpickrInstance.set('clickOpens', true);
             document.getElementById('modal_fecha_sesion').removeAttribute('readonly');
             document.getElementById('alertaAsistenciaRegistrada').classList.add('d-none');
             document.getElementById('ayuda_fecha').classList.remove('d-none');
@@ -357,7 +339,12 @@
         myModal.show();
     }
 
-    // Envío del formulario mediante AJAX
+    window.abrirModalGenerarMasivo = function() {
+        var myModal = new bootstrap.Modal(document.getElementById('modalGenerarMasivo'));
+        myModal.show();
+    }
+
+    // Manejo de Formulario Individual
     document.getElementById('formSesion').addEventListener('submit', function(e) {
         e.preventDefault();
         const form = this;
@@ -365,23 +352,25 @@
         const url = form.action;
         const method = document.getElementById('formMethod').value;
 
-        let fetchOptions = {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        };
-
-        if(method === 'PUT') {
+        if (method === 'PUT') {
             formData.append('_method', 'PUT');
         }
 
-        fetch(url, fetchOptions)
-        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(async response => {
+            const data = await response.json();
+            return { ok: response.ok, status: response.status, body: data };
+        })
         .then(res => {
-            if(res.status === 200 && res.body.success) {
+            if (res.ok && res.body.success) {
                 bootstrap.Modal.getInstance(document.getElementById('modalSesion')).hide();
                 Swal.fire({
                     icon: 'success',
@@ -397,18 +386,87 @@
                     }
                 });
             } else {
+                let errorMsg = res.body.message || 'Ocurrió un error de validación.';
+                if (res.body.errors) {
+                    errorMsg = Object.values(res.body.errors).flat().join('<br>');
+                }
                 Swal.fire({
                     icon: 'error',
                     title: 'Atención',
-                    text: res.body.message || 'Ocurrió un error de validación.'
+                    html: errorMsg
                 });
             }
         })
         .catch(error => {
             Swal.fire({
                 icon: 'error',
+                title: 'Error de comunicación',
+                text: 'Ocurrió un detalle al procesar la respuesta del servidor.'
+            });
+        });
+    });
+
+    // Manejo de Formulario Masivo
+    document.getElementById('formGenerarMasivo').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+        const url = form.action;
+
+        const btn = document.getElementById('btnEjecutarMasivo');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(async response => {
+            const data = await response.json();
+            return { ok: response.ok, status: response.status, body: data };
+        })
+        .then(res => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-magic me-1"></i> Generar Sesiones';
+
+            if (res.ok && res.body.success) {
+                bootstrap.Modal.getInstance(document.getElementById('modalGenerarMasivo')).hide();
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Generación Completada!',
+                    text: res.body.message,
+                    confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    if (window.LaravelDataTables && window.LaravelDataTables['sesiones-seccion-table']) {
+                        window.LaravelDataTables['sesiones-seccion-table'].draw();
+                    } else {
+                        window.location.reload();
+                    }
+                });
+            } else {
+                let errorMsg = res.body.message || 'No se pudieron generar las sesiones.';
+                if (res.body.errors) {
+                    errorMsg = Object.values(res.body.errors).flat().join('<br>');
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Atención',
+                    html: errorMsg
+                });
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-magic me-1"></i> Generar Sesiones';
+            Swal.fire({
+                icon: 'error',
                 title: 'Error de servidor',
-                text: 'No se pudo procesar la solicitud.'
+                text: 'Ocurrió un error inesperado en la red o servidor.'
             });
         });
     });

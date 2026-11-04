@@ -28,7 +28,7 @@ class Persona extends Model
         'id_lugar_nacimiento',
         'email_personas',
         'id_cohortes',
-        'continua_estudios' // <-- NUEVA COLUMNA AÑADIDA AQUÍ
+        'continua_estudios'
     ];
 
     /**
@@ -157,7 +157,7 @@ class Persona extends Model
     {
         return $this->fecha_nacimiento_personas 
             ? \Carbon\Carbon::parse($this->fecha_nacimiento_personas)->format('d/m/Y') 
-            : 'No registrada'; // O el mensaje que prefieras
+            : 'No registrada';
     }
 
     public function getEdadAttribute()
@@ -180,14 +180,29 @@ class Persona extends Model
         return $titulacion->titulacion->nombre_titulo_base ?? 'TÍTULO NO ESPECIFICADO';
     }
 
-    // <-- NUEVO ACCESSOR: Evalúa si la persona tiene permitido continuar
     public function getPuedeContinuarAttribute(): bool
     {
-        // Si es explícitamente falso, 0 o "No", se le bloquea la inscripción.
-        // Al ser nullable, si es null o verdadero, pasará como true y podrá inscribirse.
         if ($this->continua_estudios === 0 || $this->continua_estudios === false || strtolower((string)$this->continua_estudios) === 'no') {
             return false;
         }
         return true;
+    }
+
+    /**
+     * ==========================================
+     * HELPERS DE NEGOCIO (Control de Estudios)
+     * ==========================================
+     */
+    
+    /**
+     * Retorna TRUE si el estudiante ya posee una inscripción en estatus 'Activo'.
+     * Este será el candado maestro para evitar dobles inscripciones.
+     */
+    public function tieneInscripcionActiva(): bool
+    {
+        return $this->inscripcionesSecciones()
+                    ->where('estatus_inscripcion', 'Activo')
+                    ->whereNull('deleted_at')
+                    ->exists();
     }
 }

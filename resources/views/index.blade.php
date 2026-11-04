@@ -96,45 +96,19 @@
                 </div>
             </div>
 
-            <div class="row g-4">
-                <!-- Radar de Cumplimiento (Clases sin asistencia) -->
+            <div class="row g-4 mb-4">
+                <!-- Gráfico de Pastel: Distribución de Estudiantes por PNF -->
                 <div class="col-lg-8">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-radar text-danger me-2"></i>Radar de Cumplimiento</h5>
-                            <span class="badge bg-danger rounded-pill">{{ count($sesionesPendientesGlobales ?? []) }} Alertas</span>
+                            <h5 class="card-title mb-0 fw-bold text-dark">
+                                <i class="bi bi-pie-chart-fill text-primary me-2"></i>Estudiantes por PNF
+                            </h5>
                         </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light text-muted small">
-                                        <tr>
-                                            <th>Fecha (Pasada)</th>
-                                            <th>Sección</th>
-                                            <th>Profesor Titular</th>
-                                            <th>Acción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($sesionesPendientesGlobales ?? [] as $sesion)
-                                        <tr>
-                                            <td class="fw-bold text-danger">{{ \Carbon\Carbon::parse($sesion->fecha_sesion)->format('d/m/Y') }}</td>
-                                            <td class="small">{{ $sesion->seccion->nombre_seccion }}</td>
-                                            <td class="small">{{ $sesion->profesor->user->name_users ?? 'No asignado' }}</td>
-                                            <td>
-                                                <a href="{{ route('sesiones.show', $sesion->id_sesiones) }}" class="btn btn-sm btn-outline-primary">Intervenir</a>
-                                            </td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center py-4 text-muted">
-                                                <i class="bi bi-check-circle-fill text-success fs-3 d-block mb-2"></i>
-                                                Todas las clases impartidas tienen su asistencia registrada.
-                                            </td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                        <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                            <!-- ALTURA AUMENTADA A 480px Y SIN MAX-WIDTH RESTRINGIDO -->
+                            <div style="width: 100%; height: 480px; position: relative;">
+                                <canvas id="chartEstudiantesPnf"></canvas>
                             </div>
                         </div>
                     </div>
@@ -144,23 +118,25 @@
                 <div class="col-lg-4">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-header bg-white border-bottom py-3">
-                            <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Matrícula por Empresa</h5>
+                            <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-bar-chart-steps text-primary me-2"></i>Matrícula por Empresa</h5>
                         </div>
                         <div class="card-body p-0">
                             <ul class="list-group list-group-flush">
                                 @forelse($metricasEmpresas ?? [] as $metrica)
-                                <li class="list-group-item py-3 px-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="small fw-semibold text-dark">{{ $metrica->nombre_empresa }}</span>
-                                        <span class="small fw-bold text-primary">{{ $metrica->total_alumnos }} alu.</span>
-                                    </div>
-                                    <div class="progress" style="height: 6px;">
-                                        <div class="progress-bar bg-primary rounded-pill" role="progressbar" style="width: {{ $metrica->porcentaje }}%"></div>
-                                    </div>
-                                </li>
+                                    @if($metrica->total_alumnos > 0)
+                                    <li class="list-group-item py-3 px-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="small fw-semibold text-dark">{{ $metrica->nombre_empresa }}</span>
+                                            <span class="small fw-bold text-primary">{{ $metrica->total_alumnos }} alu.</span>
+                                        </div>
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-primary rounded-pill" role="progressbar" style="width: {{ $metrica->porcentaje }}%"></div>
+                                        </div>
+                                    </li>
+                                    @endif
                                 @empty
                                 <li class="list-group-item text-center py-4 text-muted small">
-                                    No hay datos suficientes para graficar.
+                                    No hay empresas con estudiantes registrados.
                                 </li>
                                 @endforelse
                             </ul>
@@ -184,7 +160,7 @@
                 </div>
             </div>
 
-            <!-- Métricas Operativas (Solo 3 tarjetas centradas en su labor) -->
+            <!-- Métricas Operativas -->
             <div class="row g-3 mb-4">
                 <div class="col-lg-4">
                     <div class="card border-0 shadow-sm bg-primary text-white h-100">
@@ -266,3 +242,77 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const canvas = document.getElementById('chartEstudiantesPnf');
+        if (!canvas) return;
+
+        const rawData = {!! json_encode($metricasPnf ?? []) !!};
+
+        const labelsPnf = rawData.map(item => item.nombre_pnf);
+        const dataPnf = rawData.map(item => item.total_estudiantes);
+
+        const totalSum = dataPnf.reduce((a, b) => a + b, 0);
+
+        const ctx = canvas.getContext('2d');
+
+        // Determina la posición de la leyenda según el ancho de la pantalla
+        const legendPosition = window.innerWidth >= 768 ? 'right' : 'bottom';
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: totalSum > 0 ? labelsPnf : ['Sin Estudiantes Inscritos'],
+                datasets: [{
+                    data: totalSum > 0 ? dataPnf : [1],
+                    backgroundColor: totalSum > 0 ? [
+                        '#0d6efd',
+                        '#198754',
+                        '#ffc107',
+                        '#0dcaf0',
+                        '#6f42c1',
+                        '#fd7e14',
+                        '#20c997',
+                        '#d63384'
+                    ] : ['#e9ecef'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: 15
+                },
+                plugins: {
+                    legend: {
+                        position: legendPosition,
+                        labels: {
+                            padding: 16,
+                            usePointStyle: true,
+                            font: { 
+                                size: 13,
+                                family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif"
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if (totalSum === 0) return ' Sin estudiantes registrados';
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                return ` ${label}: ${value} estudiante(s)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush

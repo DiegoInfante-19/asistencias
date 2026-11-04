@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Pnf extends Model 
 {
@@ -39,10 +40,11 @@ class Pnf extends Model
         return $this->hasMany(TituloPnf::class, 'id_pnf', 'id_pnf');
     }
 
-    // Un PNF tiene varios grupos académicos (TSU, Ingeniería en distintas cohortes)
-    public function secciones(): HasMany
+    // 1. RELACIÓN ACTUALIZADA: De HasMany a BelongsToMany
+    public function secciones(): BelongsToMany
     {
-        return $this->hasMany(Seccion::class, 'id_pnf', 'id_pnf');
+        return $this->belongsToMany(Seccion::class, 'pnf_seccion', 'id_pnf', 'id_seccion')
+                    ->withTimestamps();
     }
 
     // Un PNF tiene asignados varios profesores

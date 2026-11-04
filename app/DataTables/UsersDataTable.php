@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
+use Yajra\DataTables\Html\Button;
 
 class UsersDataTable extends BaseDataTable
 {
@@ -15,7 +16,33 @@ class UsersDataTable extends BaseDataTable
         return EloquentDataTable::create($query)
             ->addIndexColumn()
             ->addColumn('full_name', function ($user) {
-                return $user->name_users . ' ' . $user->last_name_users;
+                return e($user->name_users . ' ' . $user->last_name_users);
+            })
+            // NUEVA COLUMNA: PNF Asignado al Profesor
+            ->addColumn('pnf_nombre', function ($user) {
+                if ($user->profesor && $user->profesor->pnf) {
+                    return '<span class="badge text-dark bg-dark-subtle border border-dark rounded-3 shadow-sm px-2 py-1" style="font-size: 0.8rem; font-weight: 500;">' . e($user->profesor->pnf->nombre_pnf) . '</span>';
+                }
+                return '<span class="text-muted small fst-italic">Sin PNF asignado</span>';
+            })
+            // NUEVA COLUMNA: Secciones Registradas/Asignadas
+            ->addColumn('secciones_nombres', function ($user) {
+                if (!$user->profesor || $user->profesor->secciones->isEmpty()) {
+                    return '<span class="text-muted small fst-italic">Sin secciones</span>';
+                }
+
+                $secciones = $user->profesor->secciones;
+                $cantidad = $secciones->count();
+
+                if ($cantidad <= 4) {
+                    $badges = $secciones->map(function ($sec) {
+                        return '<span class="badge bg-light text-dark border shadow-sm me-1 mb-1" style="font-size: 0.78rem;">' . e($sec->nombre_seccion) . '</span>';
+                    })->implode('');
+
+                    return '<div class="d-flex flex-wrap gap-1 align-items-center">' . $badges . '</div>';
+                }
+
+                return '<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-bold">' . $cantidad . ' Secciones</span>';
             })
             // Badge estandarizado visualmente
             ->editColumn('status_users', function ($user) {
@@ -32,6 +59,18 @@ class UsersDataTable extends BaseDataTable
                 $query->where(function($q) use ($keyword) {
                     $q->where('cedula_users', 'like', "%{$keyword}%")
                       ->orWhereRaw("CONCAT(name_users, ' ', last_name_users) like ?", ["%{$keyword}%"]);
+                });
+            })
+            // Búsqueda personalizada por PNF
+            ->filterColumn('pnf_nombre', function($query, $keyword) {
+                $query->whereHas('profesor.pnf', function($q) use ($keyword) {
+                    $q->where('nombre_pnf', 'like', "%{$keyword}%");
+                });
+            })
+            // Búsqueda personalizada por Secciones
+            ->filterColumn('secciones_nombres', function($query, $keyword) {
+                $query->whereHas('profesor.secciones', function($q) use ($keyword) {
+                    $q->where('nombre_seccion', 'like', "%{$keyword}%");
                 });
             })
             ->filter(function ($query) {
@@ -84,14 +123,20 @@ class UsersDataTable extends BaseDataTable
                     $query->tieneSeccion(request()->get('filtro_tiene_seccion'));
                 }
             }, true)
-            ->rawColumns(['action', 'status_users'])
+            ->rawColumns(['action', 'status_users', 'pnf_nombre', 'secciones_nombres'])
             ->setRowId('id_users');
     }
 
     public function query(User $model): EloquentBuilder
     {
         return $model->newQuery()
-            ->with(['rol', 'profesor.pnf', 'profesor.secciones'])
+            // Blindaje: Solo traemos a los usuarios que tengan el rol de Profesor
+            ->where('id_rol', User::ROLE_PROFESOR)
+            ->with([
+                'rol', 
+                'profesor.pnf', 
+                'profesor.secciones'
+            ])
             ->selectRaw("*, CONCAT(name_users, ' ', last_name_users) as full_name");
     }
 
@@ -99,20 +144,37 @@ class UsersDataTable extends BaseDataTable
     {
         return 'users-table';
     }
-    
+
     public function html(): HtmlBuilder
     {
-        return $this->sharedHtmlBuilder();
+        return $this->sharedHtmlBuilder()
+            ->setTableId('users-table')
+            ->columns($this->getColumns())
+            ->minifiedAjax()
+            ->orderBy(2, 'asc')
+            ->buttons([
+                Button::make('excel')->text('<i class="bi bi-file-earmark-excel"></i> Excel')->addClass('btn btn-success btn-sm shadow-sm'),
+                Button::make('pdf')->text('<i class="bi bi-file-earmark-pdf"></i> PDF')->addClass('btn btn-danger btn-sm shadow-sm'),
+                Button::make('print')->text('<i class="bi bi-printer"></i> Imprimir')->addClass('btn btn-secondary btn-sm shadow-sm'),
+                Button::make('colvis')->text('<i class="bi bi-layout-three-columns me-1"></i> Columnas')->addClass('btn btn-outline-secondary btn-sm shadow-sm')
+            ])
+            ->addTableClass('table-sm align-middle')
+            ->parameters([
+                'responsive' => true,
+                'autoWidth'  => false,
+            ]);
     }
 
     protected function getColumns(): array
     {
         return [
-            Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center'),
-            Column::make('cedula_users')->title('Cédula')->width(110), // <-- Columna de cédula restaurada
-            Column::make('full_name')->title('Nombre y Apellido')->searchable(true),
-            Column::make('status_users')->title('Estado')->addClass('text-center'),
-            Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width(120)->addClass('text-center all'),
+            Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center align-middle'),
+            Column::make('cedula_users')->title('Cédula')->width(110)->addClass('align-middle'),
+            Column::make('full_name')->title('Nombre y Apellido')->searchable(true)->addClass('align-middle fw-bold'),
+            Column::make('pnf_nombre')->title('PNF')->searchable(true)->addClass('align-middle'),
+            Column::make('secciones_nombres')->title('Secciones')->searchable(true)->addClass('align-middle'),
+            Column::make('status_users')->title('Estado')->addClass('text-center align-middle'),
+            Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width(120)->addClass('text-center align-middle all'),
         ];
     }
 }

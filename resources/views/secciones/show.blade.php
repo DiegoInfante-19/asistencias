@@ -30,7 +30,8 @@
                             Cohorte: <strong class="text-primary">{{ $seccion->periodoAcademico->cohorte->numero_cohorte ?? 'N/D' }}</strong>
                         </p>
                         <p class="text-muted mb-1">
-                            PNF: <strong>{{ $seccion->pnf->nombre_pnf ?? 'N/D' }}</strong> | Período: <strong>{{ $seccion->periodoAcademico ? ($seccion->periodoAcademico->fecha_inicio?->format('Y') . '-' . $seccion->periodoAcademico->fecha_fin?->format('Y')) : 'N/D' }}</strong>
+                            {{-- CORRECCIÓN: Compatibilidad con múltiple PNF --}}
+                            PNF: <strong>{{ $seccion->pnfs->isEmpty() ? 'N/D' : $seccion->pnfs->pluck('nombre_pnf')->implode(' / ') }}</strong> | Período: <strong>{{ $seccion->periodoAcademico ? ($seccion->periodoAcademico->fecha_inicio?->format('Y') . '-' . $seccion->periodoAcademico->fecha_fin?->format('Y')) : 'N/D' }}</strong>
                         </p>
                         <p class="text-muted mb-0 small">
                             @if($seccion->periodoAcademico && $seccion->periodoAcademico->fecha_inicio && $seccion->periodoAcademico->fecha_fin)
@@ -98,7 +99,7 @@
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porEstado = $seccion->inscripciones->groupBy(function($i) {
-                                        return $i->persona->lugarNacimiento?->ciudad?->estado?->nombre_estado ?? 'No registrado';
+                                            return $i->persona->lugarNacimiento?->ciudad?->estado?->nombre_estado ?? 'No registrado';
                                         })->filter(fn($items, $estado) => $estado !== 'No registrado' && $items->count() > 0);
                                         @endphp
                                         @forelse($porEstado as $nombreEstado => $items)
@@ -107,7 +108,7 @@
                                             <span class="fw-bold text-primary">{{ $items->count() }}</span>
                                         </li>
                                         @empty
-                                        <li class="text-muted py-1">Sin registros geográficos > 0</li>
+                                        <li class="text-muted py-1">Sin registros geográficos &gt; 0</li>
                                         @endforelse
                                     </ul>
                                 </div>
@@ -126,15 +127,15 @@
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porExpediente = $seccion->inscripciones->groupBy(function($i) {
-                                        $titulacion = $i->persona->titulacionPersona instanceof \Illuminate\Support\Collection
-                                        ? $i->persona->titulacionPersona->first()
-                                        : $i->persona->titulacionPersona;
+                                            $titulacion = $i->persona->titulacionPersona instanceof \Illuminate\Support\Collection
+                                                ? $i->persona->titulacionPersona->first()
+                                                : $i->persona->titulacionPersona;
 
-                                        if ($titulacion && $titulacion->id_estatus_expediente) {
-                                        $estExp = \App\Models\EstatusExpediente::find($titulacion->id_estatus_expediente);
-                                        return $estExp ? $estExp->nombre_estatus_expediente : 'Sin Estatus';
-                                        }
-                                        return 'Sin Expediente';
+                                            if ($titulacion && $titulacion->id_estatus_expediente) {
+                                                $estExp = \App\Models\EstatusExpediente::find($titulacion->id_estatus_expediente);
+                                                return $estExp ? $estExp->nombre_estatus_expediente : 'Sin Estatus';
+                                            }
+                                            return 'Sin Expediente';
                                         });
                                         @endphp
                                         @foreach($porExpediente as $estatusExp => $items)
@@ -184,11 +185,11 @@
                                     <ul class="list-unstyled mb-0">
                                         @php
                                         $porEmpresa = $seccion->inscripciones->groupBy(function($i) {
-                                        $empresaRel = $i->persona->empresaPersona;
-                                        $empresaObj = $empresaRel instanceof \Illuminate\Support\Collection
-                                        ? $empresaRel->first()
-                                        : $empresaRel;
-                                        return $empresaObj?->empresa->nombre_empresa ?? 'Independiente';
+                                            $empresaRel = $i->persona->empresaPersona;
+                                            $empresaObj = $empresaRel instanceof \Illuminate\Support\Collection
+                                                ? $empresaRel->first()
+                                                : $empresaRel;
+                                            return $empresaObj?->empresa->nombre_empresa ?? 'Independiente';
                                         });
                                         @endphp
                                         @foreach($porEmpresa as $nombreEmpresa => $items)
@@ -208,7 +209,7 @@
         </div>
     </div>
 
-    <!-- 2. TARJETA CONTENEDORA DE PESTAÑAS (TABS) RESTAURADA -->
+    <!-- 2. TARJETA CONTENEDORA DE PESTAÑAS (TABS) -->
     <div class="card shadow-sm">
         <div class="card-header bg-white py-3 d-flex align-items-center">
             <h4 class="card-title text-dark mb-0" style="font-weight: 500;">
@@ -268,12 +269,10 @@
 
 @section('styles')
 <style>
-    /* Parche para que el calendario Flatpickr flote SOBRE el Modal de Bootstrap */
     .flatpickr-calendar {
         z-index: 1060 !important;
     }
 
-    /* Tus otros estilos que ya tenías... */
     .card-header-tabs {
         margin-right: 0 !important;
         margin-left: 0 !important;
@@ -315,6 +314,8 @@
         border-top: 1px solid #dee2e6 !important;
     }
 </style>
+@endsection
+
 @push('scripts')
 {{ $dataTable->html()->scripts() }}
 {{ $profesorDataTable->html()->scripts() }}
@@ -322,7 +323,6 @@
 
 <script type="module">
     document.addEventListener('DOMContentLoaded', function() {
-        // Buscador de Estudiantes (Si usas jQuery aquí, asegúrate de que esté expuesto o mantenlo si te funciona)
         if (typeof $ !== 'undefined') {
             $('.select2-buscador').select2({
                 theme: 'bootstrap-5',
@@ -411,7 +411,8 @@
             window.flatpickr("#admin_fecha_sesion", {
                 locale: window.Spanish || "es",
                 dateFormat: "Y-m-d",
-                maxDate: "today",
+                minDate: "{{ $seccion->periodoAcademico?->fecha_inicio?->format('Y-m-d') ?? '' }}",
+                maxDate: "{{ $seccion->periodoAcademico?->fecha_fin?->format('Y-m-d') ?? '' }}",
                 disable: bloqueosFlatpickr,
                 allowInput: false,
             });
@@ -419,7 +420,7 @@
     });
 
     // =========================================================================
-    // INTERCEPTAR EL FORMULARIO RÁPIDO DEL PROFESOR CON VANILLA JS (ROBUSTO)
+    // INTERCEPTAR EL FORMULARIO RÁPIDO DEL PROFESOR CON VANILLA JS
     // =========================================================================
     document.addEventListener('submit', function(e) {
         const form = e.target.closest('.form-registrar-sesion-profesor');

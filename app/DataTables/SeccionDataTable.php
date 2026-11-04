@@ -14,11 +14,20 @@ class SeccionDataTable extends BaseDataTable
     {
         return EloquentDataTable::create($query)
             ->addIndexColumn()
+            // RENDERIZADO DE PNFs MÚLTIPLES
             ->addColumn('pnf_nombre', function ($seccion) {
-                return $seccion->pnf->nombre_pnf ?? 'Sin PNF';
+                if ($seccion->pnfs->isEmpty()) {
+                    return '<span class="text-muted small fst-italic">Sin PNF asignado</span>';
+                }
+
+                $badges = $seccion->pnfs->map(function ($pnf) {
+                    return '<span class="badge text-dark bg-dark-subtle border border-dark rounded-3 shadow-sm me-1 mb-1" style="font-size: 0.8rem; font-weight: 500; white-space: normal;">' . e($pnf->nombre_pnf) . '</span>';
+                })->implode('');
+
+                return '<div class="d-flex flex-wrap gap-1 align-items-center">' . $badges . '</div>';
             })
+            // BADGES DE DOCENTES CON TONO BLANCO GRISÁCEO SUAVE (bg-light-subtle + border-secondary-subtle)
             ->addColumn('profesores_lista', function ($seccion) {
-                // Usamos el conteo que viene directo de la base de datos
                 $cantidad = $seccion->n_profesores ?? $seccion->profesores->count();
                 
                 if ($cantidad === 0) {
@@ -26,22 +35,22 @@ class SeccionDataTable extends BaseDataTable
                 }
 
                 if ($cantidad <= 4) {
-                    return $seccion->profesores->map(function ($profesor) {
+                    $badges = $seccion->profesores->map(function ($profesor) {
                         $nombre = trim(($profesor->user->name_users ?? '') . ' ' . ($profesor->user->last_name_users ?? ''));
-                        return '<span class="badge bg-light text-dark border shadow-sm mb-1">' . e($nombre) . '</span>';
-                    })->implode('<br>'); // Salto de línea para apilar verticalmente
+                        return '<span class="badge bg-light-subtle text-dark border border-secondary-subtle shadow-sm rounded-3 px-2 py-1 me-1 mb-1" style="font-size: 0.78rem; font-weight: 500;">' . e($nombre) . '</span>';
+                    })->implode('');
+
+                    return '<div class="d-flex flex-wrap gap-1 align-items-center">' . $badges . '</div>';
                 }
 
-                return '<span class="text-primary fw-bold">' . $cantidad . ' Profesores</span>';
+                return '<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-bold">' . $cantidad . ' Profesores</span>';
             })
             ->filterColumn('pnf_nombre', function($query, $keyword) {
-                // Permite buscar por el nombre del PNF relacionado
-                $query->whereHas('pnf', function($q) use ($keyword) {
+                $query->whereHas('pnfs', function($q) use ($keyword) {
                     $q->where('nombre_pnf', 'like', "%{$keyword}%");
                 });
             })
             ->filterColumn('profesores_lista', function($query, $keyword) {
-                // Permite buscar por el nombre, apellido o cédula de los docentes asignados
                 $query->whereHas('profesores.user', function($q) use ($keyword) {
                     $q->where('cedula_users', 'like', "%{$keyword}%")
                       ->orWhereRaw("CONCAT(name_users, ' ', last_name_users) like ?", ["%{$keyword}%"]);
@@ -50,20 +59,19 @@ class SeccionDataTable extends BaseDataTable
             ->addColumn('action', function ($seccion) {
                 return view('estructura_academica.partials.actions_secciones', compact('seccion'))->render();
             })
-            ->rawColumns(['profesores_lista', 'action'])
+            ->rawColumns(['pnf_nombre', 'profesores_lista', 'action'])
             ->setRowId('id_seccion');
     }
 
     public function query(Seccion $model): EloquentBuilder
     {
         $query = $model->newQuery()
-            ->select('secciones.*') // Importante seleccionar la tabla base al usar withCount
+            ->select('secciones.*') 
             ->where('id_periodo', $this->id_periodo)
             ->with([
-                'pnf',
+                'pnfs',
                 'profesores.user'
             ])
-            // Esto permite que el conteo funcione correctamente
             ->withCount([
                 'profesores as n_profesores'
             ]);
@@ -76,8 +84,7 @@ class SeccionDataTable extends BaseDataTable
         }
 
         if ($this->request()->filled('filtro_pnf')) {
-            $pnfId = $this->request()->get('filtro_pnf');
-            $query->where('id_pnf', $pnfId);
+            $query->porPnf($this->request()->get('filtro_pnf'));
         }
 
         return $query;
@@ -102,7 +109,7 @@ class SeccionDataTable extends BaseDataTable
         return [
             Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(50)->addClass('text-center align-middle'),
             Column::make('nombre_seccion')->title('Sección')->searchable(true)->addClass('align-middle fw-bold')->width('25%'),
-            Column::make('pnf_nombre')->title('PNF')->searchable(true)->addClass('align-middle')->width('25%'),
+            Column::make('pnf_nombre')->title('PNFs')->searchable(true)->addClass('align-middle')->width('25%'),
             Column::make('profesores_lista')->title('Docentes')->searchable(true)->addClass('align-middle')->width('25%'),
             Column::computed('action')->title('Acciones')->exportable(false)->printable(false)->width('25%')->addClass('text-center align-middle'),
         ];

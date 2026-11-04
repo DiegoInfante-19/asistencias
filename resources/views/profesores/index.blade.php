@@ -35,10 +35,10 @@
                     <select id="filtro_seccion" class="form-select select2-buscador">
                         <option value="" selected>Todas las Secciones...</option>
                         @if(isset($secciones))
-                        <!-- CORRECCIÓN: Filtramos las secciones en vivo para mostrar solo las activas -->
-                        @foreach(\App\Models\Seccion::with('pnf')->activasParaAsignacion()->orderBy('nombre_seccion')->get() as $seccion)
+                        <!-- CORREGIDO: Se usa with('pnfs') en plural y se aprovecha el accessor nombre_completo_select -->
+                        @foreach(\App\Models\Seccion::with(['pnfs', 'periodoAcademico.cohorte'])->activasParaAsignacion()->orderBy('nombre_seccion')->get() as $seccion)
                         <option value="{{ $seccion->id_seccion }}">
-                            {{ $seccion->nombre_seccion }} ({{ $seccion->pnf->nombre_pnf ?? 'Sin PNF' }})
+                            {{ $seccion->nombre_completo_select }}
                         </option>
                         @endforeach
                         @endif

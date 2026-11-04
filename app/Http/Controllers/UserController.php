@@ -139,7 +139,7 @@ class UserController extends Controller
             'rol', 
             'profesor.pnf', 
             'profesor.secciones.periodoAcademico.cohorte',
-            'profesor.secciones.pnf',
+            'profesor.secciones.pnfs', // CORREGIDO: Se usa la relación en plural 'pnfs'
             'profesor.secciones.inscripciones.persona.cohorte',
             'profesor.secciones.inscripciones.persona.empresaPersona.empresa'
         ])->findOrFail($id);
@@ -151,9 +151,9 @@ class UserController extends Controller
             $pnfs = Pnf::where('vigencia_pnf', true)->orderBy('nombre_pnf', 'asc')->get();
 
             if ($user->profesor && $user->profesor->id_pnf && $user->profesor->nivel_asignado) {
-                // Consultamos las secciones disponibles filtrando por el PNF del profesor sin invocar columnas inexistentes
-                $seccionesDisponibles = \App\Models\Seccion::with(['periodoAcademico.cohorte', 'pnf'])
-                    ->where('id_pnf', $user->profesor->id_pnf)
+                // CORREGIDO: Se busca usando el scope porPnf() sobre la tabla pivote y la relación 'pnfs'
+                $seccionesDisponibles = \App\Models\Seccion::with(['periodoAcademico.cohorte', 'pnfs'])
+                    ->porPnf($user->profesor->id_pnf)
                     ->activasParaAsignacion()
                     ->get()
                     ->map(function ($seccion) {

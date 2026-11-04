@@ -30,9 +30,9 @@
         ESTILO CUSTOM PARA BADGE SECCIÓN (SOFT BORDER)
        ========================================= */
     .badge-seccion-custom {
-        background-color: #e7f1ff !important; /* Fondo azul primario muy claro */
-        color: #0d6efd !important;             /* Texto azul primario */
-        border: 1px solid #0d6efd !important;  /* Borde con el color completo primario */
+        background-color: #e7f1ff !important; 
+        color: #0d6efd !important;             
+        border: 1px solid #0d6efd !important;  
         font-weight: 600 !important;
         font-size: 0.85rem !important;
         padding: 0.4em 0.75em !important;
@@ -173,7 +173,8 @@
             <div class="d-block d-md-none">
                 @php
                     $user = auth()->user();
-                    $queryMovil = App\Models\Seccion::query()->activasParaAsignacion()->with(['pnf', 'periodoAcademico.cohorte', 'profesores.user']);
+                    // CORRECCIÓN AQUÍ: Se cambió 'pnf' a 'pnfs' en el with()
+                    $queryMovil = App\Models\Seccion::query()->activasParaAsignacion()->with(['pnfs', 'periodoAcademico.cohorte', 'profesores.user']);
                     
                     if (!$user->isAdmin() && !$user->isCoordinador()) {
                         if ($user->profesor) {
@@ -201,7 +202,13 @@
                             <!-- Badge con estilo de borde completo y fondo claro diferenciado -->
                             <span class="badge badge-seccion-custom mb-1">Sección: {{ $seccion->nombre_seccion }}</span>
                             <div class="text-muted small fw-medium mt-1">
-                                <i class="bi bi-mortarboard text-secondary me-1"></i>{{ $seccion->pnf->nombre_pnf ?? 'Sin PNF' }}
+                                <i class="bi bi-mortarboard text-secondary me-1"></i>
+                                <!-- CORRECCIÓN AQUÍ: Renderizado del array de PNFs -->
+                                @if($seccion->pnfs->isEmpty())
+                                    <span class="fst-italic">Sin PNF</span>
+                                @else
+                                    {{ $seccion->pnfs->pluck('nombre_pnf')->implode(' / ') }}
+                                @endif
                             </div>
                         </div>
                         <!-- Cohorte limpio sin texto adicional -->
@@ -249,7 +256,7 @@
                     <!-- Botón de Acción Principal en Móvil (Sólido) -->
                     <div class="d-grid">
                         <a href="{{ route('clases.secciones.sesiones', $seccion->id_seccion) }}" class="btn btn-primary btn-sm fw-bold shadow-sm py-2">
-                            <i class="bi bi-calendar-check me-1"></i> Gestionar Sesiones y Asistencia
+                            <i class="bi bi-calendar-check me-1"></i> Gestionar Sesiones
                         </a>
                     </div>
                 </div>

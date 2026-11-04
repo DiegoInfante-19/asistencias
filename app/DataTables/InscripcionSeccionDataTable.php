@@ -20,32 +20,28 @@ class InscripcionSeccionDataTable extends BaseDataTable
             ->addColumn('nombre_corto', function ($inscripcion) {
                 return $inscripcion->persona->nombre_corto ?? 'N/D';
             })
+            // AQUI: Usamos el accessor de TitulacionPersona que resuelve el nombre comercial
             ->addColumn('titulo_optar', function ($inscripcion) {
-                return $inscripcion->persona->titulo_base ?? 'N/D';
+                return $inscripcion->persona->titulacionPersona->nombre_titulo_especifico ?? 'N/D';
             })
             ->filterColumn('cedula', function($query, $keyword) {
-                $query->where('personas.cedula_personas', 'like', "%{$keyword}%");
+                $query->whereHas('persona', function($q) use ($keyword) {
+                    $q->where('cedula_personas', 'like', "%{$keyword}%");
+                });
             })
             ->filterColumn('nombre_corto', function($query, $keyword) {
-                $query->where(function($q) use ($keyword) {
-                    $q->whereRaw("CONCAT(personas.primer_nombre_personas, ' ', personas.primer_apellido_personas) like ?", ["%{$keyword}%"])
-                      ->orWhereRaw("CONCAT(personas.primer_nombre_personas, ' ', personas.segundo_nombre_personas, ' ', personas.primer_apellido_personas, ' ', personas.segundo_apellido_personas) like ?", ["%{$keyword}%"]);
+                $query->whereHas('persona', function($q) use ($keyword) {
+                    $q->whereRaw("CONCAT(primer_nombre_personas, ' ', primer_apellido_personas) like ?", ["%{$keyword}%"])
+                      ->orWhereRaw("CONCAT(primer_nombre_personas, ' ', segundo_nombre_personas, ' ', primer_apellido_personas, ' ', segundo_apellido_personas) like ?", ["%{$keyword}%"]);
                 });
             })
+            // AQUI: Ajustamos la búsqueda para que consulte en la tabla pivot titulos_pnf
             ->filterColumn('titulo_optar', function($query, $keyword) {
-                $query->whereHas('persona.titulacionPersona.titulacion', function($q) use ($keyword) {
-                    $q->where('nombre_titulo_base', 'like', "%{$keyword}%");
+                $query->whereHas('persona.titulacionPersona.tituloPnf', function($q) use ($keyword) {
+                    $q->where('nombre_titulo_pnf', 'like', "%{$keyword}%");
                 });
-            })
-            ->orderColumn('cedula', function ($query, $order) {
-                $query->orderBy('personas.cedula_personas', $order);
-            })
-            ->orderColumn('nombre_corto', function ($query, $order) {
-                $query->orderBy('personas.primer_nombre_personas', $order)
-                      ->orderBy('personas.primer_apellido_personas', $order);
             })
             ->addColumn('action', function ($inscripcion) {
-                // Si la sección está inactiva, bloqueamos el botón de retiro
                 if (!$this->seccion->estaActiva()) {
                     return '<span class="badge bg-secondary">Bloqueado (Inactiva)</span>';
                 }
@@ -72,8 +68,9 @@ HTML;
     {
         return $model->newQuery()
             ->select('inscripciones_secciones.*')
-            ->join('personas', 'inscripciones_secciones.id_personas', '=', 'personas.id_personas')
             ->with([
+                // AQUI: Añadimos tituloPnf para evitar consultas N+1 al usar el accessor
+                'persona.titulacionPersona.tituloPnf', 
                 'persona.titulacionPersona.titulacion',
                 'persona.titulacionPersona.pnf'
             ])

@@ -81,3 +81,6 @@
         </div>
     </div>
 </div>
+
+<!-- INCLUIMOS EL MODAL MASIVO DE SESIONES -->
+@include('sesiones.partials.modal_generar_sesiones_masivo')

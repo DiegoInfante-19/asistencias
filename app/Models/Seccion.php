@@ -12,9 +12,9 @@ class Seccion extends Model
     protected $table = 'secciones';
     protected $primaryKey = 'id_seccion';
     
+    // 1. ELIMINAMOS 'id_pnf' del fillable
     protected $fillable = [
         'id_periodo', 
-        'id_pnf', 
         'nombre_seccion', 
         'estatus_seccion'
     ];
@@ -24,9 +24,11 @@ class Seccion extends Model
         return $this->belongsTo(PeriodoAcademico::class, 'id_periodo', 'id_periodo');
     }
 
-    public function pnf(): BelongsTo
+    // 2. NUEVA RELACIÓN MUCHOS A MUCHOS
+    public function pnfs(): BelongsToMany
     {
-        return $this->belongsTo(Pnf::class, 'id_pnf', 'id_pnf');
+        return $this->belongsToMany(Pnf::class, 'pnf_seccion', 'id_seccion', 'id_pnf')
+                    ->withTimestamps();
     }
 
     public function profesores(): BelongsToMany
@@ -48,29 +50,20 @@ class Seccion extends Model
 
     /**
      * =====================================================================
-     * MÉTODOS DE AYUDA Y ESTANDARIZACIÓN DE ESTATUS (FASE 1)
+     * MÉTODOS DE AYUDA Y ESTANDARIZACIÓN DE ESTATUS
      * =====================================================================
      */
 
-    /**
-     * Valida de manera estricta si la sección se encuentra en estado Activo/Activa.
-     */
     public function estaActiva(): bool
     {
         return in_array(strtolower($this->estatus_seccion), ['activo', 'activa'], true);
     }
 
-    /**
-     * Scope para filtrar únicamente secciones activas a nivel general.
-     */
     public function scopeActivas(Builder $query): Builder
     {
         return $query->whereIn('estatus_seccion', ['Activo', 'Activa', 'activo', 'activa']);
     }
 
-    /**
-     * Scope original optimizado: Secciones activas y con período académico vigente para asignaciones.
-     */
     public function scopeActivasParaAsignacion(Builder $query): Builder
     {
         return $query->whereIn('estatus_seccion', ['Activo', 'Activa', 'activo', 'activa'])
@@ -79,9 +72,18 @@ class Seccion extends Model
             });
     }
 
-    public function scopePorPnf($query, $idPnf)
+    // 3. SCOPE ACTUALIZADO PARA BUSCAR EN LA TABLA PIVOTE
+    public function scopePorPnf(Builder $query, $idPnf): Builder
     {
-        return $query->where('id_pnf', $idPnf);
+        return $query->whereHas('pnfs', function (Builder $q) use ($idPnf) {
+            $q->where('pnfs.id_pnf', $idPnf);
+        });
+    }
+
+    // 4. NUEVO HELPER: Verifica si la sección admite a un PNF
+    public function admitePnf(int $idPnf): bool
+    {
+        return $this->pnfs()->where('pnfs.id_pnf', $idPnf)->exists();
     }
 
     public function scopePorProfesor($query, $idProfesor)
@@ -105,9 +107,12 @@ class Seccion extends Model
         });
     }
 
+    // 5. ACCESOR ACTUALIZADO: Une los nombres de múltiples PNFs con coma
     public function getNombreCompletoSelectAttribute(): string
     {
-        $pnfNombre = $this->pnf->nombre_pnf ?? 'Sin PNF';
+        $pnfsNombres = $this->pnfs->pluck('nombre_pnf')->implode(', ');
+        $pnfTexto = $pnfsNombres ?: 'Sin PNF asignado';
+        
         $cohorteNum = $this->periodoAcademico->cohorte->numero_cohorte ?? 'S/C';
         $periodoFechas = '';
 
@@ -116,6 +121,6 @@ class Seccion extends Model
             $periodoFechas = $inicio ? "({$inicio})" : '';
         }
 
-        return "{$this->nombre_seccion} — [PNF: {$pnfNombre} | Cohorte: {$cohorteNum} {$periodoFechas}]";
+        return "{$this->nombre_seccion} — [PNF: {$pnfTexto} | Cohorte: {$cohorteNum} {$periodoFechas}]";
     }
 }

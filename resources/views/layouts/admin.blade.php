@@ -3,7 +3,7 @@
 
 <head><!--begin::Head-->
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>AdminLTE v4 | Dashboard</title>
+  <title>SATAE</title>
 
   <!-- Token CSRF OBLIGATORIO para peticiones AJAX de jQuery -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -16,7 +16,7 @@
   <!--end::Accessibility Meta Tags-->
 
   <!--begin::Primary Meta Tags-->
-  <meta name="title" content="AdminLTE v4 | Dashboard" />
+  <meta name="title" content="SATAE" />
   <meta name="author" content="ColorlibHQ" />
   <meta name="description" content="AdminLTE is a Free Bootstrap 5 Admin Dashboard..." />
   <!--end::Primary Meta Tags-->
@@ -55,7 +55,7 @@
       <div class="sidebar-brand">
         <a href="{{ route('admin.index') }}" class="brand-link">
           <img src="{{ asset('images/upt_logo-modified.png') }}" alt="Logo" class="brand-image opacity-75 shadow" />
-          <span class="brand-text fw-light">Assis.UPT</span>
+          <span class="brand-text fw-light">SATAE</span>
         </a>
       </div>
 

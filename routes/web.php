@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DashboardController;
 
 use App\Http\Controllers\ProfileController;
 
@@ -15,7 +16,7 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PnfController;
 use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\PeriodoAcademicoController; 
-use App\Http\Controllers\SeccionController;                                
+use App\Http\Controllers\SeccionController;                                 
 use App\Http\Controllers\TituloController;
 use App\Http\Controllers\EstatusExpedienteController;
 use App\Http\Controllers\PeriodoRecesoController;
@@ -42,8 +43,8 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
     // ---------------------------------------------------------------------
     Route::middleware(['role:Administrador,Coordinador,Profesor'])->group(function () {
         
-        // Panel de inicio (Dashboard)
-        Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+        // Panel de inicio (Dashboard Principal)
+        Route::get('/', [DashboardController::class, 'index'])->name('admin.index');
 
         // Perfil y Seguridad
         Route::get('/perfil', [ProfileController::class, 'index'])->name('perfil.index');
@@ -69,17 +70,18 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             Route::get('/sesiones/{sesion}', 'show')->name('sesiones.show');
             Route::put('/sesiones/{sesion}', 'update')->name('sesiones.update');
             Route::delete('/sesiones/{sesion}', 'destroy')->name('sesiones.destroy');
+            Route::post('/sesiones/store-masivo', [SesionController::class, 'storeMasivo'])->name('sesiones.store_masivo');
         });
         
         Route::post('/asistencias/guardar-lote', [AsistenciaController::class, 'guardarLote'])->name('asistencias.guardar_lote');
     });
 
     // ---------------------------------------------------------------------
-    // BÓVEDA 2: ACCESO RESTRINGIDO (So lo Administrador y Coordinador)
+    // BÓVEDA 2: ACCESO RESTRINGIDO (Solo Administrador y Coordinador)
     // ---------------------------------------------------------------------
     Route::middleware(['role:Administrador,Coordinador'])->group(function () {
 
-        // Gestión de Usuarios y Prof esores
+        // Gestión de Usuarios y Profesores
         Route::resource('usuarios', UserController::class);
         Route::post('/usuarios/{usuario}/asignar-pnf', [UserController::class, 'asignarPnf'])->name('usuarios.asignar_pnf');
         Route::post('/usuarios/{usuario}/asignar-seccion', [UserController::class, 'asignarSeccion'])->name('usuarios.asignar_seccion');
@@ -136,9 +138,6 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             // Nivel 2: DataTable de Secciones (Filtrado por período)
             Route::get('/estructura-academica/periodos/{periodo}/secciones', 'seccionesPorPeriodo')->name('estructura.periodos.secciones');
         });
-
-
-
 
         Route::controller(CohorteController::class)->group(function () {
             Route::get('/cohortes', 'index')->name('cohortes.index');

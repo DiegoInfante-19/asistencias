@@ -3,20 +3,29 @@
     <div class="card-body bg-light rounded d-flex flex-column flex-md-row align-items-md-end gap-3 p-3">
         <div class="flex-grow-1">
             <label class="form-label fw-bold text-dark mb-1">Añadir Estudiante a la Sección</label>
-            <form id="formMatricular" action="{{ route('secciones.inscribir', $seccion->id_seccion) }}" method="POST">
-                @csrf
-                <select name="id_personas" class="form-select select2-buscador" required>
-                    <option value="" selected disabled>Buscar estudiante disponible (Cédula o Nombre)...</option>
-                    @foreach($estudiantesDisponibles as $estudiante)
-                    <option value="{{ $estudiante->id_personas }}">
-                        V-{{ ltrim($estudiante->cedula_personas, 'V-') }} - {{ $estudiante->nombre_corto }} - {{ $estudiante->cohorte->numero_cohorte ?? 'Externa' }} - {{ $estudiante->titulo_base }}
-                    </option>
-                    @endforeach
-                </select>
-            </form>
+            
+            <!-- CANDADO VISUAL 3.4: Si no hay estudiantes disponibles, ocultar formulario y mostrar info -->
+            @if($estudiantesDisponibles->isNotEmpty())
+                <form id="formMatricular" action="{{ route('secciones.inscribir', $seccion->id_seccion) }}" method="POST">
+                    @csrf
+                    <select name="id_personas" class="form-select select2-buscador" required>
+                        <option value="" selected disabled>Buscar estudiante disponible (Cédula o Nombre)...</option>
+                        @foreach($estudiantesDisponibles as $estudiante)
+                        <option value="{{ $estudiante->id_personas }}">
+                            V-{{ ltrim($estudiante->cedula_personas, 'V-') }} - {{ $estudiante->nombre_corto }} - [{{ $estudiante->titulacionPersona->pnf->nombre_pnf ?? 'PNF' }}] - {{ $estudiante->titulo_base }}
+                        </option>
+                        @endforeach
+                    </select>
+                </form>
+            @else
+                <div class="alert alert-warning mb-0 py-2 small shadow-sm">
+                    <i class="bi bi-info-circle me-1"></i> No hay estudiantes disponibles para matricular en los PNF de esta sección (todos se encuentran cursando en otra sección activa o marcados como "No Continúa").
+                </div>
+            @endif
         </div>
         <div class="mt-2 mt-md-0">
-            <button type="submit" form="formMatricular" class="btn btn-primary shadow-sm">
+            <!-- Bloquear botón si la colección está vacía -->
+            <button type="submit" form="formMatricular" class="btn btn-primary shadow-sm" {{ $estudiantesDisponibles->isEmpty() ? 'disabled' : '' }}>
                 <i class="bi bi-plus-circle me-1"></i> Inscribir
             </button>
         </div>

@@ -58,7 +58,6 @@ class SesionPolicy
             if (!$sesion->profesorPerteneceASeccion($idProfesor)) {
                 return Response::deny('No tiene autorización para modificar sesiones de esta sección.');
             }
-            // SE ELIMINÓ LA VALIDACIÓN DE TIEMPO AGOTADO AQUÍ
         }
 
         return true;

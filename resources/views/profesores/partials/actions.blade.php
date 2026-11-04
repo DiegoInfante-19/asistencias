@@ -19,7 +19,10 @@
         <i class="bi bi-pencil"></i>
     </button>
 
-    <button type="submit" form="form-delete-{{ $user->id_users }}" class="btn btn-outline-secondary" title="Eliminar Profesor">
+    <button type="button" 
+        class="btn btn-outline-secondary btn-delete-record" 
+        data-form-id="form-delete-{{ $user->id_users }}" 
+        title="Eliminar Profesor">
         <i class="bi bi-trash"></i>
     </button>
 </div>

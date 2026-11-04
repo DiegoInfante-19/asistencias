@@ -8,7 +8,7 @@
     <!-- ========================================== -->
     <div class="row g-4 mb-4">
 
-        <!-- COLUMNA 1: HEADER DE NAVEGACIÓN Y CONTEXTO (DRILL-DOWN) -->
+        <!-- COLUMNA 1: HEADER DE NAVEGACIÓN Y CONTEXTO -->
         <div class="col-lg-6">
             <div class="card h-100 shadow-sm ecosystem-card">
                 <div class="card-body p-4 bg-white d-flex flex-column justify-content-between">
@@ -31,7 +31,7 @@
                         </div>
 
                         <p class="text-muted mb-0 small">
-                            @if($periodo->fecha_inicio &&$periodo->fecha_fin)
+                            @if($periodo->fecha_inicio && $periodo->fecha_fin)
                             Inicia el {{ $periodo->fecha_inicio->format('d') }} de {{ \Carbon\Carbon::parse($periodo->fecha_inicio)->locale('es')->monthName }} del año {{ $periodo->fecha_inicio->format('Y') }}<br>
                             y finaliza el {{ $periodo->fecha_fin->format('d') }} de {{ \Carbon\Carbon::parse($periodo->fecha_fin)->locale('es')->monthName }} del año {{ $periodo->fecha_fin->format('Y') }}.
                             @else
@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <!-- COLUMNA 2: PANEL DE FILTROS RÁPIDOS (AJAX DATATABLES) -->
+        <!-- COLUMNA 2: PANEL DE FILTROS RÁPIDOS -->
         <div class="col-lg-6">
             <div class="card h-100 shadow-sm ecosystem-card overflow-hidden">
                 <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
@@ -93,7 +93,7 @@
 
                     </div>
 
-                    <!-- BOTÓN LIMPIAR FILTROS AL PIE -->
+                    <!-- BOTÓN LIMPIAR FILTROS -->
                     <div class="mt-4 pt-2 border-top">
                         <button type="button" id="btn-limpiar-filtros" class="btn btn-success shadow-sm">
                             <i class="bi bi-x-circle me-1"></i> Limpiar Filtros
@@ -106,7 +106,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- TARJETA PRINCIPAL CON LA TABLA YAJRA       -->
+    <!-- TARJETA PRINCIPAL CON LA TABLA YAJRA        -->
     <!-- ========================================== -->
     <div class="card shadow-sm ecosystem-card">
         <div class="card-header bg-white py-3 d-flex align-items-center">
@@ -138,14 +138,13 @@
 
 </div>
 
-<!-- INCLUIMOS LOS MODALES DE SECCIÓN (Nivel 2) -->
+<!-- INCLUIMOS LOS MODALES DE SECCIÓN -->
 @include('estructura_academica.partials.modals_seccion')
 
 @endsection
 
 @section('styles')
 <style>
-    /* Estética unificada y blindaje de esquinas idéntico a show.blade.php */
     .ecosystem-card {
         border: 1px solid #cbd5e1 !important;
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05) !important;
@@ -168,7 +167,6 @@
         border-bottom-right-radius: 0.5rem !important;
     }
 
-    /* Estética para Select2 */
     .select2-container--bootstrap-5 .select2-selection {
         background-color: #f8f9fa !important;
         border-color: #cbd5e1 !important;
@@ -180,7 +178,6 @@
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     }
 
-    /* Botón limpiar */
     .btn-limpiar-filtros-dt {
         background-color: #f8f9fa !important;
         border-color: #cbd5e1 !important;
@@ -190,6 +187,54 @@
         background-color: #e9ecef !important;
         border-color: #94a3b8 !important;
     }
+
+    .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+        background-color: var(--bs-dark-bg-subtle) !important;
+        color: var(--bs-dark) !important;
+        border: 1px solid var(--bs-dark) !important;
+        border-radius: 0.5rem !important;
+        padding: 0.15rem 0.5rem !important;
+        margin-top: 0.35rem !important;
+        margin-bottom: 0.35rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove {
+        color: var(--bs-dark) !important;
+        opacity: 0.7;
+        margin-right: 0.5rem !important;
+        font-weight: bold !important;
+        border-right: 1px solid rgba(0, 0, 0, 0.1) !important;
+        padding-right: 0.4rem !important;
+        transition: all 0.2s ease;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove:hover {
+        background-color: transparent !important;
+        color: #dc3545 !important;
+        opacity: 1;
+    }
+
+    /* ESTILOS DE CORRECCIÓN HOVER PARA ACCIONES */
+    .btn-action-view:hover {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: #ffffff !important;
+    }
+
+    .btn-action-edit:hover {
+        background-color: #ffc107 !important;
+        border-color: #ffc107 !important;
+        color: #000000 !important;
+    }
+
+    .btn-action-delete:hover {
+        background-color: #dc3545 !important;
+        border-color: #dc3545 !important;
+        color: #ffffff !important;
+    }
 </style>
 @endsection
 
@@ -197,14 +242,28 @@
 <script type="module">
     document.addEventListener('DOMContentLoaded', function() {
         // 1. Inicializar Select2 en los filtros
-        if ($.fn.select2) {
-            $('.select2-filtro').select2({
-                theme: 'bootstrap-5',
-                width: '100%'
-            });
-        }
+        $('.select2-filtro').select2({
+            theme: 'bootstrap-5',
+            width: '100%'
+        });
 
-        // 2. Conectar los filtros personalizados al Yajra DataTable vía preXhr
+        $('#select_pnfs_seccion').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $('#modalSeccion'),
+            placeholder: $(this).data('placeholder'),
+            allowClear: true
+        });
+
+        $('#edit_select_pnfs_seccion').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $('#modalEditarSeccion'),
+            placeholder: $(this).data('placeholder'),
+            allowClear: true
+        });
+
+        // 2. Conectar filtros personalizados al DataTable
         const tableName = 'secciones-table';
 
         $('#' + tableName).on('preXhr.dt', function(e, settings, data) {
@@ -224,36 +283,36 @@
             triggerDatatableDraw();
         });
 
-        // 3. Botón para limpiar los filtros
+        // 3. Botón para limpiar filtros
         $('#btn-limpiar-filtros').on('click', function() {
             $('#filtro_pnf, #filtro_profesor').val(null).trigger('change');
             triggerDatatableDraw();
         });
 
-        // 4. Automatización del generador de nombres de sección en el modal
-        const selectPnfSeccion = document.getElementById('select_pnf_seccion');
+        // 4. Generador dinámico de nombres
+        const selectPnfsSeccion = document.getElementById('select_pnfs_seccion');
         const inputNumeroSeccion = document.getElementById('numero_correlativo_seccion');
         const inputNombreFinalSeccion = document.getElementById('nombre_seccion_final');
 
         function actualizarNombreSeccion() {
-            if (!selectPnfSeccion || !inputNumeroSeccion || !inputNombreFinalSeccion) return;
+            if (!selectPnfsSeccion || !inputNumeroSeccion || !inputNombreFinalSeccion) return;
 
-            const opcionSeleccionada = selectPnfSeccion.options[selectPnfSeccion.selectedIndex];
-            const nombrePnf = opcionSeleccionada ? opcionSeleccionada.getAttribute('data-nombre') : '';
+            const opcionesSeleccionadas = Array.from(selectPnfsSeccion.selectedOptions);
+            const nombresPnfs = opcionesSeleccionadas.map(op => op.getAttribute('data-nombre'));
             let numero = inputNumeroSeccion.value;
 
-            if (nombrePnf && numero) {
+            if (nombresPnfs.length > 0 && numero) {
                 const numeroFormateado = numero.toString().padStart(2, '0');
-                inputNombreFinalSeccion.value = `${nombrePnf} - ${numeroFormateado}`;
+                inputNombreFinalSeccion.value = `${nombresPnfs.join(' / ')} - ${numeroFormateado}`;
             } else {
                 inputNombreFinalSeccion.value = '';
             }
         }
 
-        if (selectPnfSeccion) selectPnfSeccion.addEventListener('change', actualizarNombreSeccion);
+        $('#select_pnfs_seccion').on('change', actualizarNombreSeccion);
         if (inputNumeroSeccion) inputNumeroSeccion.addEventListener('input', actualizarNombreSeccion);
 
-        // Capturar dinámicamente el id_periodo cuando se abre el modal de Nueva Sección
+        // 5. Capturar id_periodo para la creación
         const modalSeccionObj = document.getElementById('modalSeccion');
         if (modalSeccionObj) {
             modalSeccionObj.addEventListener('show.bs.modal', function(event) {
@@ -269,27 +328,93 @@
             modalSeccionObj.addEventListener('hidden.bs.modal', function() {
                 document.getElementById('createSeccionForm').reset();
                 if (inputNombreFinalSeccion) inputNombreFinalSeccion.value = '';
-                if (selectPnfSeccion) $(selectPnfSeccion).val(null).trigger('change');
+                $('#select_pnfs_seccion').val(null).trigger('change');
             });
         }
 
-        // 5. Relleno dinámico del Modal de Edición de Sección
+        // 6. Carga dinámica del modal de edición
         const modalEditarSeccion = document.getElementById('modalEditarSeccion');
         if (modalEditarSeccion) {
             modalEditarSeccion.addEventListener('show.bs.modal', function(event) {
                 const button = event.relatedTarget;
 
-                document.getElementById('edit_id_pnf').value = button.getAttribute('data-pnf');
-                document.getElementById('edit_pnf_nombre_display').value = button.getAttribute('data-pnf-nombre');
                 document.getElementById('edit_nombre_seccion').value = button.getAttribute('data-nombre');
                 document.getElementById('edit_estatus_seccion').value = button.getAttribute('data-estatus');
+
+                try {
+                    const pnfsSeleccionados = JSON.parse(button.getAttribute('data-pnfs-json') || '[]');
+                    $('#edit_select_pnfs_seccion').val(pnfsSeleccionados).trigger('change');
+                } catch(e) {
+                    console.error("Error al parsear el JSON de PNFs", e);
+                    $('#edit_select_pnfs_seccion').val(null).trigger('change');
+                }
 
                 document.getElementById('formEditarSeccion').action = `/secciones/${button.getAttribute('data-id')}`;
             });
         }
+
+        // =======================================================
+        // 7. DELEGACIÓN ROBUSTA CON DOBLE CONFIRMACIÓN (SWEETALERT2)
+        // =======================================================
+        $(document).on('click', '.btn-delete-record', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const $btn = $(this);
+            const formId = $btn.data('form-id');
+            
+            let formToSubmit = document.getElementById(formId);
+            if (!formToSubmit) {
+                formToSubmit = $btn.closest('td, div, tr').find('form#' + formId)[0] || $btn.siblings('form')[0];
+            }
+
+            if (!formToSubmit) {
+                console.error("No se encontró el formulario de eliminación con ID: " + formId);
+                return;
+            }
+
+            // NIVEL 1: Primera Advertencia
+            Swal.fire({
+                title: "¿Está seguro que quiere eliminar esta sección?",
+                text: "Esta acción la removerá del período actual.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Sí, quiero eliminarla",
+                cancelButtonText: "Cancelar",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // NIVEL 2: Confirmación Estricta
+                    Swal.fire({
+                        title: "Confirmación Final",
+                        html: "Si elimina esta sección, <b>se perderá el registro de forma permanente</b>.<br><br>¿Confirmar eliminación?",
+                        icon: "error",
+                        showCancelButton: true,
+                        confirmButtonColor: "#000000",
+                        cancelButtonColor: "#6c757d",
+                        confirmButtonText: '<i class="bi bi-trash-fill me-1"></i> Confirmar y Borrar',
+                        cancelButtonText: "Cancelar",
+                        reverseButtons: true
+                    }).then((secondResult) => {
+                        if (secondResult.isConfirmed) {
+                            Swal.fire({
+                                title: "Eliminando...",
+                                text: "Por favor espere.",
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+                            formToSubmit.submit();
+                        }
+                    });
+                }
+            });
+        });
     });
 </script>
 
-<!-- Renderizado del script Yajra DataTable de Secciones -->
 {!! $dataTable->scripts(null, ['type' => 'module']) !!}
 @endpush

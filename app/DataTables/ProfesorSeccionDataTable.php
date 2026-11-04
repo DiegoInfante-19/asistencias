@@ -15,19 +15,20 @@ class ProfesorSeccionDataTable extends BaseDataTable
         return EloquentDataTable::create($query)
             ->addIndexColumn()
             ->editColumn('cedula', function ($profesor) {
-                return '<span class="fw-bold">V-' . ltrim($profesor->user->cedula_users ?? '', 'V-') . '</span>';
+                return 'V-' . ltrim(e($profesor->user->cedula_users ?? ''), 'V-');
             })
             ->addColumn('nombre_completo', function ($profesor) {
-                $nombre = $profesor->user->name_users ?? '';
-                $apellido = $profesor->user->last_name_users ?? '';
-                $email = $profesor->user->email_users ?? '';
+                $nombre = e($profesor->user->name_users ?? '');
+                $apellido = e($profesor->user->last_name_users ?? '');
+                $email = e($profesor->user->email_users ?? '');
 
-                return '<div class="fw-bold text-dark">' . $nombre . ' ' . $apellido . '</div>' .
+                return '<div class="fw-medium text-dark">' . $nombre . ' ' . $apellido . '</div>' .
                     '<div class="text-muted small">' . $email . '</div>';
             })
+            // BADGE ESTANDARIZADO Y ELEGANTE (Mismo estilo PNF de UsersDataTable)
             ->editColumn('nivel_asignado', function ($profesor) {
                 $nivel = $profesor->nivel_asignado?->value ?? $profesor->nivel_asignado ?? 'N/D';
-                return '<h5><span class="badge bg-primary text-dark">' . $nivel . '</span></h5>';
+                return '<span class="badge text-dark bg-dark-subtle border border-dark rounded-3 shadow-sm px-2 py-1" style="font-size: 0.8rem; font-weight: 500;">' . e($nivel) . '</span>';
             })
             ->filterColumn('cedula', function($query, $keyword) {
                 $query->where('users.cedula_users', 'like', "%{$keyword}%");
@@ -66,7 +67,7 @@ class ProfesorSeccionDataTable extends BaseDataTable
         <form action="{$url}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de remover a este docente de la sección?');">
             {$csrf}
             {$method}
-            <button type="submit" class="btn btn-danger shadow-sm">Remover</button>
+            <button type="submit" class="btn btn-danger btn-sm shadow-sm">Remover</button>
         </form>
 HTML;
             })
@@ -99,12 +100,11 @@ HTML;
     protected function getColumns(): array
     {
         return [
-            Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center'),
-            // Vinculamos explícitamente el name() para que Yajra sepa a qué columna física corresponde cada campo relacionado
-            Column::make('cedula')->name('users.cedula_users')->title('Cédula')->searchable(true)->width('15%'),
-            Column::make('nombre_completo')->name('users.name_users')->title('Nombre y Apellido')->searchable(true)->width('35%'),
-            Column::make('nivel_asignado')->name('profesores.nivel_asignado')->title('Nivel Académico')->searchable(true)->width('40%'),
-            Column::computed('action')->title('Acciones')->width('20%')->exportable(false)->printable(false)->addClass('text-center'),
+            Column::make('DT_RowIndex')->title('#')->searchable(false)->orderable(false)->width(40)->addClass('text-center align-middle'),
+            Column::make('cedula')->name('users.cedula_users')->title('Cédula')->searchable(true)->width('15%')->addClass('align-middle'),
+            Column::make('nombre_completo')->name('users.name_users')->title('Nombre y Apellido')->searchable(true)->width('35%')->addClass('align-middle'),
+            Column::make('nivel_asignado')->name('profesores.nivel_asignado')->title('Nivel Académico')->searchable(true)->width('40%')->addClass('align-middle'),
+            Column::computed('action')->title('Acciones')->width('20%')->exportable(false)->printable(false)->addClass('text-center align-middle'),
         ];
     }
 }

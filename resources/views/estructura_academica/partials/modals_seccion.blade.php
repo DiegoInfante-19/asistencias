@@ -16,15 +16,21 @@
                     <!-- ID CORREGIDO: Coincide perfectamente con el script -->
                     <input type="hidden" name="id_periodo" id="id_periodo_hidden">
                     
-                    <!-- SELECT PNF -->
+                    <!-- SELECT PNF (MULTI-PNF HABILITADO) -->
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold small text-muted">PNF (Programa Nacional de Formación) <span class="text-danger">*</span></label>
-                        <select class="form-select bg-light border-secondary-subtle shadow-sm" name="id_pnf" id="select_pnf_seccion" required>
-                            <option value="" selected disabled data-nombre="">Seleccione un PNF...</option>
+                        <label class="form-label fw-bold small text-muted">PNFs Asignados a la Sección <span class="text-danger">*</span></label>
+                        <!-- AQUI: Cambio a array (pnfs[]) y atributo multiple -->
+                        <select class="form-select select2-multiple-pnf shadow-sm" 
+                                name="pnfs[]" 
+                                id="select_pnfs_seccion" 
+                                multiple="multiple" 
+                                data-placeholder="Seleccione uno o más PNFs..." 
+                                required>
                             @foreach($pnfs as $pnf)
                                 <option value="{{ $pnf->id_pnf }}" data-nombre="{{ $pnf->nombre_pnf }}">{{ $pnf->nombre_pnf }}</option>
                             @endforeach
                         </select>
+                        <small class="text-muted" style="font-size: 0.75rem;">Puede asociar 2 o más PNFs para permitir matrícula compartida.</small>
                     </div>
 
                     <!-- FILA GENERADORA DE NOMBRE -->
@@ -65,7 +71,7 @@
 </div>
 
 <!-- ========================================== -->
-<!-- MODAL: ACTUALIZAR SECCIÓN (PNF PROTEGIDO)  -->
+<!-- MODAL: ACTUALIZAR SECCIÓN                  -->
 <!-- ========================================== -->
 <div class="modal fade" id="modalEditarSeccion" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -81,12 +87,20 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- PNF FIJO / BLOQUEADO -->
-                    <input type="hidden" name="id_pnf" id="edit_id_pnf">
+                    <!-- AQUI: Ahora permitimos editar los PNFs asociados -->
                     <div class="form-group mb-3">
-                        <label class="form-label fw-bold small text-muted">PNF Asignado</label>
-                        <input type="text" class="form-control bg-light border-secondary-subtle shadow-sm text-dark fw-semibold" id="edit_pnf_nombre_display" readonly tabindex="-1">
-                        <small class="text-muted" style="font-size: 0.75rem;">El PNF no se puede modificar para proteger la integridad de los estudiantes inscritos.</small>
+                        <label class="form-label fw-bold small text-muted">PNFs Asignados <span class="text-danger">*</span></label>
+                        <select class="form-select select2-multiple-pnf shadow-sm" 
+                                name="pnfs[]" 
+                                id="edit_select_pnfs_seccion" 
+                                multiple="multiple" 
+                                data-placeholder="Seleccione uno o más PNFs..." 
+                                required>
+                            @foreach($pnfs as $pnf)
+                                <option value="{{ $pnf->id_pnf }}" data-nombre="{{ $pnf->nombre_pnf }}">{{ $pnf->nombre_pnf }}</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted" style="font-size: 0.75rem;">Añade o quita PNFs según las necesidades de la sección.</small>
                     </div>
 
                     <div class="form-group mb-3">
