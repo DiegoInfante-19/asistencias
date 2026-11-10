@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
@@ -16,7 +17,7 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PnfController;
 use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\PeriodoAcademicoController; 
-use App\Http\Controllers\SeccionController;                                 
+use App\Http\Controllers\SeccionController;                                  
 use App\Http\Controllers\TituloController;
 use App\Http\Controllers\EstatusExpedienteController;
 use App\Http\Controllers\PeriodoRecesoController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\SesionController;
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\EstructuraAcademicaController;
+
 
 Auth::routes(['register' => true]);
 
@@ -45,7 +47,7 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
         
         // Panel de inicio (Dashboard Principal)
         Route::get('/', [DashboardController::class, 'index'])->name('admin.index');
-
+        Route::get('/reportes/analitica-asistencias', [\App\Http\Controllers\ReporteAnaliticaController::class, 'exportar'])->name('reportes.analitica.exportar');
         // Perfil y Seguridad
         Route::get('/perfil', [ProfileController::class, 'index'])->name('perfil.index');
         Route::put('/perfil/update', [ProfileController::class, 'update'])->name('perfil.update');
@@ -80,9 +82,9 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
     // BÓVEDA 2: ACCESO RESTRINGIDO (Solo Administrador y Coordinador)
     // ---------------------------------------------------------------------
     Route::middleware(['role:Administrador,Coordinador'])->group(function () {
-
         // Gestión de Usuarios y Profesores
         Route::resource('usuarios', UserController::class);
+        Route::put('/usuarios/{id}/cambiar-password', [UserController::class, 'cambiarPassword'])->name('usuarios.cambiar_password');
         Route::post('/usuarios/{usuario}/asignar-pnf', [UserController::class, 'asignarPnf'])->name('usuarios.asignar_pnf');
         Route::post('/usuarios/{usuario}/asignar-seccion', [UserController::class, 'asignarSeccion'])->name('usuarios.asignar_seccion');
         Route::delete('/usuarios/{id_usuario}/remover-seccion/{id_seccion}', [UserController::class, 'removerSeccion'])->name('usuarios.remover_seccion');
@@ -123,7 +125,6 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             
             // --- GESTIÓN DE TÍTULOS DEL PNF ---
             Route::post('/pnfs/{pnf}/titulos', 'vincularTitulo')->name('pnfs.titulos.store');
-            // NUEVA RUTA: Actualización in-situ
             Route::put('/pnfs/titulos/{titulo_pnf}', 'actualizarTitulo')->name('pnfs.titulos.update'); 
             Route::delete('/pnfs/titulos/{titulo_pnf}', 'desvincularTitulo')->name('pnfs.titulos.destroy');
             
@@ -133,9 +134,7 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
         });
 
         Route::controller(EstructuraAcademicaController::class)->group(function () {
-            // Nivel 1: DataTables de Cohortes y Períodos
             Route::get('/estructura-academica', 'index')->name('estructura.index');
-            // Nivel 2: DataTable de Secciones (Filtrado por período)
             Route::get('/estructura-academica/periodos/{periodo}/secciones', 'seccionesPorPeriodo')->name('estructura.periodos.secciones');
         });
 
@@ -153,7 +152,7 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
         Route::resource('secciones', SeccionController::class)->parameters([
             'secciones' => 'seccion'
         ]);
-         
+          
         Route::post('/secciones/{seccion}/inscribir', [SeccionController::class, 'inscribirEstudiante'])->name('secciones.inscribir');
         Route::delete('/secciones/{seccion}/retirar/{id_inscripcion}', [SeccionController::class, 'retirarEstudiante'])->name('secciones.retirar');
 
@@ -195,7 +194,7 @@ Route::middleware(['auth', 'no-back-history'])->group(function () {
             Route::post('/inscripciones', [PersonaInscripcionController::class, 'store'])->name('inscripciones.store');
             Route::delete('/inscripciones/{inscripcion}', [PersonaInscripcionController::class, 'destroy'])->name('inscripciones.destroy');
         });
-         
+          
         Route::get('/titulos-por-pnf/{id_pnf}', [PersonaTitulacionController::class, 'getTitulosPorPnf'])->name('api.titulos.pnf');
     });
 

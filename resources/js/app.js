@@ -77,6 +77,8 @@ import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 Alpine.start();
 
+
+
 // 10. Auto-inicialización global segura para Select2 (.select2-buscador)
 document.addEventListener('DOMContentLoaded', () => {
     // Definir $ localmente para evitar ReferenceError en este módulo

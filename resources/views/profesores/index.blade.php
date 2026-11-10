@@ -222,7 +222,6 @@
 
         // 5. BOTÓN PARA LIMPIAR / RESETEAR FILTROS
         $('#btnResetFiltros').on('click', function() {
-            // Usamos .trigger('change.select2') para evitar múltiples redibujados, y luego un solo draw()
             $('.select2-buscador').val(null).trigger('change.select2');
             window.LaravelDataTables['users-table'].draw();
         });
@@ -263,16 +262,52 @@
             modal.find('input, select').trigger('input');
         });
 
-        // 8. LÓGICA PARA AUTO-ABRIR MODAL TRAS ERROR DE VALIDACIÓN
-        @if($errors -> any())
-        @if(old('origen') == 'modal')
-        var createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
-        createUserModal.show();
-        @elseif(old('_method') == 'PUT')
-        $('#editUserForm').attr('action', $('#edit_url').val());
-        var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
-        editUserModal.show();
-        @endif
+        // 8. LÓGICA PARA EL MODAL: CAMBIAR CONTRASEÑA (Delegación global)
+        $(document).on('show.bs.modal', '#changePasswordModal', function(event) {
+            var button = $(event.relatedTarget);
+            var modal = $(this);
+            
+            // Si el modal se abre desde un botón de la tabla
+            if (button.length && button.data('url')) {
+                var actionUrl = button.data('url');
+                var userInfo = button.data('username') + ' (' + button.data('name') + ' ' + button.data('lastname') + ')';
+                
+                modal.find('#changePasswordForm').attr('action', actionUrl);
+                modal.find('#change_pwd_url').val(actionUrl);
+                modal.find('#display-username').text(userInfo);
+                
+                // Guardar en sessionStorage para persistencia en caso de error de validación
+                sessionStorage.setItem('last_change_pwd_url', actionUrl);
+                sessionStorage.setItem('last_display_username', userInfo);
+            } else {
+                // Si se abrió por re-intentar tras un error, restaurar desde sessionStorage
+                var savedUrl = sessionStorage.getItem('last_change_pwd_url');
+                var savedUser = sessionStorage.getItem('last_display_username');
+                if (savedUrl) {
+                    modal.find('#changePasswordForm').attr('action', savedUrl);
+                    modal.find('#change_pwd_url').val(savedUrl);
+                }
+                if (savedUser) {
+                    modal.find('#display-username').text(savedUser);
+                }
+            }
+            
+            modal.find('input[type="password"]').val('');
+        });
+
+        // 9. LÓGICA PARA AUTO-ABRIR MODALES TRAS ERRORES DE VALIDACIÓN
+        @if($errors->any())
+            @if(old('origen') == 'modal')
+                var createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+                createUserModal.show();
+            @elseif(old('_method') == 'PUT' && old('change_pwd_url'))
+                var changePasswordModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+                changePasswordModal.show();
+            @elseif(old('_method') == 'PUT')
+                $('#editUserForm').attr('action', $('#edit_url').val());
+                var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                editUserModal.show();
+            @endif
         @endif
     });
 </script>

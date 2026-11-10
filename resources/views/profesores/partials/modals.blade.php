@@ -248,3 +248,58 @@
         </div>
     </div>
 </div>
+<!-- ========================================== -->
+<!-- MODAL: CAMBIAR CONTRASEÑA DE USUARIO       -->
+<!-- ========================================== -->
+<div class="modal fade" id="changePasswordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-white border-bottom text-dark">
+                <h1 class="modal-title fs-5" id="changePasswordModalLabel" style="font-weight: 500;">
+                    <i class="bi bi-key-fill text-primary me-2"></i> Cambiar Contraseña de Usuario
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-white p-4">
+                <form id="changePasswordForm" method="POST" action="">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="change_pwd_url" id="change_pwd_url" value="{{ old('change_pwd_url') }}">
+                    
+                    <!-- Tarjeta informativa del usuario seleccionado -->
+                    <div class="mb-4 p-3 bg-light border rounded-3 shadow-sm d-flex align-items-center">
+                        <div class="fs-3 text-primary me-3">
+                            <i class="bi bi-person-badge-fill"></i>
+                        </div>
+                        <div>
+                            <span class="d-block text-muted small fw-bold text-uppercase">Usuario Seleccionado</span>
+                            <span class="fs-6 fw-bold text-dark" id="display-username">Cargando...</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Nueva Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control bg-light border-secondary-subtle shadow-sm @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+                        <div class="form-text text-muted small">Mínimo 8 caracteres, al menos una mayúscula, una minúscula, un número y un símbolo.</div>
+                        @error('password')
+                            <div class="invalid-feedback fw-bold">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Confirmar Nueva Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control bg-light border-secondary-subtle shadow-sm" name="password_confirmation" required autocomplete="new-password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-white border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Cancelar
+                </button>
+                <button type="submit" form="changePasswordForm" class="btn btn-primary fw-bold shadow-sm">
+                    <i class="bi bi-check-circle me-1"></i> Actualizar Contraseña
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

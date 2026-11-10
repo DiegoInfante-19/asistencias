@@ -11,24 +11,44 @@ use App\DataTables\PnfsDataTable;
 use App\Http\Requests\StorePnfRequest;
 use App\Http\Requests\UpdatePnfRequest;
 use App\Http\Requests\VincularTituloPnfRequest;
-use App\Http\Requests\UpdateTituloPnfRequest; // <-- 1. Importación del nuevo Request
+use App\Http\Requests\UpdateTituloPnfRequest;
 use App\Http\Requests\VincularEmpresaPnfRequest;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request; // <-- ¡ESTA ERA LA IMPORTACIÓN QUE FALTABA!
+use App\Services\Analytics\AttendanceHierarchyService;
 
 class PnfController extends Controller
 {
     /**
      * Muestra el catálogo de PNFs.
      */
-    public function index(PnfsDataTable $dataTable)
-    {
-        // Blindaje para responder con JSON si es una petición asíncrona de DataTables
-        if (request()->ajax() || request()->wantsJson()) {
-            return $dataTable->ajax();
-        }
-
-        return $dataTable->render('pnfs.index');
+   public function index(PnfsDataTable $dataTable, AttendanceHierarchyService $hierarchyService, Request $request)
+{
+    // Si es una petición AJAX para refrescar la jerarquía del acordeón con los filtros aplicados
+    if ($request->ajax() && $request->has('get_jerarquia')) {
+        return response()->json([
+            'jerarquia' => $hierarchyService->obtenerJerarquiaPnfEmpresas($request)
+        ]);
     }
+
+    // Blindaje para responder con JSON si es una petición asíncrona de DataTables
+    if ($request->ajax() || $request->wantsJson()) {
+        return $dataTable->ajax();
+    }
+
+    // Carga de catálogos para llenar el panel de filtros universales
+    $cohortes  = \App\Models\Cohorte::orderBy('numero_cohorte')->get();
+    $pnfs      = Pnf::where('vigencia_pnf', true)->orderBy('nombre_pnf')->get();
+    $empresas  = \App\Models\Empresa::orderBy('nombre_empresa')->get();
+    $periodos  = \App\Models\PeriodoAcademico::with('cohorte')->orderBy('fecha_inicio', 'desc')->get();
+    $secciones = \App\Models\Seccion::activasParaAsignacion()->orderBy('nombre_seccion')->get();
+
+    // Obtenemos la estructura jerárquica consolidada (PNF -> Empresas -> Meses)
+    $jerarquiaPnf = $hierarchyService->obtenerJerarquiaPnfEmpresas($request);
+
+    // AQUÍ ESTABA EL DETALLE: Debemos pasar $dataTable utilizando ->render() junto con las variables
+    return $dataTable->render('pnfs.index', compact('cohortes', 'pnfs', 'empresas', 'periodos', 'secciones', 'jerarquiaPnf'));
+}
 
     /**
      * Guarda un nuevo PNF.
@@ -76,7 +96,7 @@ class PnfController extends Controller
     }
 
     /* =====================================================================
-       MÉTODOS DEL DASHBOARD (VISTA SHOW Y VINCULACIONES)
+        MÉTODOS DEL DASHBOARD (VISTA SHOW Y VINCULACIONES)
        ===================================================================== */
 
     public function show($id)
@@ -108,13 +128,10 @@ class PnfController extends Controller
         }
     }
 
-    // <-- 2. NUEVO MÉTODO: Actualiza el título sin destruir el ID
     public function actualizarTitulo(UpdateTituloPnfRequest $request, $id_titulos_pnf)
     {
         try {
             $vinculo = TituloPnf::findOrFail($id_titulos_pnf);
-            
-            // Actualiza los campos validados in-situ
             $vinculo->update($request->validated());
 
             return redirect()->back()
@@ -124,14 +141,10 @@ class PnfController extends Controller
         }
     }
 
-    // <-- 3. MÉTODO REFACTORIZADO (Aprovecha SoftDeletes)
     public function desvincularTitulo($id_titulos_pnf)
     {
         try {
             $vinculo = TituloPnf::findOrFail($id_titulos_pnf);
-            
-            // Gracias al SoftDeletes, esto ahora hace un UPDATE deleted_at = NOW()
-            // Ya no arrojará error de llave foránea ni dejará huérfanos a los estudiantes.
             $vinculo->delete();
 
             return redirect()->back()->with('success', 'Título retirado exitosamente del catálogo activo.');

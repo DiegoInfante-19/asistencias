@@ -166,6 +166,36 @@ class UserController extends Controller
         return view('profesores.show', compact('user', 'pnfs', 'seccionesDisponibles'));
     }
 
+    public function cambiarPassword(Request $request, $id)
+    {
+        $usuarioAEditar = User::findOrFail($id);
+        $usuarioAutenticado = auth()->user();
+
+        // Blindaje: Un coordinador no puede modificar la contraseña de un Administrador
+        if ((int) $usuarioAEditar->id_rol === User::ROLE_ADMINISTRADOR && !$usuarioAutenticado->isAdmin()) {
+            return redirect()->back()->with('error', 'No tienes autorización para cambiar la contraseña de un Administrador.');
+        }
+
+        $request->validate([
+            'password' => [
+                'required', 
+                'string', 
+                'confirmed', 
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.+-])[A-Za-z\d@$!%*?&.+-]{8,64}$/'
+            ]
+        ], [
+            'password.required' => 'La nueva contraseña es obligatoria.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+            'password.regex' => 'Mínimo 8 caracteres: al menos una mayúscula, una minúscula, un número y un símbolo.'
+        ]);
+
+        $usuarioAEditar->update([
+            'password_users' => Hash::make($request->password)
+        ]);
+
+        return redirect()->back()->with('success', 'La contraseña del usuario ha sido actualizada exitosamente.');
+    }
+
     public function asignarPnf(AsignarPnfRequest $request, $id)
     {
         $user = User::findOrFail($id);

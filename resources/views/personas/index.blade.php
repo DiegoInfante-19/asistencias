@@ -2,39 +2,50 @@
 
 @section('styles')
 <style>
-    /* 1. Azul Claro (#ADD8E6) para Masculino */
-    table.dataTable tbody tr.bg-masculino>td {
+    /* 1. Azul Claro original (#ADD8E6) solo para la columna de Nombre (1ra columna) en Masculino */
+    table.dataTable tbody tr.bg-masculino > td:nth-child(1) {
         background-color: #ADD8E6 !important;
     }
 
-    /* 2. Rosa Claro (#FFB6C1) para Femenino */
-    table.dataTable tbody tr.bg-femenino>td {
+    /* 2. Rosa Claro original (#FFB6C1) solo para la columna de Nombre (1ra columna) en Femenino */
+    table.dataTable tbody tr.bg-femenino > td:nth-child(1) {
         background-color: #FFB6C1 !important;
     }
 
-    /* 3. Tonos ligeramente más profundos y cómodos para el efecto Hover */
-    table.dataTable tbody tr.bg-masculino:hover>td {
+    /* 3. Efectos Hover sutiles únicamente para la columna de Nombre */
+    table.dataTable tbody tr.bg-masculino:hover > td:nth-child(1) {
         background-color: #9ac2d9 !important;
     }
 
-    table.dataTable tbody tr.bg-femenino:hover>td {
+    table.dataTable tbody tr.bg-femenino:hover > td:nth-child(1) {
         background-color: #f29da9 !important;
     }
 
-    /* 4. ESTÉTICA UNIFICADA PARA INPUTS Y SELECTS EN EL PANEL DE FILTROS */
+    /* 4. Desde la segunda columna en adelante, todo tiene fondo blanco puro y limpio */
+    table.dataTable tbody tr.bg-masculino > td:nth-child(n+2),
+    table.dataTable tbody tr.bg-femenino > td:nth-child(n+2) {
+        background-color: #ffffff !important;
+    }
+
+    table.dataTable tbody tr.bg-masculino:hover > td:nth-child(n+2),
+    table.dataTable tbody tr.bg-femenino:hover > td:nth-child(n+2) {
+        background-color: #f8f9fa !important;
+    }
+
+    /* 5. ESTÉTICA UNIFICADA PARA INPUTS Y SELECTS EN EL PANEL DE FILTROS */
     .card-body.bg-white .form-control,
     .card-body.bg-white .form-select {
         background-color: #f8f9fa !important;
         border-color: #dee2e6 !important;
     }
 
-    /* 5. Integración específica para el buscador de Select2 para que no sea blanco puro */
+    /* 6. Integración específica para el buscador de Select2 */
     .card-body.bg-white .select2-container--bootstrap-5 .select2-selection {
         background-color: #f8f9fa !important;
         border-color: #dee2e6 !important;
     }
 
-    /* 6. Efecto al hacer Focus */
+    /* 7. Efecto al hacer Focus */
     .card-body.bg-white .form-control:focus,
     .card-body.bg-white .form-select:focus,
     .card-body.bg-white .select2-container--bootstrap-5.select2-container--open .select2-selection {
@@ -151,10 +162,8 @@
                         </label>
                         <select id="filtro_seccion" class="form-select select2-buscador">
                             <option value="">Cualquier sección...</option>
-                            <!-- CORRECCIÓN: Cambiamos 'pnf' por 'pnfs' en el with() -->
                             @foreach(\App\Models\Seccion::with('pnfs')->activasParaAsignacion()->orderBy('nombre_seccion')->get() as $seccion)
                             <option value="{{ $seccion->id_seccion }}">
-                                <!-- CORRECCIÓN: Manejamos múltiples PNFs usando implode -->
                                 Sección: {{ $seccion->nombre_seccion }} ({{ $seccion->pnfs->isEmpty() ? 'Sin PNF' : $seccion->pnfs->pluck('nombre_pnf')->implode(' / ') }})
                             </option>
                             @endforeach
@@ -292,7 +301,7 @@
             triggerDatatableDraw();
         });
 
-        // 4. LÓGICA EN CASCADA AJAX (PNF -> TÍTULO) - CORREGIDA
+        // 4. LÓGICA EN CASCADA AJAX (PNF -> TÍTULO)
         let $pnfSelect = $('#filtro_pnf');
         let $tituloSelect = $('#filtro_titulo');
 
@@ -317,7 +326,6 @@
                 success: function(data) {
                     $tituloSelect.empty().append('<option value="">Todos los títulos del PNF...</option>');
                     $.each(data, function(key, item) {
-                        // CORRECCIÓN APLICADA: Se extrae id_titulos_pnf para coincidir exactamente con el ID de la tabla puente
                         $tituloSelect.append(`<option value="${item.id_titulos_pnf}">${item.nombre_titulo_pnf}</option>`);
                     });
 

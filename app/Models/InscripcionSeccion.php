@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\CalculaMetricasAsistencia;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class InscripcionSeccion extends Model
 {
+    use CalculaMetricasAsistencia;
     use SoftDeletes;
 
     protected $table = 'inscripciones_secciones';

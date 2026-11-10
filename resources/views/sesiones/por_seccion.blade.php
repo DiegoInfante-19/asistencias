@@ -24,12 +24,12 @@
         </div>
 
         <div class="d-flex gap-2">
-            <a href="{{ route('clases.secciones.index') }}" class="btn btn-outline-secondary fw-bold shadow-sm">
+            <a href="{{ route('clases.secciones.index') }}" class="btn btn-secondary fw-bold shadow-sm">
                 <i class="bi bi-arrow-left me-1"></i> Volver al Directorio
             </a>
 
             @can('create', App\Models\Sesion::class)
-            <button type="button" class="btn btn-outline-primary fw-bold shadow-sm" onclick="abrirModalCrear()">
+            <button type="button" class="btn btn-primary fw-bold shadow-sm" onclick="abrirModalCrear()">
                 <i class="bi bi-calendar-plus me-1"></i> Programar Clase
             </button>
             <button type="button" class="btn btn-primary fw-bold shadow-sm" onclick="abrirModalGenerarMasivo()">

@@ -60,7 +60,7 @@ class PersonaController extends Controller
 
     public function show($id)
     {
-        // EXPANDIDO: Eager Loading profundo para asegurar la disponibilidad de todas las relaciones del expediente
+        // EXPANDIDO: Eager Loading profundo adaptado a la relación Multi-PNF (pnfs)
         $persona = Persona::with([
             'lugarNacimiento.ciudad.estado', 
             'cohorte', 
@@ -75,7 +75,7 @@ class PersonaController extends Controller
             'formacionAcademica.titulo',
             'formacionAcademica.tituloPnf',
             'inscripcionesSecciones.seccion.periodoAcademico', 
-            'inscripcionesSecciones.seccion.pnf'                                
+            'inscripcionesSecciones.seccion.pnfs' // CORREGIDO: Se cambia 'pnf' por 'pnfs'                               
         ])->findOrFail($id);
 
         $pnfs               = \App\Models\Pnf::all();
@@ -86,16 +86,17 @@ class PersonaController extends Controller
         $empresas           = \App\Models\Empresa::all();
         $cargos             = \App\Models\Cargo::all();
 
-        $seccionesData = \App\Models\Seccion::with(['pnf', 'periodoAcademico.cohorte'])
+        // CORREGIDO: Ajuste de Eager Loading y mapeo para soportar múltiples PNFs en Secciones
+        $seccionesData = \App\Models\Seccion::with(['pnfs', 'periodoAcademico.cohorte'])
             ->activasParaAsignacion()
             ->get()
             ->map(function ($seccion) {
                 return [
                     'id_seccion'      => $seccion->id_seccion,
                     'id_periodo'      => $seccion->id_periodo,
-                    'id_pnf'          => $seccion->id_pnf,
+                    'id_pnf'          => $seccion->pnfs->first()?->id_pnf ?? null,
                     'nombre_seccion'  => $seccion->nombre_completo_select, 
-                    'nombre_pnf'      => $seccion->pnf->nombre_pnf ?? '',
+                    'nombre_pnf'      => $seccion->pnfs->isEmpty() ? '' : $seccion->pnfs->pluck('nombre_pnf')->implode(' / '),
                 ];
             });
 
